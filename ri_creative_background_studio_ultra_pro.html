@@ -2641,19 +2641,18 @@
     </div>
 
     <!-- BOTTOM DOCK: Batch Queue, History & Processing Logs -->
-    <footer id="studioBottomDock" class="h-28 border-t px-3.5 py-2 flex flex-col justify-between shrink-0 z-20">
-        <div class="flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3 text-[11px]">
-                <span class="studio-heading font-bold uppercase tracking-wider">Batch Queue &amp; Processing Engine</span>
-                <span id="lblQueueSummary" class="studio-accent-text font-semibold">Queue: 0 Triplets (0 Images)</span>
-                <span id="lblWorkerStatus" class="hidden sm:inline-block px-1.5 py-0.5 rounded bg-black/10 text-[10px] studio-subtext">Worker &amp; Offscreen Pipeline Ready</span>
+    <footer id="studioBottomDock" class="h-28 border-t px-2.5 sm:px-3.5 py-1.5 sm:py-2 flex flex-col justify-between shrink-0 z-20 overflow-hidden">
+        <div class="flex flex-wrap sm:flex-nowrap items-center justify-between gap-1.5 sm:gap-3 overflow-hidden">
+            <div class="flex items-center gap-1.5 sm:gap-3 text-[10px] sm:text-[11px] truncate">
+                <span class="studio-heading font-bold uppercase tracking-wider truncate">Batch Queue<span class="hidden sm:inline"> &amp; Engine</span></span>
+                <span id="lblQueueSummary" class="studio-accent-text font-semibold truncate">0 Triplets</span>
+                <span id="lblWorkerStatus" class="hidden md:inline-block px-1.5 py-0.5 rounded bg-black/10 text-[10px] studio-subtext">Ready</span>
             </div>
-            <div class="flex items-center gap-2 text-[11px]">
-                <span id="lblBatchSuccess" class="font-semibold text-emerald-700">Completed: 0</span>
-                <span id="lblBatchFailed" class="font-semibold text-rose-700">Failed: 0</span>
-                <span id="lblBatchRemaining" class="studio-subtext">Remaining: 0</span>
-                <button id="btnRetryFailed" type="button" class="hidden studio-btn px-2 py-0.5 rounded border text-[10px] font-semibold">Retry Failed</button>
-                <button id="btnClearLogs" type="button" class="studio-btn px-2 py-0.5 rounded border text-[10px]">Clear Log</button>
+            <div class="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] shrink-0">
+                <span id="lblBatchSuccess" class="font-semibold text-emerald-700">Done: 0</span>
+                <span id="lblBatchFailed" class="font-semibold text-rose-700">Fail: 0</span>
+                <button id="btnRetryFailed" type="button" class="hidden studio-btn px-2 py-0.5 rounded border text-[10px] font-semibold">Retry</button>
+                <button id="btnClearLogs" type="button" class="studio-btn px-2 py-0.5 rounded border text-[10px]">Clear</button>
             </div>
         </div>
 
@@ -10180,16 +10179,16 @@
     <!-- ==================================================================== -->
     <div id="liquifyStudioModal" class="hidden fixed inset-0 z-[9999] bg-[#080d1a]/95 text-slate-100 flex flex-col font-sans select-none backdrop-blur-xl">
         <!-- Top Navigation & Control Bar -->
-        <header class="h-12 bg-[#0d1424] border-b border-white/10 px-3 flex items-center justify-between shrink-0 text-xs">
+        <header class="h-11 sm:h-12 bg-[#0d1424] border-b border-white/10 px-2 sm:px-3 flex items-center justify-between shrink-0 text-xs overflow-hidden">
             <!-- Left: Title & Target -->
-            <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-1.5 sm:gap-2.5 min-w-0 shrink">
                 <div class="flex items-center gap-1.5 font-bold text-sky-400">
                     <span class="text-base">🌊</span>
-                    <span class="tracking-wide">LIQUIFY STUDIO PRO</span>
-                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono">v24.0</span>
+                    <span class="tracking-wide text-[11px] sm:text-xs">LIQUIFY<span class="hidden sm:inline"> STUDIO PRO</span></span>
+                    <span class="hidden sm:inline text-[9px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono">v24.0</span>
                 </div>
-                <div class="h-4 w-px bg-white/20"></div>
-                <div class="flex items-center gap-1 text-[11px]">
+                <div class="hidden md:block h-4 w-px bg-white/20"></div>
+                <div class="hidden md:flex items-center gap-1 text-[11px]">
                     <span class="text-slate-400">Target:</span>
                     <select id="modalSelLiquifyTarget" class="bg-slate-800 border border-white/20 rounded px-2 py-0.5 text-slate-200 font-semibold focus:outline-none focus:border-sky-400 text-[11px]">
                         <option value="composite">Full Composite Canvas</option>
@@ -10201,8 +10200,8 @@
                 </div>
             </div>
 
-            <!-- Center: Viewport Controls & Compare -->
-            <div class="flex items-center gap-2">
+            <!-- Center: Viewport Controls & Compare (Desktop & Tablet only) -->
+            <div class="hidden md:flex items-center gap-2 shrink-0">
                 <div class="flex items-center bg-slate-800/80 rounded-lg p-0.5 border border-white/10 text-[11px]">
                     <button id="liqBtnZoomOut" type="button" class="px-2 py-0.5 hover:bg-white/10 rounded transition" title="Zoom Out (-)">−</button>
                     <span id="liqValZoom" class="px-2 font-mono text-sky-400 min-w-[48px] text-center">100%</span>
@@ -10235,10 +10234,10 @@
             </div>
 
             <!-- Right: Undo/Redo & Actions -->
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
                 <button id="liqBtnToggleInspector" type="button" class="md:hidden px-2 py-1 rounded border border-sky-400/30 bg-sky-900/40 text-sky-300 transition text-[11px] flex items-center gap-1" title="Toggle Tool Options">
                     <span>⚙️</span>
-                    <span class="hidden xs:inline">Options</span>
+                    <span class="text-[10px]">Options</span>
                 </button>
                 <button id="liqBtnUndo" type="button" class="hidden xs:inline-block px-2 py-1 rounded border border-white/15 bg-slate-800/80 hover:bg-white/10 transition text-[11px]" title="Undo (Ctrl+Z)">↶</button>
                 <button id="liqBtnRedo" type="button" class="hidden xs:inline-block px-2 py-1 rounded border border-white/15 bg-slate-800/80 hover:bg-white/10 transition text-[11px]" title="Redo (Ctrl+Y)">↷</button>

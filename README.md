@@ -3,6 +3,16 @@
 
 A powerful, high-performance web-based creative studio and batch processing engine for 3-in-one background creation, multi-axis blur engines, 24-tool professional Liquify Studio, 136 3D glass styles, procedural noise textures, and automated Photoshop ExtendScript batch pipelines.
 
+🌐 **Live Web Application:** [https://rafiqulislam11.github.io/Gradian-Batch-3in-One-Website/](https://rafiqulislam11.github.io/Gradian-Batch-3in-One-Website/)
+
+---
+
+### Project Files
+- **`index.html`**: The complete standalone single-file Web Studio Application with built-in Tailwind CSS, WebGL Liquify Engine, Photoshop Blur/Noise/Glass Engine, and responsive UI for Desktop, Tablet, and Mobile.
+- **`ri_creative_batch_studio_pro_fixed.jsx`**: Adobe Photoshop ExtendScript (ES3 compatible) for running batch automation directly in Photoshop.
+
+---
+
 ### Key Features
 - **3-Panel Layout Generator:** Custom split measurements, Golden Ratio, symmetrical & asymmetrical cropping, pan & zoom, and slot swapping.
 - **Photoshop Blur Engine:** 20 direct pixel-level blur filters with mathematical incremental accumulator formula and zero underlying ghosting.

@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * RI CREATIVE — BATCH BACKGROUND PROCESSING STUDIO PRO
- * Version: 2.5.0 (Ultra High Quality Master Edition)
+ * Version: 2.6.0 (3D Glass Effect & Ultra High Quality Master Edition)
  * Target: Adobe Photoshop CS6, CC 2014 - CC 2026 (Windows 10/11 & macOS)
  * Developed by: RI Creative Studio & AI Engineering Team
  * ============================================================================
@@ -16,7 +16,7 @@ app.bringToFront();
         // 1. GLOBAL CONSTANTS & DEFAULT CONFIGURATION
         // ========================================================================
         var SCRIPT_TITLE = "RI CREATIVE — BATCH BACKGROUND STUDIO PRO";
-        var SCRIPT_VERSION = "2.5.0";
+        var SCRIPT_VERSION = "2.6.0";
         var MAX_ALLOWED_BATCH = 1000;
         var SUPPORTED_EXTENSIONS = /\.(jpg|jpeg|png|tif|tiff|psd|bmp|webp)$/i;
 
@@ -34,6 +34,24 @@ app.bringToFront();
             { label: "Custom Dimensions...", width: 4000, height: 2000 }
         ];
 
+        var GLASS_STYLE_PRESETS = [
+            "Frosted Glassmorphism (Floating 3D Slab)",
+            "Fluted & Reeded Glass (Vertical Ribs)",
+            "3D Convex Glass Sphere (Crystal Lens)",
+            "Rainbow Prism (Chromatic Dispersion)",
+            "Liquid Wave Glass (Molten Fluid Refraction)",
+            "Beveled Glass Tiles (Facet Prisms)",
+            "Photoshop Frosted Glass Filter",
+            "Photoshop Tiny Lens Glass Filter",
+            "Photoshop Blocks Glass Filter",
+            "Emerald Tinted Glass",
+            "Sapphire Blue Glass",
+            "Amber Gold Glass",
+            "Rose Quartz Glass",
+            "Neon Glow Glass",
+            "Random 3D Glass Style"
+        ];
+
         var DEFAULT_CONFIG = {
             sourcePath: "",
             outputPath: "",
@@ -47,7 +65,7 @@ app.bringToFront();
             seamlessFeather: 60,
             maxBatchCount: 500,
             // Export Engine
-            exportFormat: "JPEG (Baseline 300 DPI)", // JPEG, TIFF, PNG, PSD
+            exportFormat: "JPEG (Baseline 300 DPI)",
             jpegQuality: 12,
             minFileSizeMB: 0,
             embedProfile: true,
@@ -55,20 +73,29 @@ app.bringToFront();
             filenamePrefix: "RI_Background_",
             // 11 Photoshop Blur Engine Configuration
             blurType: "None (Clean Stock Approved)",
-            blurScope: "Full Composition", // Full Composition, Background Only, Outer Panels
+            blurScope: "Full Composition",
             blurRadius: 25,
             blurThreshold: 25,
             motionAngle: 0,
             motionDistance: 30,
             radialAmount: 25,
-            radialMethod: "Spin", // Spin, Zoom
+            radialMethod: "Spin",
             blurEnable: false,
             // Optical Film Grain & Photoshop Noise Integration
             noiseEnable: false,
             noiseAmount: 6,
             noiseDistribution: "Gaussian",
             noiseMonochromatic: true,
-            noiseFilmGrainOverlay: true, // Non-destructive 50% neutral gray overlay layer
+            noiseFilmGrainOverlay: true,
+            // 3D Glass Effect Studio Engine
+            glassEnable: false,
+            glassStyle: "Frosted Glassmorphism (Floating 3D Slab)",
+            glassScope: "Full Composition", // Full Composition, Center 3D Floating Panel, Left & Right Ribbed Flutes, Outer Border Frame
+            glassOpacity: 50,
+            glassFrostBlur: 15,
+            glassDistortion: 30,
+            glassTintColor: "Clear Transparent", // Clear Transparent, Emerald Green, Sapphire Blue, Amber Gold, Rose Quartz, Cyberpunk Neon
+            glassBevelRim: true,
             // 30-Category Gradient Studio
             gradientEnable: false,
             gradientPreset: "Random Preset",
@@ -418,10 +445,6 @@ app.bringToFront();
         // 5. PHOTOSHOP NATIVE HIGH-PRECISION IMAGE PROCESSING ENGINE
         // ========================================================================
 
-        /**
-         * Safely unlocks background layer across all Photoshop versions (CS6 - 2026).
-         * Assigning .name converts background layer to a floating ArtLayer without error.
-         */
         function prepareBaseLayer(doc) {
             try {
                 if (doc.layers.length > 1) {
@@ -463,7 +486,6 @@ app.bringToFront();
         function setDocumentResolution300DPI(doc) {
             try {
                 if (Math.round(doc.resolution) !== 300) {
-                    // ResampleMethod.NONE updates metadata to 300 DPI without altering pixel dimensions
                     doc.resizeImage(undefined, undefined, 300, ResampleMethod.NONE);
                 }
             } catch (resErr) {}
@@ -493,7 +515,6 @@ app.bringToFront();
                 app.backgroundColor = bgCol;
                 doc.resizeCanvas(UnitValue(targetW, "px"), UnitValue(targetH, "px"), AnchorPosition.MIDDLECENTER);
             } else {
-                // Fit/Crop (Fill)
                 var scaleFill = Math.max(targetW / origW, targetH / origH);
                 var scaledW = Math.round(origW * scaleFill);
                 var scaledH = Math.round(origH * scaleFill);
@@ -511,8 +532,6 @@ app.bringToFront();
 
         // ====================================================================
         // ADOBE PHOTOSHOP CC EXTENDSCRIPT BLUR ENGINE (11 FILTER ALGORITHMS)
-        // Average, Blur, Blur More, Box Blur, Gaussian Blur, Lens Blur,
-        // Motion Blur, Radial Blur, Shape Blur, Smart Blur, Surface Blur
         // ====================================================================
 
         function applyAverageBlur(doc) {
@@ -673,16 +692,11 @@ app.bringToFront();
             }
         }
 
-        /**
-         * Creates a non-destructive 50% neutral gray film grain overlay.
-         * Mode: Soft Light / Overlay. This produces genuine analog film texture without color distortion.
-         */
         function applyProfessionalFilmGrainOverlay(doc, amount, monochromatic) {
             try {
                 var grainLayer = doc.artLayers.add();
                 grainLayer.name = "RI Studio Film Grain [35mm Stock]";
                 
-                // Fill with 50% Neutral Gray (128, 128, 128)
                 var grayCol = new SolidColor();
                 grayCol.rgb.red = 128;
                 grayCol.rgb.green = 128;
@@ -693,21 +707,228 @@ app.bringToFront();
                 doc.selection.fill(grayCol, ColorBlendMode.NORMAL, 100, false);
                 doc.selection.deselect();
 
-                // Apply Gaussian monochromatic noise
                 var distEnum = NoiseDistribution.GAUSSIAN;
                 grainLayer.applyAddNoise(Math.max(1, Math.min(100, amount * 2.2)), distEnum, monochromatic);
-
-                // Subtle soft blur to avoid harsh digital pixelation
                 grainLayer.applyGaussianBlur(0.6);
 
-                // Set blend mode to Soft Light or Overlay
                 grainLayer.blendMode = BlendMode.SOFTLIGHT;
                 grainLayer.opacity = Math.max(10, Math.min(100, Math.round(amount * 4)));
             } catch (grainErr) {
-                // Fallback to direct noise application
                 try {
                     applyAddNoiseFilter(doc, Math.min(25, amount), "Gaussian", monochromatic);
                 } catch (fbErr) {}
+            }
+        }
+
+        // ====================================================================
+        // 3D GLASS EFFECT STUDIO ENGINE (NATIVE PHOTOSHOP ACTIONMANAGER & DOM)
+        // ====================================================================
+
+        /**
+         * Renders professional 3D Glass Effects natively in Photoshop.
+         * Includes Frosted Glassmorphism, Fluted/Reeded Ribs, 3D Spheres,
+         * Rainbow Prisms, Liquid Glass Refraction, and Beveled Glass Facets.
+         */
+        function apply3DGlassEffectPhotoshop(doc, cfg) {
+            if (!cfg.glassEnable) return null;
+
+            var w = doc.width.as("px");
+            var h = doc.height.as("px");
+            var style = cfg.glassStyle || "Frosted Glassmorphism (Floating 3D Slab)";
+            if (style === "Random 3D Glass Style") {
+                var pool = [
+                    "Frosted Glassmorphism (Floating 3D Slab)",
+                    "Fluted & Reeded Glass (Vertical Ribs)",
+                    "3D Convex Glass Sphere (Crystal Lens)",
+                    "Rainbow Prism (Chromatic Dispersion)",
+                    "Liquid Wave Glass (Molten Fluid Refraction)",
+                    "Beveled Glass Tiles (Facet Prisms)",
+                    "Photoshop Frosted Glass Filter",
+                    "Emerald Tinted Glass",
+                    "Sapphire Blue Glass"
+                ];
+                style = pool[Math.floor(Math.random() * pool.length)];
+            }
+
+            var opacity = Math.max(10, Math.min(100, cfg.glassOpacity || 50));
+            var frostBlur = Math.max(1, Math.min(60, cfg.glassFrostBlur || 15));
+            var distortion = Math.max(5, Math.min(100, cfg.glassDistortion || 30));
+            var tintColor = cfg.glassTintColor || "Clear Transparent";
+            var scope = cfg.glassScope || "Full Composition";
+
+            try {
+                // 1. Duplicate active layer to form the 3D Glass Refraction Body
+                var glassLayer = doc.activeLayer.duplicate();
+                glassLayer.name = "RI 3D Glass [" + style + "]";
+                doc.activeLayer = glassLayer;
+
+                if (style.indexOf("Frosted") !== -1 || style.indexOf("Glassmorphism") !== -1) {
+                    // Modern Frosted Glassmorphism
+                    glassLayer.applyGaussianBlur(frostBlur);
+
+                    // Add subtle micro-surface texture
+                    applyAddNoiseFilter(doc, 4, "Gaussian", true);
+                    glassLayer.opacity = opacity;
+
+                    if (scope === "Center 3D Floating Panel") {
+                        var insetX = Math.round(w * 0.16);
+                        var insetY = Math.round(h * 0.18);
+                        doc.selection.select([[insetX, insetY], [w - insetX, insetY], [w - insetX, h - insetY], [insetX, h - insetY]]);
+                        doc.selection.invert();
+                        doc.selection.clear();
+                        doc.selection.deselect();
+
+                        // 3D Rim Highlight Stroke on the floating glass pane
+                        if (cfg.glassBevelRim) {
+                            try {
+                                var strokeLayer = doc.artLayers.add();
+                                strokeLayer.name = "RI Glass Bevel Rim [Specular]";
+                                var whiteCol = new SolidColor();
+                                whiteCol.rgb.red = 255;
+                                whiteCol.rgb.green = 255;
+                                whiteCol.rgb.blue = 255;
+                                doc.selection.select([[insetX, insetY], [w - insetX, insetY], [w - insetX, h - insetY], [insetX, h - insetY]]);
+                                doc.selection.stroke(whiteCol, 2, StrokeLocation.INSIDE, ColorBlendMode.SCREEN, 45);
+                                doc.selection.deselect();
+                                strokeLayer.blendMode = BlendMode.SCREEN;
+                                strokeLayer.opacity = 65;
+                            } catch (strkErr) {}
+                        }
+                    }
+
+                } else if (style.indexOf("Fluted") !== -1 || style.indexOf("Reeded") !== -1) {
+                    // Fluted & Reeded Architectural Glass (Vertical Cylindrical Lenses)
+                    glassLayer.applyMotionBlur(90, Math.round(distortion * 1.5));
+                    var waveCount = Math.max(12, Math.round(w / 45));
+                    glassLayer.applyWave(waveCount, 18, 36, 4, Math.round(distortion * 0.45), 100, 100, WaveType.SINE, UndefinedAreas.WRAPAROUND);
+                    glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.35));
+                    glassLayer.opacity = opacity;
+
+                } else if (style.indexOf("Sphere") !== -1 || style.indexOf("Lens") !== -1) {
+                    // 3D Convex Glass Sphere / Optical Crystal Lens
+                    var radius = Math.round(Math.min(w, h) * 0.32);
+                    var cx = Math.round(w / 2);
+                    var cy = Math.round(h / 2);
+
+                    doc.selection.selectEllipse([[cx - radius, cy - radius], [cx + radius, cy - radius], [cx + radius, cy + radius], [cx - radius, cy + radius]]);
+                    glassLayer.applySpherize(Math.round(distortion * 0.85), SpherizeMode.NORMAL);
+                    glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.4));
+                    doc.selection.invert();
+                    doc.selection.clear();
+                    doc.selection.deselect();
+                    glassLayer.opacity = opacity;
+
+                    // Specular Glare Reflection on Lens
+                    if (cfg.glassBevelRim) {
+                        try {
+                            var flareLayer = doc.artLayers.add();
+                            flareLayer.name = "RI Lens Specular Glare";
+                            var flareCol = new SolidColor();
+                            flareCol.rgb.red = 255;
+                            flareCol.rgb.green = 255;
+                            flareCol.rgb.blue = 255;
+                            var glareR = Math.round(radius * 0.28);
+                            var glareX = cx - Math.round(radius * 0.45);
+                            var glareY = cy - Math.round(radius * 0.45);
+                            doc.selection.selectEllipse([[glareX - glareR, glareY - glareR], [glareX + glareR, glareY - glareR], [glareX + glareR, glareY + glareR], [glareX - glareR, glareY + glareR]]);
+                            doc.selection.feather(Math.round(glareR * 0.5));
+                            doc.selection.fill(flareCol, ColorBlendMode.NORMAL, 100, false);
+                            doc.selection.deselect();
+                            flareLayer.blendMode = BlendMode.SCREEN;
+                            flareLayer.opacity = 75;
+                        } catch (glareErr) {}
+                    }
+
+                } else if (style.indexOf("Rainbow") !== -1 || style.indexOf("Prism") !== -1) {
+                    // Rainbow Prism & Chromatic Dispersion (Optical Refraction)
+                    glassLayer.applyMotionBlur(0, Math.round(distortion * 1.4));
+                    glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.3));
+                    glassLayer.blendMode = BlendMode.SCREEN;
+                    glassLayer.opacity = Math.round(opacity * 0.75);
+
+                } else if (style.indexOf("Liquid") !== -1) {
+                    // Liquid Wave Glass (Molten Fluid Refraction)
+                    glassLayer.applyWave(5, 120, 260, 18, Math.round(distortion * 0.65), 100, 100, WaveType.SINE, UndefinedAreas.WRAPAROUND);
+                    glassLayer.applyTwirl(Math.round(distortion * 0.8));
+                    glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.45));
+                    glassLayer.opacity = opacity;
+
+                } else if (style.indexOf("Beveled") !== -1 || style.indexOf("Facet") !== -1) {
+                    // Beveled Glass Tiles (Facet Prisms)
+                    glassLayer.applyZigZag(Math.round(distortion * 0.6), 8, ZigZagType.AROUNDCENTER);
+                    glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.5));
+                    glassLayer.opacity = opacity;
+
+                } else {
+                    // Native Photoshop Glass Filter Integration (Texture: Frosted / Tiny Lens / Blocks)
+                    try {
+                        var idGls = charIDToTypeID("Gls ");
+                        var desc = new ActionDescriptor();
+                        desc.putInteger(charIDToTypeID("Dstr"), Math.min(20, Math.max(1, Math.round(distortion / 5))));
+                        desc.putInteger(charIDToTypeID("Smth"), Math.min(15, Math.max(1, Math.round(frostBlur / 3))));
+
+                        var txtrID = charIDToTypeID("Frst"); // Frosted default
+                        if (style.indexOf("Tiny Lens") !== -1) txtrID = charIDToTypeID("TnyL");
+                        else if (style.indexOf("Blocks") !== -1) txtrID = charIDToTypeID("Blck");
+                        desc.putEnumerated(charIDToTypeID("Txtr"), charIDToTypeID("TxtT"), txtrID);
+
+                        desc.putUnitDouble(charIDToTypeID("Scl "), charIDToTypeID("#Prc"), 100);
+                        executeAction(idGls, desc, DialogModes.NO);
+                    } catch (glsErr) {
+                        glassLayer.applyGaussianBlur(frostBlur);
+                    }
+                    glassLayer.opacity = opacity;
+                }
+
+                // 2. Apply Scope Masking if Left & Right Ribs or Outer Border requested
+                if (scope === "Left & Right Ribbed Flutes") {
+                    var fluteW = Math.round(w * 0.22);
+                    doc.selection.select([[fluteW, 0], [w - fluteW, 0], [w - fluteW, h], [fluteW, h]]);
+                    doc.selection.feather(40);
+                    doc.selection.clear();
+                    doc.selection.deselect();
+                } else if (scope === "Outer Border Frame") {
+                    var borderMargin = Math.round(Math.min(w, h) * 0.12);
+                    doc.selection.select([[borderMargin, borderMargin], [w - borderMargin, borderMargin], [w - borderMargin, h - borderMargin], [borderMargin, h - borderMargin]]);
+                    doc.selection.feather(35);
+                    doc.selection.clear();
+                    doc.selection.deselect();
+                }
+
+                // 3. Apply Professional Glass Tint Color Layer
+                if (tintColor !== "Clear Transparent" || style.indexOf("Tint") !== -1 || style.indexOf("Emerald") !== -1 || style.indexOf("Sapphire") !== -1 || style.indexOf("Amber") !== -1 || style.indexOf("Rose") !== -1 || style.indexOf("Neon") !== -1) {
+                    try {
+                        var tintLayer = doc.artLayers.add();
+                        tintLayer.name = "RI 3D Glass Tint [" + tintColor + "]";
+                        var tintCol = new SolidColor();
+
+                        if (tintColor.indexOf("Emerald") !== -1 || style.indexOf("Emerald") !== -1) {
+                            tintCol.rgb.red = 24; tintCol.rgb.green = 185; tintCol.rgb.blue = 142;
+                        } else if (tintColor.indexOf("Sapphire") !== -1 || style.indexOf("Sapphire") !== -1) {
+                            tintCol.rgb.red = 28; tintCol.rgb.green = 112; tintCol.rgb.blue = 224;
+                        } else if (tintColor.indexOf("Amber") !== -1 || style.indexOf("Amber") !== -1) {
+                            tintCol.rgb.red = 236; tintCol.rgb.green = 162; tintCol.rgb.blue = 44;
+                        } else if (tintColor.indexOf("Rose") !== -1 || style.indexOf("Rose") !== -1) {
+                            tintCol.rgb.red = 232; tintCol.rgb.green = 124; tintCol.rgb.blue = 168;
+                        } else if (tintColor.indexOf("Neon") !== -1 || style.indexOf("Neon") !== -1) {
+                            tintCol.rgb.red = 148; tintCol.rgb.green = 62; tintCol.rgb.blue = 248;
+                        } else {
+                            tintCol.rgb.red = 180; tintCol.rgb.green = 210; tintCol.rgb.blue = 235;
+                        }
+
+                        doc.selection.selectAll();
+                        doc.selection.fill(tintCol, ColorBlendMode.NORMAL, 100, false);
+                        doc.selection.deselect();
+
+                        tintLayer.blendMode = BlendMode.COLORBLEND;
+                        tintLayer.opacity = 22;
+                    } catch (tintErr) {}
+                }
+
+                return style + " (" + scope + ", Opacity: " + opacity + "%)";
+
+            } catch (glassErr) {
+                return null;
             }
         }
 
@@ -718,7 +939,6 @@ app.bringToFront();
             var w = doc.width.as("px");
             var h = doc.height.as("px");
 
-            // 1. Studio Vignette (Soft Cosine-Fourth Radial Shadow)
             if (cfg.vignetteEnable) {
                 try {
                     var vigLayer = doc.artLayers.add();
@@ -728,7 +948,6 @@ app.bringToFront();
                     blackCol.rgb.green = 0;
                     blackCol.rgb.blue = 0;
 
-                    // Create centered elliptical feather mask
                     var featherRadius = Math.round(Math.min(w, h) * 0.22);
                     var insetX = Math.round(w * 0.08);
                     var insetY = Math.round(h * 0.08);
@@ -744,7 +963,6 @@ app.bringToFront();
                 } catch (vigErr) {}
             }
 
-            // 2. Hollywood Anamorphic Flare Streak
             if (cfg.anamorphicFlareEnable) {
                 try {
                     var flareLayer = doc.artLayers.add();
@@ -768,7 +986,6 @@ app.bringToFront();
                 } catch (flareErr) {}
             }
 
-            // 3. Top-Down Ambient Sunlight / Rim Glow
             if (cfg.ambientSunlightEnable) {
                 try {
                     var sunLayer = doc.artLayers.add();
@@ -864,7 +1081,6 @@ app.bringToFront();
                 } else if (chosenStyle === "Directional Ripple Warp") {
                     doc.activeLayer.applyRipple(Math.round(40 + norm * 80), RippleSize.MEDIUM);
                 } else {
-                    // Default: Organic Fluid Wave
                     doc.activeLayer.applyWave(
                         6,
                         Math.round(180 + Math.random() * 180),
@@ -1125,7 +1341,6 @@ app.bringToFront();
         // MULTI-FORMAT EXPORT ENGINE (JPEG 300 DPI, TIFF, PNG, PSD)
         // ====================================================================
         function exportDocumentMaster(doc, outFile, cfg) {
-            // 1. Flatten document if not PSD
             var isPSD = (cfg.exportFormat.indexOf("PSD") !== -1);
             if (!isPSD) {
                 try {
@@ -1138,17 +1353,14 @@ app.bringToFront();
                 } catch (cleanErr) {}
             }
 
-            // 2. Convert to sRGB IEC61966-2.1 for commercial color accuracy
             try {
                 if (cfg.embedProfile) {
                     doc.convertProfile("sRGB IEC61966-2.1", Intent.PERCEPTUAL, true, true);
                 }
             } catch (profErr) {}
 
-            // 3. Ensure 300 DPI metadata
             setDocumentResolution300DPI(doc);
 
-            // 4. Save according to format
             if (cfg.exportFormat.indexOf("TIFF") !== -1) {
                 var tifOpts = new TiffSaveOptions();
                 tifOpts.imageCompression = TIFFEncoding.TIFFLZW;
@@ -1170,7 +1382,6 @@ app.bringToFront();
                 doc.saveAs(outFile, psdOpts, true, Extension.LOWERCASE);
 
             } else {
-                // Default: Standard Baseline JPEG (300 DPI)
                 var jpgOpts = new JPEGSaveOptions();
                 jpgOpts.quality = Math.max(1, Math.min(12, Math.round(cfg.jpegQuality)));
                 jpgOpts.formatOptions = FormatOptions.STANDARDBASELINE;
@@ -1224,10 +1435,6 @@ app.bringToFront();
         // 6. SINGLE & 3-IMAGE FUSION PROCESSING PIPELINE (ANTI-SIMILAR ENGINE)
         // ========================================================================
 
-        /**
-         * Places an image into a designated spatial zone with robust layer selection
-         * and optional seamless soft edge feathering.
-         */
         function placeImageInSpatialZone(mainDoc, imgFile, zoneType, cfg, layerTag) {
             var extraDoc = null;
             try {
@@ -1243,12 +1450,10 @@ app.bringToFront();
 
                 resizeImageSmart(extraDoc, extraW, zoneH, "Fit/Crop (Fill)");
 
-                // Duplicate layer to main document
                 extraDoc.activeLayer.duplicate(mainDoc, ElementPlacement.PLACEATBEGINNING);
                 extraDoc.close(SaveOptions.DONOTSAVECHANGES);
                 extraDoc = null;
 
-                // Explicitly activate the newly duplicated layer (always at index 0)
                 app.activeDocument = mainDoc;
                 var pastedLayer = mainDoc.layers[0];
                 mainDoc.activeLayer = pastedLayer;
@@ -1267,11 +1472,9 @@ app.bringToFront();
                 }
                 pastedLayer.translate(UnitValue(targetX - curX, "px"), UnitValue(0 - curY, "px"));
 
-                // Apply soft feathered edge blending on overlaps
                 if (cfg.seamlessBlend && overlap > 0) {
                     try {
                         if (zoneType === "CENTER") {
-                            // Feather left and right seams
                             var b = pastedLayer.bounds;
                             var leftSeamX = b[0].as("px");
                             var rightSeamX = b[2].as("px");
@@ -1331,12 +1534,10 @@ app.bringToFront();
                     var zoneW = Math.round(cfg.width / 3);
 
                     if (cfg.blurScope === "Background Only" && cfg.blurType && cfg.blurType !== "None (Clean Stock Approved)") {
-                        // Background Only Scope: Primary image fills canvas and gets blurred as backdrop
                         resizeImageSmart(doc, cfg.width, cfg.height, "Fit/Crop (Fill)");
                         applyPhotoshopBlurEngineJSX(doc, cfg);
                         doc.activeLayer.name = "Blurred Backdrop";
 
-                        // Place all 3 photos sharp and crisp on top of the blurred backdrop
                         placeImageInSpatialZone(doc, primaryFile, "LEFT", cfg, "Left Zone [" + primaryFile.name + "]");
                         var centerFile = (tripletFiles.length >= 2) ? tripletFiles[1] : primaryFile;
                         var rightFile = (tripletFiles.length >= 3) ? tripletFiles[2] : (tripletFiles[1] || primaryFile);
@@ -1345,7 +1546,6 @@ app.bringToFront();
                         doc.flatten();
                         prepareBaseLayer(doc);
                     } else {
-                        // Standard Panoramic Spatial Zone Placement
                         resizeImageSmart(doc, zoneW, cfg.height, "Fit/Crop (Fill)");
                         doc.resizeCanvas(UnitValue(cfg.width, "px"), UnitValue(cfg.height, "px"), AnchorPosition.MIDDLELEFT);
                         doc.activeLayer.name = "Left Zone [" + primaryFile.name + "]";
@@ -1359,7 +1559,6 @@ app.bringToFront();
                         doc.flatten();
                         prepareBaseLayer(doc);
 
-                        // Full Composition Scope: apply blur to the entire composite if enabled
                         if (cfg.blurScope === "Full Composition" && cfg.blurType && cfg.blurType !== "None (Clean Stock Approved)") {
                             applyPhotoshopBlurEngineJSX(doc, cfg);
                         }
@@ -1378,6 +1577,12 @@ app.bringToFront();
                     } else {
                         applyAddNoiseFilter(doc, cfg.noiseAmount, cfg.noiseDistribution, cfg.noiseMonochromatic);
                     }
+                }
+
+                // 3D Glass Effect Studio Engine
+                var appliedGlassInfo = null;
+                if (cfg.glassEnable) {
+                    appliedGlassInfo = apply3DGlassEffectPhotoshop(doc, cfg);
                 }
 
                 // Optical Lighting & Vignette Engine
@@ -1406,7 +1611,6 @@ app.bringToFront();
                 var slot = getNextAvailableOutputFile(folders.processed, cfg.filenamePrefix, seqCounter, cfg.exportFormat);
                 tempOutputFile = slot.file;
 
-                // Verify active document dimensions match target before exporting
                 var actualDocW = Math.round(doc.width.as("px"));
                 var actualDocH = Math.round(doc.height.as("px"));
                 if (actualDocW !== cfg.width || actualDocH !== cfg.height) {
@@ -1449,13 +1653,18 @@ app.bringToFront();
                     };
                 }
 
+                var summaryExtra = [];
+                if (appliedGlassInfo) summaryExtra.push("3D Glass: " + appliedGlassInfo);
+                if (appliedGradInfo) summaryExtra.push("Gradient: " + appliedGradInfo.category);
+                var extraText = (summaryExtra.length > 0) ? (" | " + summaryExtra.join(" | ")) : "";
+
                 return {
                     success: true,
                     belowMinSize: false,
                     sourceName: fusedNames.join(" + "),
                     outputName: tempOutputFile.name,
                     sizeMB: formatBytesToMB(qcResult.sizeBytes),
-                    gradientInfo: appliedGradInfo ? (appliedGradInfo.category + " (" + appliedGradInfo.type + ")") : "Disabled",
+                    extraInfo: extraText,
                     nextSeq: slot.nextSeq
                 };
 
@@ -1485,7 +1694,7 @@ app.bringToFront();
             var summaryLines = [
                 "====================================================================",
                 "RI CREATIVE - BATCH BACKGROUND PROCESSING STUDIO PRO",
-                "PROCESSING SUMMARY REPORT (ULTRA PRO MASTER EDITION)",
+                "PROCESSING SUMMARY REPORT (3D GLASS & ULTRA PRO MASTER EDITION)",
                 "====================================================================",
                 "Start Time           : " + (batchState.startTime || "N/A"),
                 "End Time             : " + endTime,
@@ -1495,11 +1704,12 @@ app.bringToFront();
                 "Target Dimensions    : " + config.width + " x " + config.height + " px (300 DPI)",
                 "Resize Mode          : " + config.resizeMode,
                 "Export Format        : " + config.exportFormat + " (Quality: " + config.jpegQuality + "/12, ICC: " + config.embedProfile + ")",
+                "3D Glass Effect      : " + (config.glassEnable ? ("Enabled (" + config.glassStyle + ", " + config.glassScope + ", " + config.glassOpacity + "%)") : "Disabled"),
                 "Blur Filter          : " + (config.blurEnable ? (config.blurType + " - Radius: " + config.blurRadius + " px") : "Disabled"),
-                "Noise & Film Grain   : " + (config.noiseEnable ? (config.noiseAmount + "% " + config.noiseDistribution + " (Film Grain Overlay: " + config.noiseFilmGrainOverlay + ")") : "Disabled"),
-                "Optical Lighting     : " + (config.lightingEnable ? "Enabled (Vignette: " + config.vignetteEnable + ", Flare: " + config.anamorphicFlareEnable + ")" : "Disabled"),
-                "Liquify Fluid Flow   : " + (config.liquifyEnable ? ("Enabled (" + config.liquifyStyle + ", Intensity: " + config.liquifyIntensity + "%)") : "Disabled"),
-                "Gradient Overlay     : " + (config.gradientEnable ? ("Enabled (" + config.gradientPreset + ", " + config.gradientOpacity + "%, " + config.gradientBlendMode + ")") : "Disabled"),
+                "Noise & Film Grain   : " + (config.noiseEnable ? (config.noiseAmount + "% " + config.noiseDistribution + " (Overlay: " + config.noiseFilmGrainOverlay + ")") : "Disabled"),
+                "Optical Lighting     : " + (config.lightingEnable ? "Enabled" : "Disabled"),
+                "Liquify Fluid Flow   : " + (config.liquifyEnable ? ("Enabled (" + config.liquifyStyle + ")") : "Disabled"),
+                "Gradient Overlay     : " + (config.gradientEnable ? ("Enabled (" + config.gradientPreset + ")") : "Disabled"),
                 "Minimum File Size    : " + config.minFileSizeMB + " MB",
                 "--------------------------------------------------------------------",
                 "Total Supported Found: " + totalScanned,
@@ -1556,14 +1766,14 @@ app.bringToFront();
                 titleText.graphics.font = ScriptUI.newFont("Arial", "BOLD", 12);
             } catch (fontErr) {}
 
-            var badgeText = headerGrp.add("statictext", undefined, "⚡ 16-BIT RETINA ENGINE");
+            var badgeText = headerGrp.add("statictext", undefined, "💎 3D GLASS & 16-BIT RETINA ENGINE");
             try {
                 badgeText.graphics.font = ScriptUI.newFont("Arial", "REGULAR", 10);
             } catch (fontErr2) {}
 
             var tabPanel = win.add("tabbedpanel");
             tabPanel.alignChildren = ["fill", "fill"];
-            tabPanel.preferredSize = [530, 275];
+            tabPanel.preferredSize = [530, 280];
 
             // --------------------------------------------------------------------
             // TAB 1: FOLDERS, RESOLUTION & EXPORT
@@ -1602,7 +1812,6 @@ app.bringToFront();
             var sep1 = tabSetup.add("panel");
             sep1.alignment = "fill";
 
-            // Resolution Preset Row
             var resPresetLabels = [];
             for (var r = 0; r < RESOLUTION_PRESETS.length; r++) {
                 resPresetLabels.push(RESOLUTION_PRESETS[r].label);
@@ -1634,7 +1843,6 @@ app.bringToFront();
             var inpMaxBatch = dimRow2.add("edittext", undefined, String(DEFAULT_CONFIG.maxBatchCount));
             inpMaxBatch.preferredSize = [42, 21];
 
-            // Export Format & Quality Row
             var expRow1 = tabSetup.add("group");
             expRow1.add("statictext", undefined, "Export Format:");
             var ddExportFormat = expRow1.add("dropdownlist", undefined, [
@@ -1735,15 +1943,82 @@ app.bringToFront();
             chkNoiseMono.value = DEFAULT_CONFIG.noiseMonochromatic;
 
             // --------------------------------------------------------------------
-            // TAB 3: CREATIVE GRADIENT, LIGHTING & LIQUIFY
+            // TAB 3: 3D GLASS EFFECT STUDIO (NEW DEDICATED TAB)
             // --------------------------------------------------------------------
-            var tabCreative = tabPanel.add("tab", undefined, "3. Creative & Lighting");
+            var tabGlass = tabPanel.add("tab", undefined, "3. 3D Glass Studio");
+            tabGlass.orientation = "column";
+            tabGlass.alignChildren = ["fill", "top"];
+            tabGlass.spacing = 8;
+            tabGlass.margins = 10;
+
+            var glassRow1 = tabGlass.add("group");
+            var chkGlassEnable = glassRow1.add("checkbox", undefined, "Enable 3D Glass Effect");
+            chkGlassEnable.value = DEFAULT_CONFIG.glassEnable;
+            chkGlassEnable.preferredSize = [180, 20];
+
+            glassRow1.add("statictext", undefined, "Glass Style:");
+            var ddGlassStyle = glassRow1.add("dropdownlist", undefined, GLASS_STYLE_PRESETS);
+            ddGlassStyle.selection = 0;
+            ddGlassStyle.preferredSize = [230, 21];
+
+            var glassRow2 = tabGlass.add("group");
+            glassRow2.add("statictext", undefined, "Glass Scope:");
+            var ddGlassScope = glassRow2.add("dropdownlist", undefined, [
+                "Full Composition",
+                "Center 3D Floating Panel",
+                "Left & Right Ribbed Flutes",
+                "Outer Border Frame"
+            ]);
+            ddGlassScope.selection = 0;
+            ddGlassScope.preferredSize = [160, 21];
+
+            glassRow2.add("statictext", undefined, "Glass Tint:");
+            var ddGlassTint = glassRow2.add("dropdownlist", undefined, [
+                "Clear Transparent",
+                "Emerald Green",
+                "Sapphire Blue",
+                "Amber Gold",
+                "Rose Quartz",
+                "Cyberpunk Neon"
+            ]);
+            ddGlassTint.selection = 0;
+            ddGlassTint.preferredSize = [135, 21];
+
+            var glassRow3 = tabGlass.add("group");
+            glassRow3.add("statictext", undefined, "Opacity (%):");
+            var inpGlassOpacity = glassRow3.add("edittext", undefined, String(DEFAULT_CONFIG.glassOpacity));
+            inpGlassOpacity.preferredSize = [42, 21];
+
+            glassRow3.add("statictext", undefined, "Frost Blur (px):");
+            var inpGlassFrostBlur = glassRow3.add("edittext", undefined, String(DEFAULT_CONFIG.glassFrostBlur));
+            inpGlassFrostBlur.preferredSize = [42, 21];
+
+            glassRow3.add("statictext", undefined, "Refraction Distort:");
+            var inpGlassDistort = glassRow3.add("edittext", undefined, String(DEFAULT_CONFIG.glassDistortion));
+            inpGlassDistort.preferredSize = [42, 21];
+
+            var chkGlassBevel = glassRow3.add("checkbox", undefined, "3D Bevel & Specular Rim");
+            chkGlassBevel.value = DEFAULT_CONFIG.glassBevelRim;
+
+            var glassInfoPanel = tabGlass.add("panel", undefined, "3D Glass Characteristics");
+            glassInfoPanel.orientation = "column";
+            glassInfoPanel.alignChildren = ["fill", "top"];
+            glassInfoPanel.spacing = 2;
+            glassInfoPanel.margins = 6;
+            glassInfoPanel.add("statictext", undefined, "• Frosted Glassmorphism: Smooth Gaussian depth blur + micro-surface noise.");
+            glassInfoPanel.add("statictext", undefined, "• Fluted / Reeded Glass: Cylindrical vertical optical lenses with wave refraction.");
+            glassInfoPanel.add("statictext", undefined, "• 3D Convex Sphere: Spherical optical distortion + specular glare reflection.");
+            glassInfoPanel.add("statictext", undefined, "• Rainbow Prism: Chromatic horizontal aberration dispersion effect.");
+
+            // --------------------------------------------------------------------
+            // TAB 4: CREATIVE GRADIENT, LIGHTING & LIQUIFY
+            // --------------------------------------------------------------------
+            var tabCreative = tabPanel.add("tab", undefined, "4. Gradient & Light");
             tabCreative.orientation = "column";
             tabCreative.alignChildren = ["fill", "top"];
             tabCreative.spacing = 7;
             tabCreative.margins = 10;
 
-            // Gradient Section
             var gradRow1 = tabCreative.add("group");
             var chkGradient = gradRow1.add("checkbox", undefined, "Enable Gradient Overlay");
             chkGradient.value = DEFAULT_CONFIG.gradientEnable;
@@ -1771,7 +2046,6 @@ app.bringToFront();
             var sep3 = tabCreative.add("panel");
             sep3.alignment = "fill";
 
-            // Optical Lighting Section
             var lightRow = tabCreative.add("group");
             var chkLighting = lightRow.add("checkbox", undefined, "Optical Lighting Engine");
             chkLighting.value = DEFAULT_CONFIG.lightingEnable;
@@ -1785,7 +2059,6 @@ app.bringToFront();
             var sep4 = tabCreative.add("panel");
             sep4.alignment = "fill";
 
-            // Liquify Distortion Section
             var liqRow1 = tabCreative.add("group");
             var chkLiquify = liqRow1.add("checkbox", undefined, "Enable Liquify Fluid Flow");
             chkLiquify.value = DEFAULT_CONFIG.liquifyEnable;
@@ -1860,7 +2133,6 @@ app.bringToFront();
 
             var scannedFilesCache = [];
 
-            // UI Synchronization functions
             ddResPreset.onChange = function () {
                 var idx = ddResPreset.selection ? ddResPreset.selection.index : 0;
                 if (idx < RESOLUTION_PRESETS.length - 1) {
@@ -1945,6 +2217,16 @@ app.bringToFront();
                 config.noiseDistribution = ddNoiseDist.selection ? ddNoiseDist.selection.text : "Gaussian";
                 config.noiseMonochromatic = chkNoiseMono.value;
 
+                // 3D Glass Studio Sync
+                config.glassEnable = chkGlassEnable.value;
+                config.glassStyle = ddGlassStyle.selection ? ddGlassStyle.selection.text : "Frosted Glassmorphism (Floating 3D Slab)";
+                config.glassScope = ddGlassScope.selection ? ddGlassScope.selection.text : "Full Composition";
+                config.glassTintColor = ddGlassTint.selection ? ddGlassTint.selection.text : "Clear Transparent";
+                config.glassOpacity = parseIntSafe(inpGlassOpacity.text, 50, 10, 100);
+                config.glassFrostBlur = parseFloatSafe(inpGlassFrostBlur.text, 15, 1, 60);
+                config.glassDistortion = parseIntSafe(inpGlassDistort.text, 30, 5, 100);
+                config.glassBevelRim = chkGlassBevel.value;
+
                 config.lightingEnable = chkLighting.value;
                 config.vignetteEnable = chkVignette.value;
                 config.anamorphicFlareEnable = chkAnamorphic.value;
@@ -1990,6 +2272,16 @@ app.bringToFront();
                 chkFilmGrainOverlay.value = config.noiseFilmGrainOverlay;
                 ddNoiseDist.selection = 0;
                 chkNoiseMono.value = config.noiseMonochromatic;
+
+                // Reset 3D Glass controls
+                chkGlassEnable.value = config.glassEnable;
+                ddGlassStyle.selection = 0;
+                ddGlassScope.selection = 0;
+                ddGlassTint.selection = 0;
+                inpGlassOpacity.text = String(config.glassOpacity);
+                inpGlassFrostBlur.text = String(config.glassFrostBlur);
+                inpGlassDistort.text = String(config.glassDistortion);
+                chkGlassBevel.value = config.glassBevelRim;
 
                 chkLighting.value = config.lightingEnable;
                 chkVignette.value = config.vignetteEnable;
@@ -2180,7 +2472,7 @@ app.bringToFront();
                         if (result.success) {
                             batchState.successCount++;
                             batchState.processedFilesMap[itemLabel] = true;
-                            batchState.logs.push("[OK] " + result.outputName + " <- " + result.sourceName + " (" + result.sizeMB + " MB | " + result.gradientInfo + ")");
+                            batchState.logs.push("[OK] " + result.outputName + " <- " + result.sourceName + " (" + result.sizeMB + " MB" + result.extraInfo + ")");
                         } else {
                             batchState.failedCount++;
                             if (result.belowMinSize) {

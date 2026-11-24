@@ -484,22 +484,54 @@ app.bringToFront();
             return picked;
         }
 
-        function scanSourceFolder(folderPath) {
-            var folder = new Folder(folderPath);
+        function scanSourceFolder(folderOrPath) {
+            var folder = (folderOrPath instanceof Folder) ? folderOrPath : new Folder(folderOrPath);
             if (!folder.exists) {
                 return [];
             }
-            var rawFiles = folder.getFiles();
+            var rawFiles = [];
+            try {
+                rawFiles = folder.getFiles() || [];
+            } catch (eGet) {
+                rawFiles = [];
+            }
+
             var validFiles = [];
+            var subFolders = [];
+
             for (var i = 0; i < rawFiles.length; i++) {
                 var f = rawFiles[i];
-                if (f && !(f instanceof Folder) && typeof f.name === "string" && SUPPORTED_EXTENSIONS.test(f.name)) {
+                if (!f) continue;
+                var isFld = false;
+                try {
+                    isFld = (f instanceof Folder) || (f.constructor && f.constructor.name === "Folder") || (typeof f.getFiles === "function" && typeof f.open !== "function");
+                } catch (eFld) {}
+
+                if (isFld) {
+                    subFolders.push(f);
+                } else if (typeof f.name === "string" && SUPPORTED_EXTENSIONS.test(f.name)) {
                     validFiles.push(f);
                 }
             }
+
+            // If no images found in root, scan immediate subfolders
+            if (validFiles.length === 0 && subFolders.length > 0) {
+                for (var s = 0; s < subFolders.length; s++) {
+                    try {
+                        var subRaw = subFolders[s].getFiles() || [];
+                        for (var k = 0; k < subRaw.length; k++) {
+                            var sf = subRaw[k];
+                            if (sf && !(sf instanceof Folder) && typeof sf.name === "string" && SUPPORTED_EXTENSIONS.test(sf.name)) {
+                                validFiles.push(sf);
+                            }
+                        }
+                    } catch (subErr) {}
+                }
+            }
+
             validFiles.sort(function (a, b) {
-                var nameA = a.name.toLowerCase();
-                var nameB = b.name.toLowerCase();
+                var nameA = String(a.name).toLowerCase();
+                var nameB = String(b.name).toLowerCase();
                 if (nameA < nameB) return -1;
                 if (nameA > nameB) return 1;
                 return 0;
@@ -2174,14 +2206,12 @@ app.bringToFront();
             var btnBrowseSrc = srcRow.add("button", undefined, "Source Folder...");
             btnBrowseSrc.preferredSize = [115, 23];
             var txtSrcPath = srcRow.add("edittext", undefined, "");
-            try { txtSrcPath.readonly = true; } catch (eRo1) {}
             txtSrcPath.preferredSize = [385, 21];
 
             var outRow = tabSetup.add("group");
             var btnBrowseOut = outRow.add("button", undefined, "Output Folder...");
             btnBrowseOut.preferredSize = [115, 23];
             var txtOutPath = outRow.add("edittext", undefined, "");
-            try { txtOutPath.readonly = true; } catch (eRo2) {}
             txtOutPath.preferredSize = [385, 21];
 
             var modeRow = tabSetup.add("group");
@@ -2192,7 +2222,7 @@ app.bringToFront();
 
             var btnSelectSpecific = modeRow.add("button", undefined, "Pick Files...");
             btnSelectSpecific.preferredSize = [75, 21];
-            btnSelectSpecific.enabled = false;
+            btnSelectSpecific.enabled = true;
 
             var lblScannedInfo = modeRow.add("statictext", undefined, "Found: 0 images");
             lblScannedInfo.preferredSize = [165, 20];
@@ -2690,43 +2720,109 @@ app.bringToFront();
             }
 
             btnBrowseSrc.onClick = function () {
-                var chosen = Folder.selectDialog("Select Source Image Folder");
+                var chosen = null;
+                try {
+                    chosen = Folder.selectDialog("Select Source Image Folder");
+                } catch (eSel) {
+                    try { chosen = Folder.selectDialog(); } catch (eSel2) {}
+                }
                 if (chosen) {
                     txtSrcPath.text = chosen.fsName;
-                    scannedFilesCache = scanSourceFolder(chosen.fsName);
+                    config.sourcePath = chosen.fsName;
+                    scannedFilesCache = scanSourceFolder(chosen);
                     var tripletCount = Math.ceil(scannedFilesCache.length / 3);
-                    lblScannedInfo.text = "Found: " + scannedFilesCache.length + " (" + tripletCount + " sets)";
+                    lblScannedInfo.text = "Found: " + scannedFilesCache.length + " imgs (" + tripletCount + " sets)";
                     if (scannedFilesCache.length === 0) {
-                        alert("Notice: No supported images (JPG, PNG, TIF, PSD, BMP) found in:\n" + chosen.fsName);
+                        lblCurrentFile.text = "Notice: 0 supported images in " + chosen.name;
+                        alert("Notice: No supported images (JPG, PNG, TIF, PSD, BMP) found in:\n" + chosen.fsName + "\n\nPlease select a folder containing images.");
+                    } else {
+                        lblCurrentFile.text = "Ready: Loaded " + scannedFilesCache.length + " images. Select Output folder & click START.";
+                    }
+                    if (win && typeof win.update === "function") {
+                        try { win.update(); } catch (uErr) {}
                     }
                 }
             };
 
             btnBrowseOut.onClick = function () {
-                var chosen = Folder.selectDialog("Select Output Destination Folder");
+                var chosen = null;
+                try {
+                    chosen = Folder.selectDialog("Select Output Destination Folder");
+                } catch (eOut) {
+                    try { chosen = Folder.selectDialog(); } catch (eOut2) {}
+                }
                 if (chosen) {
                     txtOutPath.text = chosen.fsName;
+                    config.outputPath = chosen.fsName;
+                    if (win && typeof win.update === "function") {
+                        try { win.update(); } catch (uErr) {}
+                    }
+                }
+            };
+
+            txtSrcPath.onChange = function () {
+                var p = txtSrcPath.text;
+                if (p) {
+                    var f = new Folder(p);
+                    if (f.exists) {
+                        config.sourcePath = p;
+                        scannedFilesCache = scanSourceFolder(f);
+                        var tripletCount = Math.ceil(scannedFilesCache.length / 3);
+                        lblScannedInfo.text = "Found: " + scannedFilesCache.length + " imgs (" + tripletCount + " sets)";
+                        if (win && typeof win.update === "function") {
+                            try { win.update(); } catch (uErr) {}
+                        }
+                    }
+                }
+            };
+
+            txtOutPath.onChange = function () {
+                var p = txtOutPath.text;
+                if (p && (new Folder(p)).exists) {
+                    config.outputPath = p;
                 }
             };
 
             ddBatchScope.onChange = function () {
                 var isSelectedMode = (ddBatchScope.selection && ddBatchScope.selection.text === "Selected Images");
-                btnSelectSpecific.enabled = isSelectedMode;
+                if (isSelectedMode && config.selectedFiles.length > 0) {
+                    lblScannedInfo.text = "Picked: " + config.selectedFiles.length + " files";
+                } else {
+                    lblScannedInfo.text = "Found: " + scannedFilesCache.length + " images";
+                }
             };
 
             btnSelectSpecific.onClick = function () {
-                var filterPattern = ($.os.indexOf("Windows") !== -1) ?
-                    "Supported Images:*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.psd;*.bmp,All Files:*.*" :
-                    function (f) { return (f instanceof Folder) || SUPPORTED_EXTENSIONS.test(f.name); };
                 var picked = null;
                 try {
-                    picked = File.openDialog("Select Images to Process", filterPattern, true);
-                } catch (dialogErr) {
-                    picked = File.openDialog("Select Images to Process", "*.*", true);
+                    picked = File.openDialog("Select Images to Process", "*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.psd;*.bmp", true);
+                } catch (dialogErr1) {
+                    try {
+                        picked = File.openDialog("Select Images to Process", "*.*", true);
+                    } catch (dialogErr2) {
+                        try {
+                            picked = File.openDialog("Select Images to Process");
+                        } catch (dialogErr3) {}
+                    }
                 }
-                if (picked && picked.length > 0) {
-                    config.selectedFiles = picked;
-                    lblScannedInfo.text = "Picked: " + picked.length + " files";
+                if (picked) {
+                    var fileList = (picked instanceof Array) ? picked : [picked];
+                    if (fileList.length > 0) {
+                        config.selectedFiles = fileList;
+                        scannedFilesCache = fileList;
+                        // Automatically activate Selected Images mode
+                        for (var m = 0; m < ddBatchScope.items.length; m++) {
+                            if (ddBatchScope.items[m].text === "Selected Images") {
+                                ddBatchScope.selection = m;
+                                break;
+                            }
+                        }
+                        lblScannedInfo.text = "Picked: " + fileList.length + " files";
+                        lblCurrentFile.text = "Loaded " + fileList.length + " selected images. Click START to process.";
+                        if (win && typeof win.update === "function") {
+                            try { win.update(); } catch (uErr) {}
+                        }
+                    }
                 }
             };
 

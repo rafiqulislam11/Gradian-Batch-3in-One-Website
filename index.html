@@ -558,6 +558,9 @@
             <button id="btnHeaderOpenLiquify" type="button" class="studio-btn px-2 sm:px-2.5 py-1.5 sm:py-1 rounded-lg border text-[11px] sm:text-xs font-semibold transition text-sky-600 hover:text-sky-700 flex items-center gap-1 shrink-0" title="Open Professional Liquify Studio (Photoshop Engine - Ctrl+Shift+X)">
                 <span>🌊</span><span class="hidden 2xl:inline">Liquify Studio</span><span class="hidden xl:inline 2xl:hidden">Liquify</span>
             </button>
+            <button id="btnHeaderProBg" type="button" class="studio-btn px-2 sm:px-2.5 py-1.5 sm:py-1 rounded-lg border text-[11px] sm:text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 transition shrink-0 flex items-center gap-1" title="Generate Ultra Pro Studio Background">
+                <span>✨</span><span class="hidden 2xl:inline">Pro BG</span><span class="hidden xl:inline 2xl:hidden">Pro</span>
+            </button>
             <button id="btnRandomize" type="button" class="studio-btn px-2 sm:px-2.5 py-1.5 sm:py-1 rounded-lg border text-[11px] sm:text-xs font-medium transition shrink-0" title="Randomize Seed">
                 <span class="sm:hidden">🎲</span><span class="hidden 2xl:inline">Randomize </span><span class="hidden xl:inline 2xl:inline">Seed</span>
             </button>
@@ -604,6 +607,62 @@
 
         <!-- LEFT PANEL: Tools & 8 Creative Engines -->
         <aside id="studioSidebar" class="w-full lg:w-[330px] border-b lg:border-b-0 lg:border-r p-3 overflow-y-auto space-y-3 shrink-0">
+
+            <!-- PRO STUDIO BACKGROUND GENERATOR CARD (1-Click Quality Backgrounds) -->
+            <div class="studio-card p-3 rounded-xl border space-y-2.5 bg-gradient-to-r from-emerald-500/5 via-sky-500/5 to-indigo-500/5">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-sm">✨</span>
+                        <span class="studio-heading text-xs font-bold uppercase tracking-wider">Pro Background Studio</span>
+                    </div>
+                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Ultra HD</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                    <div class="col-span-2">
+                        <label class="studio-label text-[10px] block mb-0.5">Studio Master Style (12 Themes)</label>
+                        <select id="selProBgStyle" class="studio-input w-full border rounded-md px-2 py-1 text-xs font-medium focus:outline-none">
+                            <option value="cosmic_aurora">🌌 Cosmic Aurora Silk</option>
+                            <option value="fluted_glass">🔮 3D Fluted Glass Studio</option>
+                            <option value="luxury_obsidian_gold">👑 Luxury Obsidian &amp; Gold</option>
+                            <option value="cyberpunk_neon">🌊 Cyberpunk Neon Flow</option>
+                            <option value="pastel_editorial">☁️ Pastel Dream Studio</option>
+                            <option value="prismatic_crystal">💎 Prismatic Crystal Facet</option>
+                            <option value="minimal_backdrop">🎨 Minimalist Studio Backdrop</option>
+                            <option value="commercial_hero">📐 Commercial Hero Triplet</option>
+                            <option value="sunset_horizon">🌅 Sunset Horizon Glow</option>
+                            <option value="dark_monochrome">🖤 Dark Monochrome OLED</option>
+                            <option value="emerald_silk">🌿 Organic Emerald Silk</option>
+                            <option value="electric_neon">⚡ Electric Neon Energy</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="studio-label text-[10px] block mb-0.5">Studio Mode</label>
+                        <select id="selBgEngineMode" class="studio-input w-full border rounded-md px-2 py-1 text-[11px] focus:outline-none">
+                            <option value="auto">Auto / 3-in-1 Photos</option>
+                            <option value="studio_bg">Pure Creative Background</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button id="btnGenerateProBg" type="button" class="studio-primary-btn w-full py-1 rounded-md text-[11px] font-semibold flex items-center justify-center gap-1 shadow transition">
+                            <span>✨</span> <span>Create BG</span>
+                        </button>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[10px] mb-0.5">
+                            <span class="studio-label">Clarity (Sharpness)</span>
+                            <span id="valClarity" class="studio-accent-text font-semibold">45%</span>
+                        </div>
+                        <input id="rngClarity" type="range" min="0" max="100" value="45" class="w-full">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[10px] mb-0.5">
+                            <span class="studio-label">HDR Vibrance</span>
+                            <span id="valVibrance" class="studio-accent-text font-semibold">35%</span>
+                        </div>
+                        <input id="rngVibrance" type="range" min="0" max="100" value="35" class="w-full">
+                    </div>
+                </div>
+            </div>
 
             <!-- Left Sidebar Navigation Tabs & Panel Header -->
             <div id="leftPanelTabBarContainer" class="sticky -top-3 -mt-3 -mx-3 p-2 bg-inherit backdrop-blur-md border-b border-black/10 z-20 space-y-1.5">
@@ -2960,7 +3019,13 @@
             angle: 35,
             offsetX: 0.15,
             offsetY: -0.1,
-            seed: 42.18
+            seed: 42.18,
+            bgEngineMode: "auto", // 'auto', 'studio_bg', 'triplet'
+            proBgStyle: "cosmic_aurora",
+            clarity: 45,
+            vibrance: 35,
+            studioVignette: 25,
+            hdrGlow: 30
         };
 
         // Undo / Redo History Stack
@@ -4173,11 +4238,403 @@
             if (tempSource) disposeCanvas(tempSource);
         }
 
+        
+        // ====================================================================
+        // PRO STUDIO BACKGROUND GENERATOR ENGINE & 12 CURATED MASTER STYLES
+        // High-Resolution Fluid Mesh, Silk Waves, Specular Caustics & Clarity
+        // ====================================================================
+
+        const PRO_BACKGROUND_STYLES = {
+            "cosmic_aurora": {
+                name: "🌌 Cosmic Aurora Silk",
+                preset: "Aurora Gradient",
+                gradType: "aurora",
+                gradOpacity: 80,
+                blendMode: "screen",
+                blurEngineEnable: true,
+                blurType: "gaussian",
+                blurRadius: 18,
+                blurScope: "outer",
+                fracGlassEnable: false,
+                noiseEnable: true,
+                textureType: "filmgrain",
+                noise: 18,
+                lightEnable: true,
+                lightGlow: 55,
+                lightVignette: 35,
+                clarity: 50,
+                vibrance: 45
+            },
+            "fluted_glass": {
+                name: "🔮 3D Fluted Glass Studio",
+                preset: "Glass Gradient",
+                gradType: "mesh",
+                gradOpacity: 60,
+                blendMode: "soft-light",
+                blurEngineEnable: true,
+                blurType: "lens",
+                blurRadius: 22,
+                blurScope: "full",
+                fracGlassEnable: true,
+                fracGlassStyle: "glass1",
+                fracGlassBase: 85,
+                fracGlassOptics: 95,
+                noiseEnable: true,
+                textureType: "filmgrain",
+                noise: 12,
+                lightEnable: true,
+                lightFlare: 45,
+                lightGlow: 50,
+                clarity: 55,
+                vibrance: 35
+            },
+            "luxury_obsidian_gold": {
+                name: "👑 Luxury Obsidian & Gold",
+                preset: "Luxury Gradient",
+                gradType: "mesh",
+                gradOpacity: 85,
+                blendMode: "overlay",
+                blurEngineEnable: true,
+                blurType: "surface",
+                blurRadius: 15,
+                blurScope: "full",
+                fractalEnable: true,
+                fracStyle: "marble",
+                fracOpacity: 65,
+                fracDistortion: 45,
+                fracGlassEnable: false,
+                noiseEnable: true,
+                textureType: "filmgrain",
+                noise: 20,
+                lightEnable: true,
+                lightBokeh: 40,
+                lightGlow: 60,
+                lightVignette: 45,
+                clarity: 65,
+                vibrance: 45
+            },
+            "cyberpunk_neon": {
+                name: "🌊 Cyberpunk Neon Flow",
+                preset: "Cyberpunk Dusk",
+                gradType: "mesh",
+                gradOpacity: 80,
+                blendMode: "screen",
+                blurEngineEnable: true,
+                blurType: "motion",
+                blurRadius: 25,
+                blurMotionAngle: 45,
+                blurScope: "full",
+                fracGlassEnable: false,
+                noiseEnable: true,
+                textureType: "digital",
+                noise: 15,
+                lightEnable: true,
+                lightFlare: 65,
+                lightGlow: 70,
+                clarity: 60,
+                vibrance: 55
+            },
+            "pastel_editorial": {
+                name: "☁️ Pastel Dream Studio",
+                preset: "Pastel Gradient",
+                gradType: "mesh",
+                gradOpacity: 65,
+                blendMode: "soft-light",
+                blurEngineEnable: true,
+                blurType: "gaussian",
+                blurRadius: 30,
+                blurScope: "full",
+                fracGlassEnable: false,
+                noiseEnable: true,
+                textureType: "filmgrain",
+                noise: 14,
+                lightEnable: true,
+                lightGlow: 40,
+                lightVignette: 15,
+                clarity: 40,
+                vibrance: 30
+            },
+            "prismatic_crystal": {
+                name: "💎 Prismatic Crystal Facet",
+                preset: "Holographic Gradient",
+                gradType: "diamond",
+                gradOpacity: 70,
+                blendMode: "color-dodge",
+                blurEngineEnable: true,
+                blurType: "radial",
+                blurRadialAmount: 20,
+                blurScope: "full",
+                fracGlassEnable: true,
+                fracGlassStyle: "glass3",
+                fracGlassBase: 90,
+                fracGlassOptics: 100,
+                noiseEnable: true,
+                noise: 15,
+                lightEnable: true,
+                lightFlare: 50,
+                lightBokeh: 45,
+                clarity: 55,
+                vibrance: 45
+            },
+            "minimal_backdrop": {
+                name: "🎨 Minimalist Studio Backdrop",
+                preset: "Light Gradient",
+                gradType: "radial",
+                gradOpacity: 45,
+                blendMode: "soft-light",
+                blurEngineEnable: true,
+                blurType: "gaussian",
+                blurRadius: 40,
+                blurScope: "full",
+                fracGlassEnable: false,
+                noiseEnable: true,
+                textureType: "filmgrain",
+                noise: 10,
+                lightEnable: true,
+                lightVignette: 35,
+                lightGlow: 30,
+                clarity: 35,
+                vibrance: 25
+            },
+            "commercial_hero": {
+                name: "📐 Commercial Hero Triplet",
+                preset: "Corporate Gradient",
+                tripletMode: "hero",
+                tripletSplit1: 25,
+                tripletSplit2: 75,
+                blurEngineEnable: true,
+                blurType: "gaussian",
+                blurRadius: 28,
+                blurScope: "outer",
+                fracGlassEnable: false,
+                noiseEnable: true,
+                textureType: "filmgrain",
+                noise: 12,
+                lightEnable: true,
+                lightVignette: 25,
+                clarity: 55,
+                vibrance: 40
+            },
+            "sunset_horizon": {
+                name: "🌅 Sunset Horizon Glow",
+                preset: "Colorful Gradient",
+                gradType: "aurora",
+                gradOpacity: 75,
+                blendMode: "screen",
+                blurEngineEnable: true,
+                blurType: "motion",
+                blurRadius: 35,
+                blurMotionAngle: 0,
+                blurScope: "full",
+                fracGlassEnable: false,
+                noiseEnable: true,
+                noise: 16,
+                lightEnable: true,
+                lightFlare: 60,
+                lightGlow: 65,
+                clarity: 50,
+                vibrance: 50
+            },
+            "dark_monochrome": {
+                name: "🖤 Dark Monochrome OLED",
+                preset: "Dark Gradient",
+                gradType: "radial",
+                gradOpacity: 85,
+                blendMode: "overlay",
+                blurEngineEnable: true,
+                blurType: "gaussian",
+                blurRadius: 20,
+                blurScope: "full",
+                fracGlassEnable: false,
+                noiseEnable: true,
+                textureType: "filmgrain",
+                noise: 22,
+                lightEnable: true,
+                lightVignette: 50,
+                lightGlow: 40,
+                clarity: 65,
+                vibrance: 15
+            },
+            "emerald_silk": {
+                name: "🌿 Organic Emerald Silk",
+                preset: "Aurora Gradient",
+                gradType: "mesh",
+                gradOpacity: 80,
+                blendMode: "soft-light",
+                blurEngineEnable: true,
+                blurType: "surface",
+                blurRadius: 18,
+                blurScope: "full",
+                fractalEnable: true,
+                fracStyle: "marble",
+                fracOpacity: 55,
+                fracGlassEnable: false,
+                noiseEnable: true,
+                noise: 14,
+                lightEnable: true,
+                lightGlow: 45,
+                clarity: 50,
+                vibrance: 45
+            },
+            "electric_neon": {
+                name: "⚡ Electric Neon Energy",
+                preset: "Neon Gradient",
+                gradType: "conic",
+                gradOpacity: 85,
+                blendMode: "screen",
+                blurEngineEnable: true,
+                blurType: "radial",
+                blurRadialAmount: 25,
+                blurScope: "full",
+                fracGlassEnable: false,
+                noiseEnable: true,
+                noise: 18,
+                lightEnable: true,
+                lightFlare: 70,
+                lightGlow: 75,
+                clarity: 60,
+                vibrance: 60
+            }
+        };
+
+        function renderProStudioBackground(targetCtx, width, height, colors, s) {
+            const c0 = colors[0];
+            const c1 = colors[1 % colors.length];
+            const c2 = colors[2 % colors.length];
+            const c3 = colors[colors.length - 1];
+
+            // 1. Deep Volumetric Base Fill
+            targetCtx.fillStyle = `rgb(${c0[0]},${c0[1]},${c0[2]})`;
+            targetCtx.fillRect(0, 0, width, height);
+
+            // 2. Multi-Node Fluid Mesh Topology
+            const g1 = targetCtx.createRadialGradient(
+                width * 0.28, height * 0.32, width * 0.05,
+                width * 0.35, height * 0.45, width * 0.75
+            );
+            g1.addColorStop(0, `rgba(${c1[0]},${c1[1]},${c1[2]},0.92)`);
+            g1.addColorStop(0.55, `rgba(${c2[0]},${c2[1]},${c2[2]},0.65)`);
+            g1.addColorStop(1, `rgba(${c0[0]},${c0[1]},${c0[2]},0)`);
+            targetCtx.fillStyle = g1;
+            targetCtx.fillRect(0, 0, width, height);
+
+            targetCtx.save();
+            targetCtx.globalCompositeOperation = 'screen';
+            const g2 = targetCtx.createRadialGradient(
+                width * 0.74, height * 0.68, width * 0.03,
+                width * 0.68, height * 0.60, width * 0.65
+            );
+            g2.addColorStop(0, `rgba(${c3[0]},${c3[1]},${c3[2]},0.95)`);
+            g2.addColorStop(0.6, `rgba(${c1[0]},${c1[1]},${c1[2]},0.4)`);
+            g2.addColorStop(1, `rgba(${c0[0]},${c0[1]},${c0[2]},0)`);
+            targetCtx.fillStyle = g2;
+            targetCtx.fillRect(0, 0, width, height);
+            targetCtx.restore();
+
+            // 3. Fluid Wave Ribbon Interference
+            targetCtx.save();
+            targetCtx.globalCompositeOperation = 'soft-light';
+            const numWaves = 4;
+            for (let w = 0; w < numWaves; w++) {
+                targetCtx.beginPath();
+                const freq = 1.8 + w * 0.8;
+                const amp = height * (0.12 + w * 0.04);
+                const cy = height * (0.35 + w * 0.18);
+                targetCtx.moveTo(0, height);
+                for (let x = 0; x <= width; x += Math.max(10, Math.round(width / 80))) {
+                    const nx = x / width;
+                    const y = cy + Math.sin(nx * Math.PI * freq + s.seed + w) * amp +
+                                  Math.cos(nx * Math.PI * 2.2 - s.seed * 0.5) * (amp * 0.4);
+                    targetCtx.lineTo(x, y);
+                }
+                targetCtx.lineTo(width, height);
+                targetCtx.closePath();
+                const col = (w % 2 === 0) ? c2 : c3;
+                targetCtx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},0.45)`;
+                targetCtx.fill();
+            }
+            targetCtx.restore();
+
+            // 4. Specular Caustics / Prismatic Hotspot
+            targetCtx.save();
+            targetCtx.globalCompositeOperation = 'color-dodge';
+            const spotGrad = targetCtx.createRadialGradient(
+                width * 0.52, height * 0.42, 0,
+                width * 0.52, height * 0.42, width * 0.38
+            );
+            spotGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+            spotGrad.addColorStop(0.4, `rgba(${c1[0]},${c1[1]},${c1[2]},0.25)`);
+            spotGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            targetCtx.fillStyle = spotGrad;
+            targetCtx.fillRect(0, 0, width, height);
+            targetCtx.restore();
+
+            // 5. Studio Edge Vignette (Clean dark anchor for professional stock look)
+            targetCtx.save();
+            targetCtx.globalCompositeOperation = 'multiply';
+            const vig = targetCtx.createRadialGradient(
+                width * 0.5, height * 0.5, width * 0.35,
+                width * 0.5, height * 0.5, width * 0.72
+            );
+            vig.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            vig.addColorStop(0.7, 'rgba(180, 180, 195, 0.9)');
+            vig.addColorStop(1, 'rgba(30, 35, 50, 0.65)');
+            targetCtx.fillStyle = vig;
+            targetCtx.fillRect(0, 0, width, height);
+            targetCtx.restore();
+        }
+
+        function applyProBackgroundStyle(styleKey) {
+            const st = PRO_BACKGROUND_STYLES[styleKey] || PRO_BACKGROUND_STYLES["cosmic_aurora"];
+            state.proBgStyle = styleKey;
+            if (st.preset) state.preset = st.preset;
+            if (st.gradType) state.gradType = st.gradType;
+            if (st.gradOpacity !== undefined) state.gradOpacity = st.gradOpacity;
+            if (st.blendMode) state.blendMode = st.blendMode;
+            if (st.blurEngineEnable !== undefined) state.blurEngineEnable = st.blurEngineEnable;
+            if (st.blurType) state.blurType = st.blurType;
+            if (st.blurRadius !== undefined) state.blurRadius = st.blurRadius;
+            if (st.blurScope) state.blurScope = st.blurScope;
+            if (st.blurMotionAngle !== undefined) state.blurMotionAngle = st.blurMotionAngle;
+            if (st.blurRadialAmount !== undefined) state.blurRadialAmount = st.blurRadialAmount;
+            if (st.fractalEnable !== undefined) state.fractalEnable = st.fractalEnable;
+            if (st.fracStyle) state.fracStyle = st.fracStyle;
+            if (st.fracOpacity !== undefined) state.fracOpacity = st.fracOpacity;
+            if (st.fracDistortion !== undefined) state.fracDistortion = st.fracDistortion;
+            if (st.fracGlassEnable !== undefined) state.fracGlassEnable = st.fracGlassEnable;
+            if (st.fracGlassStyle) state.fracGlassStyle = st.fracGlassStyle;
+            if (st.fracGlassBase !== undefined) state.fracGlassBase = st.fracGlassBase;
+            if (st.fracGlassOptics !== undefined) state.fracGlassOptics = st.fracGlassOptics;
+            if (st.noiseEnable !== undefined) state.noiseEnable = st.noiseEnable;
+            if (st.textureType) state.textureType = st.textureType;
+            if (st.noise !== undefined) state.noise = st.noise;
+            if (st.lightEnable !== undefined) state.lightEnable = st.lightEnable;
+            if (st.lightFlare !== undefined) state.lightFlare = st.lightFlare;
+            if (st.lightBokeh !== undefined) state.lightBokeh = st.lightBokeh;
+            if (st.lightGlow !== undefined) state.lightGlow = st.lightGlow;
+            if (st.lightVignette !== undefined) state.lightVignette = st.lightVignette;
+            if (st.tripletMode) state.tripletMode = st.tripletMode;
+            if (st.tripletSplit1 !== undefined) state.tripletSplit1 = st.tripletSplit1;
+            if (st.tripletSplit2 !== undefined) state.tripletSplit2 = st.tripletSplit2;
+            if (st.clarity !== undefined) state.clarity = st.clarity;
+            if (st.vibrance !== undefined) state.vibrance = st.vibrance;
+
+            updateAllUIControls();
+            triggerRedraw(true);
+            showToast('Pro Background Applied', st.name);
+        }
+
         function renderTripletBase(targetCtx, width, height, tripletImgs) {
             const colors = PRESETS[state.preset] || PRESETS["Aurora Gradient"];
             const c0 = colors[0];
             const c1 = colors[1 % colors.length];
             const c2 = colors[2 % colors.length];
+
+            // If in Pure Studio Background mode, render rich procedural masterpiece
+            if (state.bgEngineMode === 'studio_bg') {
+                renderProStudioBackground(targetCtx, width, height, colors, state);
+                return;
+            }
 
             targetCtx.fillStyle = `rgb(${c0[0]},${c0[1]},${c0[2]})`;
             targetCtx.fillRect(0, 0, width, height);
@@ -4280,12 +4737,8 @@
                     targetCtx.restore();
                 }
             } else {
-                const bgGrad = targetCtx.createLinearGradient(0, 0, width, height);
-                bgGrad.addColorStop(0, `rgb(${c0[0]},${c0[1]},${c0[2]})`);
-                bgGrad.addColorStop(0.5, `rgb(${c1[0]},${c1[1]},${c1[2]})`);
-                bgGrad.addColorStop(1, `rgb(${c2[0]},${c2[1]},${c2[2]})`);
-                targetCtx.fillStyle = bgGrad;
-                targetCtx.fillRect(0, 0, width, height);
+                // High-End Procedural Studio Fallback (No plain flat gradient!)
+                renderProStudioBackground(targetCtx, width, height, colors, state);
             }
         }
 
@@ -4562,7 +5015,7 @@
                     }
 
                     if (state.fracOpacity > 0) {
-                        const fW = width >= 3000 ? 640 : 300;
+                        const fW = Math.min(width, 1440);
                         const fH = Math.max(160, Math.round(fW * (height / width)));
                         const fCanvas = document.createElement('canvas');
                         fCanvas.width = fW;
@@ -5131,6 +5584,51 @@
                                     gCtx.fillRect(0, 0, workW, workH);
 
                                     gCtx.globalCompositeOperation = 'source-over';
+
+                // Professional Clarity & Micro-Contrast Enhancement Filter
+                const clarityLevel = (state.clarity !== undefined ? state.clarity : 45) / 100;
+                if (clarityLevel > 0) {
+                    const cW = Math.round(width * 0.5);
+                    const cH = Math.round(height * 0.5);
+                    const cBuf = document.createElement('canvas');
+                    cBuf.width = cW; cBuf.height = cH;
+                    const cCtx = cBuf.getContext('2d');
+                    cCtx.drawImage(gradeBuf, 0, 0, cW, cH);
+                    
+                    gCtx.save();
+                    gCtx.globalAlpha = clarityLevel * 0.35;
+                    gCtx.globalCompositeOperation = 'overlay';
+                    gCtx.drawImage(cBuf, 0, 0, width, height);
+                    gCtx.restore();
+                    disposeCanvas(cBuf);
+                }
+
+                // Professional Smart Vibrance Boost
+                const vibranceLevel = (state.vibrance !== undefined ? state.vibrance : 35) / 100;
+                if (vibranceLevel > 0) {
+                    gCtx.save();
+                    gCtx.globalAlpha = vibranceLevel * 0.28;
+                    gCtx.globalCompositeOperation = 'soft-light';
+                    gCtx.drawImage(gradeBuf, 0, 0);
+                    gCtx.restore();
+                }
+
+                // Professional Studio Vignette Falloff
+                const vigLevel = (state.studioVignette !== undefined ? state.studioVignette : 25) / 100;
+                if (vigLevel > 0) {
+                    gCtx.save();
+                    gCtx.globalCompositeOperation = 'multiply';
+                    const vGrad = gCtx.createRadialGradient(
+                        width * 0.5, height * 0.5, width * 0.30,
+                        width * 0.5, height * 0.5, width * 0.72
+                    );
+                    vGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+                    vGrad.addColorStop(0.65, `rgba(220, 220, 225, ${1 - vigLevel * 0.25})`);
+                    vGrad.addColorStop(1, `rgba(18, 22, 35, ${1 - vigLevel * 0.65})`);
+                    gCtx.fillStyle = vGrad;
+                    gCtx.fillRect(0, 0, width, height);
+                    gCtx.restore();
+                }
                                     defineShapePath();
                                     gCtx.lineWidth = Math.max(2.5, localUnit * 0.006);
                                     gCtx.strokeStyle = `rgba(255, 255, 255, ${0.92 * baseNorm})`;
@@ -7862,6 +8360,38 @@
         bindInput('inpOutWidth', 'change', updateDimensionLabels);
         bindInput('inpOutHeight', 'change', updateDimensionLabels);
         bindInput('selExportFormat', 'change', updateDimensionLabels);
+
+        bindInput('btnHeaderProBg', 'click', () => {
+            const styles = Object.keys(PRO_BACKGROUND_STYLES);
+            const nextStyle = styles[Math.floor(Math.random() * styles.length)];
+            const sel = document.getElementById('selProBgStyle');
+            if (sel) sel.value = nextStyle;
+            applyProBackgroundStyle(nextStyle);
+        });
+        bindInput('btnGenerateProBg', 'click', () => {
+            const sel = document.getElementById('selProBgStyle');
+            const styleKey = sel ? sel.value : 'cosmic_aurora';
+            applyProBackgroundStyle(styleKey);
+        });
+        bindInput('selProBgStyle', 'change', (e) => {
+            applyProBackgroundStyle(e.target.value);
+        });
+        bindInput('selBgEngineMode', 'change', (e) => {
+            state.bgEngineMode = e.target.value;
+            triggerRedraw(true);
+        });
+        bindInput('rngClarity', 'input', (e) => {
+            state.clarity = parseInt(e.target.value, 10);
+            const lbl = document.getElementById('valClarity');
+            if (lbl) lbl.textContent = state.clarity + '%';
+            triggerRedraw(true);
+        });
+        bindInput('rngVibrance', 'input', (e) => {
+            state.vibrance = parseInt(e.target.value, 10);
+            const lbl = document.getElementById('valVibrance');
+            if (lbl) lbl.textContent = state.vibrance + '%';
+            triggerRedraw(true);
+        });
 
         bindInput('btnRandomize', 'click', () => {
             const keys = Object.keys(PRESETS);

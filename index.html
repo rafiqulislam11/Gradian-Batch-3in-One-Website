@@ -1450,7 +1450,444 @@
 
             <!-- PANEL 3: 3D Glass & Optical Lighting Engine (136 Ribbed/Fluted Styles & Specular Optics) -->
             <div id="leftTabPanelGlass" class="left-panel-content space-y-3 hidden">
-                <!-- 5. Professional Glass Effect Engine (136 Pro Styles + 3D Optics) -->
+
+            <!-- CATEGORY: Abstract 3D Metallic & Glass Flow Patterns Studio -->
+            <div id="card3DFlowStudio" class="studio-card p-3 rounded-xl border space-y-2.5 shadow-sm">
+                <!-- Card Header with Chevron Accordion Toggle -->
+                <div class="panel-card-header flex items-center justify-between cursor-pointer select-none panel-accordion-toggle">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <span class="panel-accordion-chevron text-[10px] font-mono transition-transform duration-200">▼</span>
+                        <span class="studio-heading text-xs font-bold uppercase tracking-wider truncate">🌊 3D Metallic &amp; Glass Flow</span>
+                        <span class="text-[9px] px-1.5 py-0.2 bg-emerald-600 text-white font-bold rounded shadow-sm">16 Presets</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+                        <button id="btnFlowRandomQuick" type="button" class="studio-btn px-2 py-0.5 rounded border text-[10px] font-semibold transition" title="Randomize Flow Pattern">🎲 Random</button>
+                        <label class="studio-check flex items-center gap-1 text-[11px] cursor-pointer">
+                            <input id="chkFlowEnable" type="checkbox" checked>
+                            <span>Enable</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="panel-card-body space-y-3 pt-1">
+                    <!-- Target Application Mode -->
+                    <div class="p-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-wider studio-heading">Canvas Target Mode:</span>
+                            <span class="text-[9px] studio-subtext font-mono">Stock Background</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1 text-[10px] font-semibold">
+                            <button type="button" id="btnFlowModeBackground" class="tab-btn active py-1 px-1.5 rounded border transition text-center flex items-center justify-center gap-1">
+                                <span>🖼️</span><span>Full Background</span>
+                            </button>
+                            <button type="button" id="btnFlowModeOverlay" class="tab-btn py-1 px-1.5 rounded border transition text-center flex items-center justify-center gap-1">
+                                <span>🔮</span><span>Glass/Metal Overlay</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 16 PRESET VISUAL SELECTOR (4x4 Grid) -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-wider studio-heading flex items-center gap-1">
+                                <span>✨</span> 16 Flow Presets (Stock 3D)
+                            </span>
+                            <span class="text-[9px] font-mono studio-accent-text font-bold">16 Styles</span>
+                        </div>
+
+                        <!-- 16 Presets Grid -->
+                        <div id="flowPresetsGrid" class="grid grid-cols-2 gap-1.5 max-h-60 overflow-y-auto pr-1">
+                            <!-- 1. Silver Metallic Flow -->
+                            <button type="button" data-flow-preset="flow_1" class="flow-preset-card active p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #1e293b, #94a3b8, #ffffff, #e11d48);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">1. Silver Metallic Flow</div>
+                                    <div class="text-[8px] studio-subtext truncate">Liquid Platinum &amp; Chrome</div>
+                                </div>
+                            </button>
+
+                            <!-- 2. Black & Gold Wave -->
+                            <button type="button" data-flow-preset="flow_2" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #090a0f, #78350f, #fde047, #ffffff);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">2. Black &amp; Gold Wave</div>
+                                    <div class="text-[8px] studio-subtext truncate">Obsidian &amp; 24K Gold</div>
+                                </div>
+                            </button>
+
+                            <!-- 3. Purple Satin Wave -->
+                            <button type="button" data-flow-preset="flow_3" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #1e0b38, #7c3aed, #c084fc, #ffffff);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">3. Purple Satin Wave</div>
+                                    <div class="text-[8px] studio-subtext truncate">Silky Orchid Drapery</div>
+                                </div>
+                            </button>
+
+                            <!-- 4. Blue Liquid Wave -->
+                            <button type="button" data-flow-preset="flow_4" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #020817, #1d4ed8, #38bdf8, #ffffff);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">4. Blue Liquid Wave</div>
+                                    <div class="text-[8px] studio-subtext truncate">Cobalt &amp; Cyan Swirl</div>
+                                </div>
+                            </button>
+
+                            <!-- 5. Champagne Gold Flow -->
+                            <button type="button" data-flow-preset="flow_5" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #292524, #b45309, #fef08a, #ffffff);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">5. Champagne Gold Flow</div>
+                                    <div class="text-[8px] studio-subtext truncate">Pearl Silk &amp; Pale Gold</div>
+                                </div>
+                            </button>
+
+                            <!-- 6. Dark Chrome Wave -->
+                            <button type="button" data-flow-preset="flow_6" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #050811, #334155, #94a3b8, #00f0ff);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">6. Dark Chrome Wave</div>
+                                    <div class="text-[8px] studio-subtext truncate">Carbon &amp; Neon Blue Rim</div>
+                                </div>
+                            </button>
+
+                            <!-- 7. Iridescent Glass Flow -->
+                            <button type="button" data-flow-preset="flow_7" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #0284c7, #f472b6, #a855f7, #fde047);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">7. Iridescent Glass Flow</div>
+                                    <div class="text-[8px] studio-subtext truncate">Prismatic Hologram Prism</div>
+                                </div>
+                            </button>
+
+                            <!-- 8. Red Chrome Ribbon -->
+                            <button type="button" data-flow-preset="flow_8" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #09090b, #991b1b, #ef4444, #cbd5e1);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">8. Red Chrome Ribbon</div>
+                                    <div class="text-[8px] studio-subtext truncate">Candy Crimson &amp; Silver</div>
+                                </div>
+                            </button>
+
+                            <!-- 9. Blue-Purple Gradient Flow -->
+                            <button type="button" data-flow-preset="flow_9" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #0369a1, #38bdf8, #8b5cf6, #d946ef);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">9. Blue-Purple Flow</div>
+                                    <div class="text-[8px] studio-subtext truncate">Azure to Royal Violet</div>
+                                </div>
+                            </button>
+
+                            <!-- 10. Pearl Gold Wave -->
+                            <button type="button" data-flow-preset="flow_10" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #ffffff, #e2e8f0, #fde047, #b45309);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">10. Pearl Gold Wave</div>
+                                    <div class="text-[8px] studio-subtext truncate">Ivory Pearl &amp; Gold Rim</div>
+                                </div>
+                            </button>
+
+                            <!-- 11. Emerald Metallic Flow -->
+                            <button type="button" data-flow-preset="flow_11" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #021a14, #047857, #10b981, #fde047);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">11. Emerald Metallic Flow</div>
+                                    <div class="text-[8px] studio-subtext truncate">Imperial Jade &amp; Gold</div>
+                                </div>
+                            </button>
+
+                            <!-- 12. Crystal Blue Wave -->
+                            <button type="button" data-flow-preset="flow_12" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #e0f2fe, #38bdf8, #0284c7, #ffffff);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">12. Crystal Blue Wave</div>
+                                    <div class="text-[8px] studio-subtext truncate">Glacial Ice &amp; Aqua Glass</div>
+                                </div>
+                            </button>
+
+                            <!-- 13. Metallic Layered Curve -->
+                            <button type="button" data-flow-preset="flow_13" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #270523, #831843, #db2777, #f472b6);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">13. Metallic Layered Curve</div>
+                                    <div class="text-[8px] studio-subtext truncate">Tiered Magenta Velvet</div>
+                                </div>
+                            </button>
+
+                            <!-- 14. Neon Blue-Pink Flow -->
+                            <button type="button" data-flow-preset="flow_14" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #02040a, #00f0ff, #ff007f, #ffffff);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">14. Neon Blue-Pink Flow</div>
+                                    <div class="text-[8px] studio-subtext truncate">Cyberpunk Synthwave</div>
+                                </div>
+                            </button>
+
+                            <!-- 15. Silver Satin Texture -->
+                            <button type="button" data-flow-preset="flow_15" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #111827, #4b5563, #9ca3af, #ffffff);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">15. Silver Satin Texture</div>
+                                    <div class="text-[8px] studio-subtext truncate">Monochrome Liquid Metal</div>
+                                </div>
+                            </button>
+
+                            <!-- 16. Deep Purple Glass Flow -->
+                            <button type="button" data-flow-preset="flow_16" class="flow-preset-card p-1.5 rounded-lg border text-left flex items-center gap-2 hover:border-accent-main transition">
+                                <span class="w-6 h-6 rounded-md shadow-sm shrink-0 border border-white/20" style="background: linear-gradient(135deg, #0a0217, #581c87, #1d4ed8, #38bdf8);"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-[10px] font-bold truncate">16. Deep Purple Glass</div>
+                                    <div class="text-[8px] studio-subtext truncate">Midnight Violet &amp; Cobalt</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CUSTOMIZATION CONTROLS -->
+                    <div class="p-2.5 rounded-xl border studio-card space-y-2.5">
+                        <div class="text-[10px] font-bold uppercase tracking-wider studio-heading flex items-center gap-1 border-b border-black/5 dark:border-white/5 pb-1">
+                            <span>🎛️</span> Pattern Parameters &amp; Shading
+                        </div>
+
+                        <!-- Style & Colors -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="studio-label text-[9px] block mb-0.5">Pattern Style</label>
+                                <select id="selFlowStyle" class="studio-input w-full border rounded-md px-1.5 py-1 text-[11px] focus:outline-none">
+                                    <option value="flow_1">1. Silver Metallic Flow</option>
+                                    <option value="flow_2">2. Black &amp; Gold Wave</option>
+                                    <option value="flow_3">3. Purple Satin Wave</option>
+                                    <option value="flow_4">4. Blue Liquid Wave</option>
+                                    <option value="flow_5">5. Champagne Gold Flow</option>
+                                    <option value="flow_6">6. Dark Chrome Wave</option>
+                                    <option value="flow_7">7. Iridescent Glass Flow</option>
+                                    <option value="flow_8">8. Red Chrome Ribbon</option>
+                                    <option value="flow_9">9. Blue-Purple Gradient Flow</option>
+                                    <option value="flow_10">10. Pearl Gold Wave</option>
+                                    <option value="flow_11">11. Emerald Metallic Flow</option>
+                                    <option value="flow_12">12. Crystal Blue Wave</option>
+                                    <option value="flow_13">13. Metallic Layered Curve</option>
+                                    <option value="flow_14">14. Neon Blue-Pink Flow</option>
+                                    <option value="flow_15">15. Silver Satin Texture</option>
+                                    <option value="flow_16">16. Deep Purple Glass Flow</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="studio-label text-[9px] block mb-0.5">Color Palette</label>
+                                <select id="selFlowColorPreset" class="studio-input w-full border rounded-md px-1.5 py-1 text-[11px] focus:outline-none">
+                                    <option value="default" selected>Preset Default</option>
+                                    <option value="gold_obsidian">24K Gold &amp; Obsidian</option>
+                                    <option value="silver_platinum">Liquid Silver Platinum</option>
+                                    <option value="purple_satin">Royal Violet &amp; Orchid</option>
+                                    <option value="sapphire_cyan">Ocean Sapphire &amp; Cyan</option>
+                                    <option value="champagne_pearl">Champagne &amp; Pearl</option>
+                                    <option value="dark_cyan">Dark Carbon &amp; Neon</option>
+                                    <option value="iridescent_holo">Prismatic Hologram</option>
+                                    <option value="ruby_chrome">Candy Crimson &amp; Chrome</option>
+                                    <option value="blue_violet">Azure Blue &amp; Violet</option>
+                                    <option value="pearl_gold">Ivory Pearl &amp; Gold</option>
+                                    <option value="emerald_gold">Imperial Emerald &amp; Gold</option>
+                                    <option value="crystal_aqua">Glacial Ice Aqua</option>
+                                    <option value="magenta_pink">Tiered Rose &amp; Magenta</option>
+                                    <option value="synthwave_neon">Synthwave Cyan &amp; Pink</option>
+                                    <option value="monochrome_satin">Studio Liquid Platinum</option>
+                                    <option value="deep_purple_blue">Imperial Violet &amp; Cobalt</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Background Color & Direction -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="studio-label text-[9px] block mb-0.5">Background Tone</label>
+                                <div class="flex items-center gap-1.5">
+                                    <input id="inpFlowBgColor" type="color" value="#090a0f" class="w-7 h-7 p-0.5 rounded border border-black/20 dark:border-white/20 cursor-pointer bg-transparent">
+                                    <button type="button" id="btnFlowResetBgColor" class="studio-btn px-1.5 py-1 rounded text-[9px] truncate flex-1 border">Style Default</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="studio-label text-[9px] block mb-0.5">Wave Direction</label>
+                                <select id="selFlowDirection" class="studio-input w-full border rounded-md px-1.5 py-1 text-[11px] focus:outline-none">
+                                    <option value="diagonal_nw_se">Diagonal NW &rarr; SE (32&deg;)</option>
+                                    <option value="horizontal_s">S-Curve Horizontal (0&deg;)</option>
+                                    <option value="diagonal_ne_sw">Diagonal NE &rarr; SW (-32&deg;)</option>
+                                    <option value="vertical">Cascading Vertical (90&deg;)</option>
+                                    <option value="organic_swirl">Organic Dynamic Swirl</option>
+                                    <option value="layered_curves">Multi-Tiered Arcs</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Wave Sliders: Density & Depth -->
+                        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-black/5 dark:border-white/5">
+                            <div>
+                                <div class="flex justify-between text-[9px] mb-0.5">
+                                    <span class="studio-subtext">Wave Density</span>
+                                    <span id="valFlowDensity" class="font-mono font-bold studio-accent-text">5 ribbons</span>
+                                </div>
+                                <input id="rngFlowDensity" type="range" min="2" max="12" value="5" class="w-full">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[9px] mb-0.5">
+                                    <span class="studio-subtext">Wave Depth (Amp)</span>
+                                    <span id="valFlowDepth" class="font-mono font-bold studio-accent-text">100%</span>
+                                </div>
+                                <input id="rngFlowDepth" type="range" min="20" max="200" value="100" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- 3D Depth & Metallic Shine -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <div class="flex justify-between text-[9px] mb-0.5">
+                                    <span class="studio-subtext">3D Depth &amp; Shadows</span>
+                                    <span id="valFlow3DDepth" class="font-mono font-bold studio-accent-text">75%</span>
+                                </div>
+                                <input id="rngFlow3DDepth" type="range" min="0" max="100" value="75" class="w-full">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[9px] mb-0.5">
+                                    <span class="studio-subtext">Metallic Shine</span>
+                                    <span id="valFlowMetallicShine" class="font-mono font-bold studio-accent-text">85%</span>
+                                </div>
+                                <input id="rngFlowMetallicShine" type="range" min="0" max="100" value="85" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- Glass Trans & Reflection -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <div class="flex justify-between text-[9px] mb-0.5">
+                                    <span class="studio-subtext">Glass Transparency</span>
+                                    <span id="valFlowGlassTrans" class="font-mono font-bold studio-accent-text">20%</span>
+                                </div>
+                                <input id="rngFlowGlassTrans" type="range" min="0" max="100" value="20" class="w-full">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[9px] mb-0.5">
+                                    <span class="studio-subtext">Reflection Strength</span>
+                                    <span id="valFlowReflection" class="font-mono font-bold studio-accent-text">80%</span>
+                                </div>
+                                <input id="rngFlowReflection" type="range" min="0" max="100" value="80" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- Blur & Glow -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <div class="flex justify-between text-[9px] mb-0.5">
+                                    <span class="studio-subtext">Soft Blur</span>
+                                    <span id="valFlowBlur" class="font-mono font-bold studio-accent-text">0 px</span>
+                                </div>
+                                <input id="rngFlowBlur" type="range" min="0" max="30" value="0" class="w-full">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[9px] mb-0.5">
+                                    <span class="studio-subtext">Crest Glow (Bloom)</span>
+                                    <span id="valFlowGlow" class="font-mono font-bold studio-accent-text">35%</span>
+                                </div>
+                                <input id="rngFlowGlow" type="range" min="0" max="100" value="35" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- Grain & Scale -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <div class="flex justify-between text-[9px] mb-0.5">
+                                    <span class="studio-subtext">Grain / Micro-Texture</span>
+                                    <span id="valFlowGrain" class="font-mono font-bold studio-accent-text">10%</span>
+                                </div>
+                                <input id="rngFlowGrain" type="range" min="0" max="50" value="10" class="w-full">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[9px] mb-0.5">
+                                    <span class="studio-subtext">Pattern Scale</span>
+                                    <span id="valFlowScale" class="font-mono font-bold studio-accent-text">100%</span>
+                                </div>
+                                <input id="rngFlowScale" type="range" min="50" max="250" value="100" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- Rotation -->
+                        <div>
+                            <div class="flex justify-between text-[9px] mb-0.5">
+                                <span class="studio-subtext">Pattern Rotation</span>
+                                <span id="valFlowRotation" class="font-mono font-bold studio-accent-text">0&deg;</span>
+                            </div>
+                            <input id="rngFlowRotation" type="range" min="0" max="360" value="0" class="w-full">
+                        </div>
+                    </div>
+
+                    <!-- ADVANCED ACTION CONTROLS & PRESET MANAGEMENT -->
+                    <div class="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 space-y-2">
+                        <div class="text-[9px] font-bold uppercase tracking-wider studio-heading flex items-center justify-between">
+                            <span>⚡ Advanced Actions</span>
+                            <span class="font-mono text-[9px] studio-accent-text">Seeds &amp; Variations</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <button id="btnFlowRandom" type="button" class="studio-btn py-1.5 px-1 rounded border text-[10px] font-semibold truncate hover:border-accent-main transition text-center" title="Generate Random Harmonic Seed">🎲 Randomize</button>
+                            <button id="btnFlowVariations" type="button" class="studio-btn py-1.5 px-1 rounded border text-[10px] font-semibold truncate hover:border-accent-main transition text-center" title="Show 4 Variations Grid">🔀 4 Variations</button>
+                            <button id="btnFlowReset" type="button" class="studio-btn py-1.5 px-1 rounded border text-[10px] font-semibold truncate hover:border-accent-main transition text-center" title="Reset Current Preset Settings">↺ Reset</button>
+                        </div>
+
+                        <!-- Preset Save / Load -->
+                        <div class="grid grid-cols-3 gap-1 pt-1 border-t border-black/5 dark:border-white/5">
+                            <button id="btnFlowSavePreset" type="button" class="studio-btn py-1 px-1 rounded border text-[9px] font-semibold truncate" title="Save current parameters as custom preset">💾 Save Preset</button>
+                            <select id="selFlowSavedPresets" class="studio-input col-span-2 border rounded px-1 text-[9px] focus:outline-none">
+                                <option value="">Saved User Presets (0)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- EXPORT, 4K & BULK GENERATION STUDIO -->
+                    <div class="p-2.5 rounded-xl border studio-card space-y-2">
+                        <div class="flex items-center justify-between border-b border-black/5 dark:border-white/5 pb-1">
+                            <span class="text-[10px] font-bold uppercase tracking-wider studio-heading flex items-center gap-1">
+                                <span>📥</span> 4K &amp; Bulk Export Studio
+                            </span>
+                            <span class="text-[9px] font-mono studio-accent-text font-bold">Ultra-HD</span>
+                        </div>
+
+                        <!-- Resolution Selector -->
+                        <div class="space-y-1">
+                            <label class="studio-label text-[9px] block">Export Resolution</label>
+                            <select id="selFlowExportRes" class="studio-input w-full border rounded-md px-1.5 py-1 text-[11px] focus:outline-none">
+                                <option value="3840x2160" selected>3840 &times; 2160 (4K UHD 16:9)</option>
+                                <option value="4000x2000">4000 &times; 2000 (4K Stock 2:1)</option>
+                                <option value="4096x4096">4096 &times; 4096 (1:1 4K Square)</option>
+                                <option value="2560x1440">2560 &times; 1440 (2K QHD 16:9)</option>
+                                <option value="1920x1080">1920 &times; 1080 (FHD 16:9)</option>
+                                <option value="custom">Custom Resolution &hellip;</option>
+                            </select>
+                            <div id="flowCustomResInputs" class="grid grid-cols-2 gap-1.5 hidden pt-1">
+                                <input id="inpFlowCustomW" type="number" value="3840" min="256" max="8192" placeholder="Width" class="studio-input border rounded px-1.5 py-0.5 text-[10px]">
+                                <input id="inpFlowCustomH" type="number" value="2160" min="256" max="8192" placeholder="Height" class="studio-input border rounded px-1.5 py-0.5 text-[10px]">
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="grid grid-cols-2 gap-1.5 pt-1">
+                            <button id="btnFlowDownloadPng" type="button" class="studio-btn py-1.5 px-2 rounded-lg border text-[10px] font-bold flex items-center justify-center gap-1 transition">
+                                <span>⬇️</span> Download PNG
+                            </button>
+                            <button id="btnFlowDownloadJpg" type="button" class="studio-btn py-1.5 px-2 rounded-lg border text-[10px] font-bold flex items-center justify-center gap-1 transition">
+                                <span>⬇️</span> Download JPG
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button id="btnFlowDownload4K" type="button" class="studio-primary-btn py-1.5 px-2 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 transition">
+                                <span>🌟</span> 4K UHD Direct
+                            </button>
+                            <button id="btnFlowBulkGenerate" type="button" class="studio-btn py-1.5 px-2 rounded-lg border text-[10px] font-bold flex items-center justify-center gap-1 transition" title="Generate multiple variations packaged in a ZIP">
+                                <span>📦</span> Bulk Variations (ZIP)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Professional Glass Effect Engine (136 Pro Styles + 3D Optics) -->
             <div class="studio-card p-3 rounded-xl border space-y-2.5">
                 <!-- Card Header with Chevron Accordion Toggle -->
                 <div class="panel-card-header flex items-center justify-between cursor-pointer select-none panel-accordion-toggle">
@@ -1789,12 +2226,52 @@
 
                         </optgroup>
 
+                        <optgroup label="9. Abstract 3D Metallic &amp; Glass Flow Patterns">
+
+                            <option value="flow_1">9.1 Silver Metallic Flow</option>
+
+                            <option value="flow_2">9.2 Black &amp; Gold Wave</option>
+
+                            <option value="flow_3">9.3 Purple Satin Wave</option>
+
+                            <option value="flow_4">9.4 Blue Liquid Wave</option>
+
+                            <option value="flow_5">9.5 Champagne Gold Flow</option>
+
+                            <option value="flow_6">9.6 Dark Chrome Wave</option>
+
+                            <option value="flow_7">9.7 Iridescent Glass Flow</option>
+
+                            <option value="flow_8">9.8 Red Chrome Ribbon</option>
+
+                            <option value="flow_9">9.9 Blue-Purple Gradient Flow</option>
+
+                            <option value="flow_10">9.10 Pearl Gold Wave</option>
+
+                            <option value="flow_11">9.11 Emerald Metallic Flow</option>
+
+                            <option value="flow_12">9.12 Crystal Blue Wave</option>
+
+                            <option value="flow_13">9.13 Metallic Layered Curve</option>
+
+                            <option value="flow_14">9.14 Neon Blue-Pink Flow</option>
+
+                            <option value="flow_15">9.15 Silver Satin Texture</option>
+
+                            <option value="flow_16">9.16 Deep Purple Glass Flow</option>
+
+                        </optgroup>
+
                     </select>
 
-                        <!-- Quick Category Pills (8 Categories) -->
+                        <!-- Quick Category Pills (8 Categories + 3D Flow) -->
                         <div class="space-y-1 pt-1">
-                            <div class="text-[9px] font-semibold studio-subtext uppercase tracking-wider">Quick Category Filter:</div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-[9px] font-semibold studio-subtext uppercase tracking-wider">Quick Category Filter:</span>
+                                <span class="text-[8px] font-mono studio-accent-text font-bold">9 Categories</span>
+                            </div>
                             <div class="grid grid-cols-4 gap-1">
+                                <button type="button" data-quick-glass="flow_1" class="studio-btn py-1 px-1 rounded border text-[9px] font-bold truncate hover:border-accent-main transition text-center col-span-4 bg-emerald-600/15 border-emerald-500/40 text-emerald-400">🌊 3D Metallic &amp; Glass Flow Patterns (16 Presets)</button>
                                 <button type="button" data-quick-glass="pro_frost_1" class="studio-btn py-1 px-1 rounded border text-[9px] font-semibold truncate hover:border-accent-main transition text-center">❄️ Frosted</button>
                                 <button type="button" data-quick-glass="pro_rib_1" class="studio-btn py-1 px-1 rounded border text-[9px] font-semibold truncate hover:border-accent-main transition text-center">💈 Ribbed</button>
                                 <button type="button" data-quick-glass="pro_prism_1" class="studio-btn py-1 px-1 rounded border text-[9px] font-semibold truncate hover:border-accent-main transition text-center">🌈 Prism</button>
@@ -3046,6 +3523,29 @@
             fracTurbulence: 65,
             fracDistortion: 55,
             fracOpacity: 55,
+            // Abstract 3D Metallic & Glass Flow Patterns
+            flowPatternEnable: true,
+            flowTargetMode: 'background',
+            flowStyle: 'flow_1',
+            flowColorPreset: 'default',
+            flowBgColor: '#090a0f',
+            flowDirection: 'diagonal_nw_se',
+            flowDensity: 5,
+            flowDepth: 100,
+            flow3DDepth: 75,
+            flowMetallicShine: 85,
+            flowGlassTrans: 20,
+            flowReflection: 80,
+            flowBlur: 0,
+            flowGlow: 35,
+            flowGrain: 10,
+            flowScale: 100,
+            flowRotation: 0,
+            flowSeed: 12345,
+            flowExportRes: '3840x2160',
+            flowCustomW: 3840,
+            flowCustomH: 2160,
+            flowSavedPresets: [],
             fracGlassEnable: false,
             fracGlassStyle: "glass1",
             glassDir: "auto",
@@ -4728,6 +5228,575 @@
             return c;
         }
 
+        // ============================================================================
+        // ABSTRACT 3D METALLIC & GLASS FLOW PATTERNS ENGINE (16 Stock 3D Presets)
+        // ============================================================================
+        const FLOW_PRESETS = {
+            flow_1: {
+                id: "flow_1",
+                name: "Silver Metallic Flow",
+                subtitle: "Liquid Platinum & Satin Chrome",
+                bg: ["#0f172a", "#1e293b", "#334155"],
+                accentType: "rose_accent",
+                accentColor: ["#f43f5e", "#fb7185", "#ffe4e6"],
+                ribbons: [
+                    { stops: [ [0,"#1e293b"], [0.2,"#475569"], [0.45,"#94a3b8"], [0.52,"#ffffff"], [0.65,"#cbd5e1"], [0.85,"#64748b"], [1,"#0f172a"] ] },
+                    { stops: [ [0,"#334155"], [0.25,"#64748b"], [0.48,"#e2e8f0"], [0.52,"#ffffff"], [0.7,"#94a3b8"], [1,"#1e293b"] ] },
+                    { stops: [ [0,"#0f172a"], [0.3,"#e11d48"], [0.5,"#fda4af"], [0.52,"#ffffff"], [0.7,"#e2e8f0"], [1,"#334155"] ] }
+                ],
+                type: "metallic",
+                defaultDirection: "diagonal_nw_se",
+                shine: 92, trans: 10, reflection: 88, glow: 30, grain: 8
+            },
+            flow_2: {
+                id: "flow_2",
+                name: "Black & Gold Wave",
+                subtitle: "Obsidian Charcoal & 24K Molten Gold",
+                bg: ["#050608", "#0d0f14", "#161922"],
+                accentType: "gold_trim",
+                accentColor: ["#b45309", "#f59e0b", "#fef08a", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#050608"], [0.3,"#181a24"], [0.5,"#2d3142"], [0.52,"#4f566b"], [0.7,"#1f2330"], [1,"#090b0e"] ] },
+                    { stops: [ [0,"#78350f"], [0.25,"#b45309"], [0.48,"#f59e0b"], [0.52,"#fffbeb"], [0.68,"#d97706"], [0.85,"#92400e"], [1,"#451a03"] ] },
+                    { stops: [ [0,"#090a0f"], [0.35,"#1c202d"], [0.5,"#92400e"], [0.52,"#fde047"], [0.7,"#222636"], [1,"#0b0d12"] ] }
+                ],
+                type: "metallic",
+                defaultDirection: "horizontal_s",
+                shine: 95, trans: 5, reflection: 90, glow: 45, grain: 22
+            },
+            flow_3: {
+                id: "flow_3",
+                name: "Purple Satin Wave",
+                subtitle: "Lush Silky Violet & Orchid Folds",
+                bg: ["#0b0416", "#1c0936", "#2e1065"],
+                accentType: "lilac_glow",
+                accentColor: ["#c084fc", "#e9d5ff", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#1e0b38"], [0.3,"#581c87"], [0.48,"#9333ea"], [0.52,"#f3e8ff"], [0.7,"#7e22ce"], [1,"#150628"] ] },
+                    { stops: [ [0,"#3b0764"], [0.28,"#7c3aed"], [0.48,"#c084fc"], [0.52,"#ffffff"], [0.72,"#a855f7"], [1,"#2e1065"] ] },
+                    { stops: [ [0,"#150628"], [0.35,"#6b21a8"], [0.5,"#d8b4fe"], [0.52,"#ffffff"], [0.7,"#9333ea"], [1,"#1e0b38"] ] }
+                ],
+                type: "satin",
+                defaultDirection: "diagonal_nw_se",
+                shine: 82, trans: 20, reflection: 78, glow: 40, grain: 10
+            },
+            flow_4: {
+                id: "flow_4",
+                name: "Blue Liquid Wave",
+                subtitle: "Royal Oceanic Cobalt & Cyan Fluid",
+                bg: ["#020817", "#071a3d", "#0c2d66"],
+                accentType: "cyan_glass",
+                accentColor: ["#0284c7", "#38bdf8", "#e0f2fe"],
+                ribbons: [
+                    { stops: [ [0,"#03112c"], [0.28,"#1d4ed8"], [0.48,"#38bdf8"], [0.52,"#ffffff"], [0.7,"#2563eb"], [1,"#0a1f4a"] ] },
+                    { stops: [ [0,"#0a2559"], [0.3,"#2563eb"], [0.48,"#60a5fa"], [0.52,"#e0f2fe"], [0.7,"#1e40af"], [1,"#07193b"] ] },
+                    { stops: [ [0,"#020b1e"], [0.32,"#0284c7"], [0.5,"#7dd3fc"], [0.52,"#ffffff"], [0.7,"#0369a1"], [1,"#041433"] ] }
+                ],
+                type: "liquid_glass",
+                defaultDirection: "horizontal_s",
+                shine: 94, trans: 40, reflection: 85, glow: 48, grain: 6
+            },
+            flow_5: {
+                id: "flow_5",
+                name: "Champagne Gold Flow",
+                subtitle: "Warm Pearl Silk & Pale Platinum Gold",
+                bg: ["#1c1917", "#292524", "#44403c"],
+                accentType: "champagne_rim",
+                accentColor: ["#d97706", "#fef08a", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#292524"], [0.25,"#78716c"], [0.48,"#d6d3d1"], [0.52,"#ffffff"], [0.7,"#a8a29e"], [1,"#1c1917"] ] },
+                    { stops: [ [0,"#451a03"], [0.25,"#b45309"], [0.48,"#fde047"], [0.52,"#fffbeb"], [0.7,"#d97706"], [1,"#291e0a"] ] },
+                    { stops: [ [0,"#1c1917"], [0.3,"#a16207"], [0.48,"#fef08a"], [0.52,"#ffffff"], [0.7,"#ca8a04"], [1,"#261e12"] ] }
+                ],
+                type: "satin_metallic",
+                defaultDirection: "diagonal_nw_se",
+                shine: 88, trans: 15, reflection: 85, glow: 35, grain: 12
+            },
+            flow_6: {
+                id: "flow_6",
+                name: "Dark Chrome Wave",
+                subtitle: "Perforated Matte Carbon & Neon Blue Rim",
+                bg: ["#050811", "#0b0f19", "#111827"],
+                accentType: "neon_cyan_rim",
+                accentColor: ["#0284c7", "#00f0ff", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#050811"], [0.28,"#1e293b"], [0.5,"#334155"], [0.52,"#475569"], [0.7,"#1e293b"], [1,"#090d18"] ] },
+                    { stops: [ [0,"#0b0f19"], [0.25,"#334155"], [0.48,"#94a3b8"], [0.52,"#e2e8f0"], [0.7,"#475569"], [1,"#0d1322"] ] },
+                    { stops: [ [0,"#030712"], [0.3,"#0369a1"], [0.5,"#00f0ff"], [0.52,"#ffffff"], [0.7,"#0284c7"], [1,"#060c18"] ] }
+                ],
+                type: "chrome_textured",
+                defaultDirection: "horizontal_s",
+                shine: 92, trans: 8, reflection: 92, glow: 50, grain: 28
+            },
+            flow_7: {
+                id: "flow_7",
+                name: "Iridescent Glass Flow",
+                subtitle: "Holographic Rainbow Prism Dispersion",
+                bg: ["#0f172a", "#1e1b4b", "#312e81"],
+                accentType: "holographic",
+                accentColor: ["#22d3ee", "#f472b6", "#a855f7", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#064e3b"], [0.25,"#0284c7"], [0.48,"#818cf8"], [0.52,"#ffffff"], [0.7,"#c084fc"], [1,"#4c1d95"] ] },
+                    { stops: [ [0,"#1e1b4b"], [0.25,"#06b6d4"], [0.48,"#f472b6"], [0.52,"#ffffff"], [0.7,"#a855f7"], [1,"#312e81"] ] },
+                    { stops: [ [0,"#0c4a6e"], [0.3,"#38bdf8"], [0.5,"#f472b6"], [0.52,"#ffffff"], [0.7,"#818cf8"], [1,"#1e293b"] ] }
+                ],
+                type: "glass_iridescent",
+                defaultDirection: "diagonal_nw_se",
+                shine: 90, trans: 55, reflection: 94, glow: 55, grain: 6
+            },
+            flow_8: {
+                id: "flow_8",
+                name: "Red Chrome Ribbon",
+                subtitle: "Obsidian Dark & High-Gloss Candy Crimson",
+                bg: ["#050505", "#0c0a09", "#18181b"],
+                accentType: "silver_chrome_inner",
+                accentColor: ["#64748b", "#cbd5e1", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#09090b"], [0.25,"#27272a"], [0.48,"#71717a"], [0.52,"#d4d4d8"], [0.7,"#3f3f46"], [1,"#09090b"] ] },
+                    { stops: [ [0,"#450a0a"], [0.25,"#991b1b"], [0.48,"#ef4444"], [0.52,"#fee2e2"], [0.7,"#dc2626"], [1,"#260505"] ] },
+                    { stops: [ [0,"#18181b"], [0.28,"#b91c1c"], [0.5,"#f87171"], [0.52,"#ffffff"], [0.7,"#7f1d1d"], [1,"#0c0a09"] ] }
+                ],
+                type: "metallic",
+                defaultDirection: "diagonal_ne_sw",
+                shine: 96, trans: 10, reflection: 92, glow: 40, grain: 10
+            },
+            flow_9: {
+                id: "flow_9",
+                name: "Blue-Purple Gradient Flow",
+                subtitle: "Azure Cerulean to Vibrant Royal Violet",
+                bg: ["#060b26", "#0f172a", "#1e1b4b"],
+                accentType: "violet_sheen",
+                accentColor: ["#38bdf8", "#c084fc", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#0f172a"], [0.25,"#0369a1"], [0.48,"#38bdf8"], [0.52,"#ffffff"], [0.7,"#6366f1"], [1,"#1e1b4b"] ] },
+                    { stops: [ [0,"#1e1b4b"], [0.28,"#4338ca"], [0.48,"#a855f7"], [0.52,"#fdf4ff"], [0.7,"#3b82f6"], [1,"#0f172a"] ] },
+                    { stops: [ [0,"#0284c7"], [0.3,"#60a5fa"], [0.5,"#c084fc"], [0.52,"#ffffff"], [0.7,"#9333ea"], [1,"#1e1b4b"] ] }
+                ],
+                type: "gradient_flow",
+                defaultDirection: "horizontal_s",
+                shine: 88, trans: 35, reflection: 82, glow: 42, grain: 8
+            },
+            flow_10: {
+                id: "flow_10",
+                name: "Pearl Gold Wave",
+                subtitle: "Sculpted Mother-of-Pearl & Thin Gold Wire",
+                bg: ["#e2e8f0", "#f1f5f9", "#ffffff"],
+                accentType: "gold_wire",
+                accentColor: ["#ca8a04", "#fde047", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#cbd5e1"], [0.25,"#e2e8f0"], [0.48,"#f8fafc"], [0.52,"#ffffff"], [0.7,"#e2e8f0"], [1,"#94a3b8"] ] },
+                    { stops: [ [0,"#e2e8f0"], [0.28,"#f1f5f9"], [0.48,"#ffffff"], [0.52,"#ffffff"], [0.7,"#f8fafc"], [1,"#cbd5e1"] ] },
+                    { stops: [ [0,"#78350f"], [0.28,"#ca8a04"], [0.5,"#fde047"], [0.52,"#fffbeb"], [0.7,"#b45309"], [1,"#451a03"] ] }
+                ],
+                type: "pearl_metallic",
+                defaultDirection: "diagonal_nw_se",
+                shine: 90, trans: 10, reflection: 88, glow: 30, grain: 6
+            },
+            flow_11: {
+                id: "flow_11",
+                name: "Emerald Metallic Flow",
+                subtitle: "Imperial Forest Jade & Flowing Molten Gold",
+                bg: ["#021a14", "#042f24", "#064e3b"],
+                accentType: "molten_gold_ribbon",
+                accentColor: ["#b45309", "#facc15", "#fef9c3", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#021a14"], [0.28,"#065f46"], [0.48,"#10b981"], [0.52,"#ecfdf5"], [0.7,"#047857"], [1,"#022c22"] ] },
+                    { stops: [ [0,"#78350f"], [0.25,"#ca8a04"], [0.48,"#fde047"], [0.52,"#fffbeb"], [0.7,"#b45309"], [1,"#451a03"] ] },
+                    { stops: [ [0,"#022c22"], [0.3,"#047857"], [0.5,"#34d399"], [0.52,"#ffffff"], [0.7,"#065f46"], [1,"#011710"] ] }
+                ],
+                type: "metallic",
+                defaultDirection: "horizontal_s",
+                shine: 94, trans: 15, reflection: 90, glow: 46, grain: 14
+            },
+            flow_12: {
+                id: "flow_12",
+                name: "Crystal Blue Wave",
+                subtitle: "Translucent Glacial Ice & Aqua Glass",
+                bg: ["#e0f2fe", "#f0f9ff", "#ffffff"],
+                accentType: "crystal_caustic",
+                accentColor: ["#0284c7", "#38bdf8", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#7dd3fc"], [0.25,"#bae6fd"], [0.48,"#e0f2fe"], [0.52,"#ffffff"], [0.7,"#bae6fd"], [1,"#38bdf8"] ] },
+                    { stops: [ [0,"#0284c7"], [0.28,"#38bdf8"], [0.48,"#bae6fd"], [0.52,"#ffffff"], [0.7,"#0ea5e9"], [1,"#0369a1"] ] },
+                    { stops: [ [0,"#bae6fd"], [0.3,"#e0f2fe"], [0.5,"#ffffff"], [0.52,"#ffffff"], [0.7,"#f0f9ff"], [1,"#7dd3fc"] ] }
+                ],
+                type: "glass_crystal",
+                defaultDirection: "diagonal_nw_se",
+                shine: 92, trans: 60, reflection: 92, glow: 38, grain: 4
+            },
+            flow_13: {
+                id: "flow_13",
+                name: "Metallic Layered Curve",
+                subtitle: "Tiered Magenta Velvet & Rose Shimmer Dust",
+                bg: ["#1f061d", "#3b0735", "#700b65"],
+                accentType: "glitter_stipple",
+                accentColor: ["#db2777", "#f472b6", "#fdf2f8", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#3b0735"], [0.25,"#831843"], [0.48,"#db2777"], [0.52,"#fdf2f8"], [0.7,"#be185d"], [1,"#270523"] ] },
+                    { stops: [ [0,"#500747"], [0.28,"#9d174d"], [0.48,"#f472b6"], [0.52,"#ffffff"], [0.7,"#db2777"], [1,"#3b0735"] ] },
+                    { stops: [ [0,"#270523"], [0.3,"#be185d"], [0.5,"#fbcfe8"], [0.52,"#ffffff"], [0.7,"#9d174d"], [1,"#1f061d"] ] }
+                ],
+                type: "satin_textured",
+                defaultDirection: "diagonal_nw_se",
+                shine: 86, trans: 18, reflection: 82, glow: 42, grain: 24
+            },
+            flow_14: {
+                id: "flow_14",
+                name: "Neon Blue-Pink Flow",
+                subtitle: "Cyberpunk Synthwave Electric Cyan & Hot Pink",
+                bg: ["#02040a", "#080718", "#120822"],
+                accentType: "dual_neon",
+                accentColor: ["#00f0ff", "#ff007f", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#050c26"], [0.28,"#0077ff"], [0.48,"#00f0ff"], [0.52,"#ffffff"], [0.7,"#0099ff"], [1,"#020614"] ] },
+                    { stops: [ [0,"#260519"], [0.25,"#c026d3"], [0.48,"#ff007f"], [0.52,"#ffffff"], [0.7,"#d946ef"], [1,"#15020d"] ] },
+                    { stops: [ [0,"#02040a"], [0.3,"#06b6d4"], [0.5,"#e879f9"], [0.52,"#ffffff"], [0.7,"#0284c7"], [1,"#050814"] ] }
+                ],
+                type: "neon_glow",
+                defaultDirection: "horizontal_s",
+                shine: 98, trans: 25, reflection: 95, glow: 70, grain: 12
+            },
+            flow_15: {
+                id: "flow_15",
+                name: "Silver Satin Texture",
+                subtitle: "Monochromatic Pure Studio Liquid Platinum",
+                bg: ["#111827", "#1f2937", "#374151"],
+                accentType: "brushed_metal",
+                accentColor: ["#9ca3af", "#e5e7eb", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#111827"], [0.25,"#374151"], [0.48,"#9ca3af"], [0.52,"#ffffff"], [0.7,"#4b5563"], [1,"#0f172a"] ] },
+                    { stops: [ [0,"#1f2937"], [0.28,"#4b5563"], [0.48,"#cbd5e1"], [0.52,"#ffffff"], [0.7,"#6b7280"], [1,"#111827"] ] },
+                    { stops: [ [0,"#0f172a"], [0.3,"#6b7280"], [0.5,"#e5e7eb"], [0.52,"#ffffff"], [0.7,"#9ca3af"], [1,"#1f2937"] ] }
+                ],
+                type: "satin_monochrome",
+                defaultDirection: "diagonal_nw_se",
+                shine: 88, trans: 12, reflection: 88, glow: 28, grain: 16
+            },
+            flow_16: {
+                id: "flow_16",
+                name: "Deep Purple Glass Flow",
+                subtitle: "Midnight Violet & Imperial Cobalt Glass",
+                bg: ["#0a0217", "#180630", "#1e1b4b"],
+                accentType: "cyan_violet_sheen",
+                accentColor: ["#7c3aed", "#2563eb", "#67e8f9", "#ffffff"],
+                ribbons: [
+                    { stops: [ [0,"#1e0b38"], [0.28,"#581c87"], [0.48,"#1d4ed8"], [0.52,"#a5f3fc"], [0.7,"#7c3aed"], [1,"#0e041b"] ] },
+                    { stops: [ [0,"#0e041b"], [0.25,"#4338ca"], [0.48,"#7c3aed"], [0.52,"#ffffff"], [0.7,"#2563eb"], [1,"#180630"] ] },
+                    { stops: [ [0,"#180630"], [0.3,"#6d28d9"], [0.5,"#38bdf8"], [0.52,"#ffffff"], [0.7,"#581c87"], [1,"#0a0217"] ] }
+                ],
+                type: "liquid_glass",
+                defaultDirection: "horizontal_s",
+                shine: 94, trans: 45, reflection: 90, glow: 50, grain: 10
+            }
+        };
+
+        const FLOW_COLOR_PALETTES = {
+            gold_obsidian: { bg: ["#090a0f", "#141722"], stops: [ [0,"#090a0f"], [0.25,"#78350f"], [0.48,"#ca8a04"], [0.52,"#fde047"], [0.7,"#b45309"], [1,"#050608"] ], accent: ["#b45309", "#fde047", "#ffffff"] },
+            silver_platinum: { bg: ["#111827", "#374151"], stops: [ [0,"#1e293b"], [0.25,"#64748b"], [0.48,"#cbd5e1"], [0.52,"#ffffff"], [0.7,"#94a3b8"], [1,"#0f172a"] ], accent: ["#94a3b8", "#e2e8f0", "#ffffff"] },
+            purple_satin: { bg: ["#0f0728", "#2e1065"], stops: [ [0,"#1e0b38"], [0.28,"#581c87"], [0.48,"#7c3aed"], [0.52,"#c084fc"], [0.7,"#9333ea"], [1,"#150628"] ], accent: ["#a855f7", "#c084fc", "#ffffff"] },
+            sapphire_cyan: { bg: ["#02081f", "#0c2d66"], stops: [ [0,"#03112c"], [0.28,"#1d4ed8"], [0.48,"#2563eb"], [0.52,"#38bdf8"], [0.7,"#60a5fa"], [1,"#07193b"] ], accent: ["#0284c7", "#38bdf8", "#ffffff"] },
+            champagne_pearl: { bg: ["#1c1917", "#44403c"], stops: [ [0,"#292524"], [0.25,"#78716c"], [0.48,"#d97706"], [0.52,"#fef08a"], [0.7,"#ca8a04"], [1,"#1c1917"] ], accent: ["#d97706", "#fef08a", "#ffffff"] },
+            dark_cyan: { bg: ["#050811", "#111827"], stops: [ [0,"#050811"], [0.28,"#1e293b"], [0.48,"#334155"], [0.52,"#00f0ff"], [0.7,"#0284c7"], [1,"#090d18"] ], accent: ["#0284c7", "#00f0ff", "#ffffff"] },
+            iridescent_holo: { bg: ["#0f172a", "#312e81"], stops: [ [0,"#0284c7"], [0.25,"#22d3ee"], [0.48,"#f472b6"], [0.52,"#ffffff"], [0.7,"#a855f7"], [1,"#312e81"] ], accent: ["#22d3ee", "#f472b6", "#a855f7", "#ffffff"] },
+            ruby_chrome: { bg: ["#050505", "#18181b"], stops: [ [0,"#450a0a"], [0.25,"#991b1b"], [0.48,"#ef4444"], [0.52,"#fee2e2"], [0.7,"#cbd5e1"], [1,"#18181b"] ], accent: ["#64748b", "#cbd5e1", "#ffffff"] },
+            blue_violet: { bg: ["#060b26", "#1e1b4b"], stops: [ [0,"#0f172a"], [0.25,"#0369a1"], [0.48,"#38bdf8"], [0.52,"#ffffff"], [0.7,"#8b5cf6"], [1,"#1e1b4b"] ], accent: ["#38bdf8", "#c084fc", "#ffffff"] },
+            pearl_gold: { bg: ["#cbd5e1", "#f8fafc"], stops: [ [0,"#e2e8f0"], [0.28,"#f1f5f9"], [0.48,"#ffffff"], [0.52,"#fde047"], [0.7,"#b45309"], [1,"#94a3b8"] ], accent: ["#ca8a04", "#fde047", "#ffffff"] },
+            emerald_gold: { bg: ["#021a14", "#064e3b"], stops: [ [0,"#021a14"], [0.28,"#065f46"], [0.48,"#10b981"], [0.52,"#fde047"], [0.7,"#ca8a04"], [1,"#022c22"] ], accent: ["#b45309", "#facc15", "#ffffff"] },
+            crystal_aqua: { bg: ["#e0f2fe", "#f0f9ff"], stops: [ [0,"#0284c7"], [0.28,"#38bdf8"], [0.48,"#bae6fd"], [0.52,"#ffffff"], [0.7,"#e0f2fe"], [1,"#7dd3fc"] ], accent: ["#0284c7", "#38bdf8", "#ffffff"] },
+            magenta_pink: { bg: ["#1f061d", "#700b65"], stops: [ [0,"#3b0735"], [0.25,"#831843"], [0.48,"#db2777"], [0.52,"#fdf2f8"], [0.7,"#f472b6"], [1,"#1f061d"] ], accent: ["#db2777", "#f472b6", "#ffffff"] },
+            synthwave_neon: { bg: ["#02040a", "#120822"], stops: [ [0,"#0077ff"], [0.28,"#00f0ff"], [0.48,"#ffffff"], [0.52,"#ff007f"], [0.7,"#d946ef"], [1,"#020614"] ], accent: ["#00f0ff", "#ff007f", "#ffffff"] },
+            monochrome_satin: { bg: ["#111827", "#374151"], stops: [ [0,"#111827"], [0.25,"#374151"], [0.48,"#9ca3af"], [0.52,"#ffffff"], [0.7,"#6b7280"], [1,"#0f172a"] ], accent: ["#9ca3af", "#e5e7eb", "#ffffff"] },
+            deep_purple_blue: { bg: ["#0a0217", "#1e1b4b"], stops: [ [0,"#1e0b38"], [0.28,"#581c87"], [0.48,"#7c3aed"], [0.52,"#2563eb"], [0.7,"#60a5fa"], [1,"#0a0217"] ], accent: ["#7c3aed", "#2563eb", "#ffffff"] }
+        };
+
+        function renderAbstract3DFlowPattern(targetCtx, width, height, options = {}) {
+            const presetKey = options.style || 'flow_1';
+            const preset = FLOW_PRESETS[presetKey] || FLOW_PRESETS.flow_1;
+
+            const density = Math.max(2, Math.min(12, options.density ?? (preset.ribbons ? preset.ribbons.length * 2 : 5)));
+            const depthPct = (options.depth ?? 100) / 100;
+            const depth3DPct = (options.depth3D ?? 75) / 100;
+            const shinePct = (options.metallicShine ?? preset.shine ?? 85) / 100;
+            const transPct = (options.glassTrans ?? preset.trans ?? 20) / 100;
+            const reflectionPct = (options.reflection ?? preset.reflection ?? 80) / 100;
+            const glowPct = (options.glow ?? preset.glow ?? 35) / 100;
+            const grainPct = (options.grain ?? preset.grain ?? 10) / 100;
+            const blurPx = Math.max(0, Math.min(30, options.blur ?? 0));
+            const scaleFactor = Math.max(0.4, (options.scale ?? 100) / 100);
+            const userRotDeg = options.rotation ?? 0;
+            const seed = Number(options.seed ?? 12345);
+
+            targetCtx.save();
+            targetCtx.clearRect(0, 0, width, height);
+
+            // 1. Background Fill: Deep Studio Gradient
+            const colorPal = (options.colorPreset && FLOW_COLOR_PALETTES[options.colorPreset]) ? FLOW_COLOR_PALETTES[options.colorPreset] : null;
+            let bgColors = options.bgColor && options.bgColor !== '#090a0f' ? [options.bgColor, options.bgColor] : (colorPal ? colorPal.bg : preset.bg);
+
+            const bgGrad = targetCtx.createRadialGradient(width * 0.45, height * 0.4, Math.min(width, height) * 0.15, width * 0.5, height * 0.5, Math.hypot(width, height) * 0.75);
+            if (bgColors.length === 1) {
+                bgGrad.addColorStop(0, bgColors[0]);
+                bgGrad.addColorStop(1, '#05070a');
+            } else {
+                bgGrad.addColorStop(0, bgColors[Math.min(2, bgColors.length - 1)]);
+                bgGrad.addColorStop(0.5, bgColors[Math.floor(bgColors.length / 2)]);
+                bgGrad.addColorStop(1, bgColors[0]);
+            }
+            targetCtx.fillStyle = bgGrad;
+            targetCtx.fillRect(0, 0, width, height);
+
+            // 2. Determine Primary Flow Angle
+            let baseAngleDeg = 32;
+            const dirMode = options.direction || preset.defaultDirection || 'diagonal_nw_se';
+            if (dirMode === 'diagonal_ne_sw') baseAngleDeg = -32;
+            else if (dirMode === 'horizontal_s') baseAngleDeg = 0;
+            else if (dirMode === 'vertical') baseAngleDeg = 90;
+            else if (dirMode === 'organic_swirl') baseAngleDeg = 20;
+            else if (dirMode === 'layered_curves') baseAngleDeg = 15;
+
+            const totalAngleRad = ((baseAngleDeg + userRotDeg) * Math.PI) / 180;
+            const diag = Math.hypot(width, height) * 1.35;
+            const spanX = diag * scaleFactor;
+            const spanY = diag * 0.85 * scaleFactor;
+
+            targetCtx.translate(width / 2, height / 2);
+            targetCtx.rotate(totalAngleRad);
+
+            // 3. Multi-Pass Ribbon Generation (Back-to-Front)
+            const numRibbons = density;
+            const ribbonStepY = spanY / (numRibbons + 1);
+            const numSegments = 140;
+            const dx = spanX / numSegments;
+
+            // Pseudo-random deterministic noise function
+            const pseudoRand = (s) => {
+                const x = Math.sin(s * 12.9898 + 78.233) * 43758.5453;
+                return x - Math.floor(x);
+            };
+
+            for (let i = 0; i < numRibbons; i++) {
+                const rIndex = i % preset.ribbons.length;
+                const ribbonDef = colorPal ? { stops: colorPal.stops } : preset.ribbons[rIndex];
+                const seedI = seed + i * 37.19;
+
+                const baseY = -spanY / 2 + (i + 1) * ribbonStepY;
+                const amp = (spanY * 0.16) * depthPct * (0.8 + 0.4 * pseudoRand(seedI));
+
+                // Harmonics
+                const freq1 = (Math.PI * 2) / (spanX * 0.95);
+                const freq2 = (Math.PI * 2) / (spanX * 0.48);
+                const freq3 = (Math.PI * 2) / (spanX * 0.24);
+
+                const phase1 = seedI * 0.15 + i * 1.35;
+                const phase2 = seedI * 0.28 + i * 0.92;
+                const phase3 = seedI * 0.45 + i * 2.1;
+
+                const baseThickness = ribbonStepY * (1.35 + 0.3 * Math.sin(phase1));
+
+                // Generate spline coordinates
+                const topPts = [];
+                const botPts = [];
+                const crestPts = [];
+
+                for (let j = 0; j <= numSegments; j++) {
+                    const px = -spanX / 2 + j * dx;
+
+                    // S-Curve undulating center height
+                    let yCenter = baseY + amp * Math.sin(freq1 * px + phase1)
+                                        + 0.38 * amp * Math.cos(freq2 * px + phase2)
+                                        + 0.12 * amp * Math.sin(freq3 * px + phase3);
+
+                    if (dirMode === 'organic_swirl') {
+                        yCenter += (px * px) / (spanX * 3.8);
+                    } else if (dirMode === 'layered_curves') {
+                        yCenter += Math.sin(freq1 * 0.5 * px + phase1) * amp * 0.5;
+                    }
+
+                    // Thickness variations (sensual drapery pinch & swell)
+                    const thick = baseThickness * (0.75 + 0.45 * Math.sin(freq1 * 0.8 * px + phase1 + 1.2));
+                    const yTop = yCenter - thick * 0.52;
+                    const yBot = yCenter + thick * 0.48;
+                    const yCrest = yCenter - thick * 0.08;
+
+                    topPts.push({ x: px, y: yTop });
+                    botPts.push({ x: px, y: yBot });
+                    crestPts.push({ x: px, y: yCrest });
+                }
+
+                // Trace Ribbon Boundary
+                targetCtx.save();
+                targetCtx.beginPath();
+                targetCtx.moveTo(topPts[0].x, topPts[0].y);
+                for (let j = 1; j < topPts.length; j++) {
+                    const prev = topPts[j - 1];
+                    const curr = topPts[j];
+                    const mx = (prev.x + curr.x) / 2;
+                    const my = (prev.y + curr.y) / 2;
+                    targetCtx.quadraticCurveTo(prev.x, prev.y, mx, my);
+                }
+                targetCtx.lineTo(topPts[topPts.length - 1].x, topPts[topPts.length - 1].y);
+                targetCtx.lineTo(botPts[botPts.length - 1].x, botPts[botPts.length - 1].y);
+
+                for (let j = botPts.length - 2; j >= 0; j--) {
+                    const next = botPts[j + 1];
+                    const curr = botPts[j];
+                    const mx = (next.x + curr.x) / 2;
+                    const my = (next.y + curr.y) / 2;
+                    targetCtx.quadraticCurveTo(next.x, next.y, mx, my);
+                }
+                targetCtx.closePath();
+
+                // Ambient Occlusion / 3D Drop Shadow
+                if (depth3DPct > 0.05) {
+                    targetCtx.shadowColor = `rgba(0, 0, 0, ${(0.65 * depth3DPct).toFixed(2)})`;
+                    targetCtx.shadowBlur = Math.round(30 * depth3DPct * scaleFactor);
+                    targetCtx.shadowOffsetX = Math.round(6 * depth3DPct * scaleFactor);
+                    targetCtx.shadowOffsetY = Math.round(18 * depth3DPct * scaleFactor);
+                }
+
+                // Directional Surface Gradient (Perpendicular to ribbon fold)
+                const midIdx = Math.floor(topPts.length / 2);
+                const gradX0 = topPts[midIdx].x;
+                const gradY0 = topPts[midIdx].y;
+                const gradX1 = botPts[midIdx].x;
+                const gradY1 = botPts[midIdx].y;
+
+                const ribGrad = targetCtx.createLinearGradient(gradX0, gradY0, gradX1, gradY1);
+                const rawStops = ribbonDef.stops;
+                for (let s = 0; s < rawStops.length; s++) {
+                    const stopPos = rawStops[s][0];
+                    let stopColor = rawStops[s][1];
+                    ribGrad.addColorStop(stopPos, stopColor);
+                }
+
+                targetCtx.fillStyle = ribGrad;
+                targetCtx.globalAlpha = 1.0 - transPct * 0.45;
+                targetCtx.fill();
+
+                // Reset Shadow for Detail Layers
+                targetCtx.shadowColor = 'transparent';
+                targetCtx.shadowBlur = 0;
+                targetCtx.shadowOffsetX = 0;
+                targetCtx.shadowOffsetY = 0;
+
+                // 4. Razor Specular Ridge Highlight
+                if (shinePct > 0.1) {
+                    targetCtx.beginPath();
+                    targetCtx.moveTo(crestPts[0].x, crestPts[0].y);
+                    for (let j = 1; j < crestPts.length; j++) {
+                        const prev = crestPts[j - 1];
+                        const curr = crestPts[j];
+                        const mx = (prev.x + curr.x) / 2;
+                        const my = (prev.y + curr.y) / 2;
+                        targetCtx.quadraticCurveTo(prev.x, prev.y, mx, my);
+                    }
+                    targetCtx.strokeStyle = `rgba(255, 255, 255, ${(0.85 * shinePct).toFixed(2)})`;
+                    targetCtx.lineWidth = Math.max(1.5, 3.2 * scaleFactor);
+                    targetCtx.stroke();
+                }
+
+                // 5. Secondary Contrasting Metallic Accent Ribbon (e.g. 24K Gold, Neon Cyan, Hot Pink, Silver)
+                if (preset.accentType && (i % 2 === 1 || i === numRibbons - 2)) {
+                    const accentColors = colorPal ? colorPal.accent : (preset.accentColor || ["#f59e0b", "#fde047", "#ffffff"]);
+                    targetCtx.save();
+                    targetCtx.beginPath();
+                    const accentOffset = baseThickness * 0.18;
+                    targetCtx.moveTo(crestPts[0].x, crestPts[0].y + accentOffset);
+                    for (let j = 1; j < crestPts.length; j++) {
+                        const prev = crestPts[j - 1];
+                        const curr = crestPts[j];
+                        const mx = (prev.x + curr.x) / 2;
+                        const my = (prev.y + curr.y) / 2 + accentOffset;
+                        targetCtx.quadraticCurveTo(prev.x, prev.y + accentOffset, mx, my);
+                    }
+                    const accentGrad = targetCtx.createLinearGradient(crestPts[0].x, crestPts[0].y, crestPts[crestPts.length - 1].x, crestPts[crestPts.length - 1].y);
+                    accentGrad.addColorStop(0, accentColors[0]);
+                    accentGrad.addColorStop(0.5, accentColors[1 % accentColors.length]);
+                    accentGrad.addColorStop(1, accentColors[accentColors.length - 1]);
+
+                    targetCtx.strokeStyle = accentGrad;
+                    targetCtx.lineWidth = Math.max(2.2, 5.0 * scaleFactor);
+                    targetCtx.stroke();
+
+                    // Accent glint
+                    targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+                    targetCtx.lineWidth = Math.max(1.0, 1.8 * scaleFactor);
+                    targetCtx.stroke();
+                    targetCtx.restore();
+                }
+
+                // 6. Prismatic Iridescent Refraction (for Glass / Iridescent Styles)
+                if (transPct > 0.25 || preset.type.includes('glass') || preset.type.includes('iridescent')) {
+                    targetCtx.save();
+                    targetCtx.globalCompositeOperation = 'screen';
+                    const prismGrad = targetCtx.createLinearGradient(-spanX / 2, 0, spanX / 2, 0);
+                    prismGrad.addColorStop(0, 'rgba(34, 211, 238, 0.25)');
+                    prismGrad.addColorStop(0.35, 'rgba(244, 114, 182, 0.25)');
+                    prismGrad.addColorStop(0.7, 'rgba(168, 85, 247, 0.25)');
+                    prismGrad.addColorStop(1, 'rgba(253, 224, 71, 0.25)');
+                    targetCtx.fillStyle = prismGrad;
+                    targetCtx.globalAlpha = reflectionPct * 0.6;
+                    targetCtx.fill();
+                    targetCtx.restore();
+                }
+
+                // 7. Micro-Texture / Metallic Glitter Particles in Creases
+                if (grainPct > 0.05) {
+                    targetCtx.save();
+                    targetCtx.fillStyle = (preset.accentType === 'gold_trim' || preset.id === 'flow_2') ? 'rgba(253, 224, 71, 0.55)' : 'rgba(255, 255, 255, 0.45)';
+                    const numGrains = Math.round(180 * grainPct);
+                    for (let g = 0; g < numGrains; g++) {
+                        const gSeed = seedI * 11.3 + g * 7.13;
+                        const gIdx = Math.floor(pseudoRand(gSeed) * (botPts.length - 1));
+                        const pt = botPts[gIdx];
+                        const gx = pt.x + (pseudoRand(gSeed + 1) - 0.5) * 40 * scaleFactor;
+                        const gy = pt.y - pseudoRand(gSeed + 2) * (baseThickness * 0.35);
+                        const gSize = (0.8 + pseudoRand(gSeed + 3) * 1.8) * scaleFactor;
+                        targetCtx.beginPath();
+                        targetCtx.arc(gx, gy, gSize, 0, Math.PI * 2);
+                        targetCtx.fill();
+                    }
+                    targetCtx.restore();
+                }
+
+                // 8. Volumetric Crest Glow
+                if (glowPct > 0.1) {
+                    targetCtx.save();
+                    targetCtx.globalCompositeOperation = 'screen';
+                    targetCtx.beginPath();
+                    targetCtx.moveTo(crestPts[0].x, crestPts[0].y);
+                    for (let j = 1; j < crestPts.length; j++) {
+                        const prev = crestPts[j - 1];
+                        const curr = crestPts[j];
+                        const mx = (prev.x + curr.x) / 2;
+                        const my = (prev.y + curr.y) / 2;
+                        targetCtx.quadraticCurveTo(prev.x, prev.y, mx, my);
+                    }
+                    const glowColor = (colorPal ? colorPal.accent[0] : (preset.accentColor ? preset.accentColor[0] : '#ffffff'));
+                    targetCtx.strokeStyle = glowColor;
+                    targetCtx.globalAlpha = glowPct * 0.45;
+                    targetCtx.lineWidth = Math.max(6, 18 * scaleFactor);
+                    targetCtx.stroke();
+                    targetCtx.restore();
+                }
+
+                targetCtx.restore();
+            }
+
+            targetCtx.restore();
+
+            // Soft blur post-pass if requested
+            if (blurPx > 0 && typeof applyCrossBrowserBlur === 'function') {
+                const blurCanvas = document.createElement('canvas');
+                blurCanvas.width = width;
+                blurCanvas.height = height;
+                applyCrossBrowserBlur(targetCtx.canvas, blurCanvas.getContext('2d'), width, height, blurPx);
+                targetCtx.clearRect(0, 0, width, height);
+                targetCtx.drawImage(blurCanvas, 0, 0);
+            }
+        }
+        // ============================================================================
+
         function renderScene(targetCtx, width, height, tripletImgs, skipSplitOverlay = false) {
             const colors = PRESETS[state.preset] || PRESETS["Aurora Gradient"];
             const c0 = colors[0];
@@ -4746,6 +5815,48 @@
             const bCtx = baseBuffer.getContext('2d');
             bCtx.clearRect(0, 0, width, height);
             renderTripletBase(bCtx, width, height, tripletImgs);
+
+            // Abstract 3D Metallic & Glass Flow Patterns (Full-Frame Background Mode)
+            if (state.flowPatternEnable && state.flowTargetMode === 'background') {
+                const flowBgCanvas = getCachedOffscreenCanvas('flowBgBuffer', width, height);
+                const fCtx = flowBgCanvas.getContext('2d');
+                renderAbstract3DFlowPattern(fCtx, width, height, {
+                    style: state.flowStyle,
+                    colorPreset: state.flowColorPreset,
+                    bgColor: state.flowBgColor,
+                    direction: state.flowDirection,
+                    density: state.flowDensity,
+                    depth: state.flowDepth,
+                    depth3D: state.flow3DDepth,
+                    metallicShine: state.flowMetallicShine,
+                    glassTrans: state.flowGlassTrans,
+                    reflection: state.flowReflection,
+                    blur: state.flowBlur,
+                    glow: state.flowGlow,
+                    grain: state.flowGrain,
+                    scale: state.flowScale,
+                    rotation: state.flowRotation,
+                    seed: state.flowSeed
+                });
+
+                if (!state.tripletCleanBase || !tripletImgs || tripletImgs.length === 0 || !tripletImgs[0]) {
+                    // Pristine Full-Frame Abstract Stock Background
+                    bCtx.clearRect(0, 0, width, height);
+                    bCtx.drawImage(flowBgCanvas, 0, 0);
+                } else {
+                    // Blend flow background beneath photo triplets
+                    const compCanvas = document.createElement('canvas');
+                    compCanvas.width = width;
+                    compCanvas.height = height;
+                    const cCtx = compCanvas.getContext('2d');
+                    cCtx.drawImage(flowBgCanvas, 0, 0);
+                    cCtx.globalAlpha = 0.95;
+                    cCtx.drawImage(baseBuffer, 0, 0);
+                    bCtx.clearRect(0, 0, width, height);
+                    bCtx.drawImage(compCanvas, 0, 0);
+                    disposeCanvas(compCanvas);
+                }
+            }
 
             // Apply Photoshop Blur Engine according to selected Scope
             if (state.blurEngineEnable && (state.blurType !== 'none' || (state.blurNoiseEnable && state.blurNoiseAmount > 0))) {
@@ -5152,6 +6263,35 @@
                     gCtx.drawImage(glassSrc, 0, 0);
 
                     const gStyle = state.fracGlassStyle || 'glass1';
+                    if (gStyle.startsWith('flow_')) {
+                        const flowLayerCanvas = document.createElement('canvas');
+                        flowLayerCanvas.width = workW;
+                        flowLayerCanvas.height = workH;
+                        renderAbstract3DFlowPattern(flowLayerCanvas.getContext('2d'), workW, workH, {
+                            style: gStyle,
+                            colorPreset: state.flowColorPreset,
+                            bgColor: state.flowBgColor,
+                            direction: state.flowDirection,
+                            density: state.flowDensity,
+                            depth: state.flowDepth,
+                            depth3D: state.flow3DDepth,
+                            metallicShine: state.flowMetallicShine,
+                            glassTrans: state.flowGlassTrans,
+                            reflection: state.flowReflection,
+                            blur: state.flowBlur,
+                            glow: state.flowGlow,
+                            grain: state.flowGrain,
+                            scale: state.flowScale,
+                            rotation: state.flowRotation,
+                            seed: state.flowSeed
+                        });
+
+                        gCtx.save();
+                        gCtx.globalAlpha = baseNorm;
+                        gCtx.drawImage(flowLayerCanvas, 0, 0);
+                        gCtx.restore();
+                        disposeCanvas(flowLayerCanvas);
+                    } else {
                     const isProCat = gStyle.startsWith('pro_');
                     const proCatName = isProCat ? gStyle.split('_')[1] : '';
                     const proSubIdx = isProCat ? (parseInt(gStyle.split('_')[2], 10) || 1) : 0;
@@ -6459,6 +7599,7 @@
                     }
 
                     gCtx.restore();
+                    }
 
                     targetCtx.save();
                     if (hasGlassRot) {
@@ -6473,6 +7614,37 @@
 
                     disposeCanvas(glassSrc);
                     disposeCanvas(glassOut);
+                }
+
+                // Overlay mode hook for Abstract 3D Metallic & Glass Flow Patterns
+                if (state.flowPatternEnable && state.flowTargetMode === 'overlay') {
+                    const flowOverlay = document.createElement('canvas');
+                    flowOverlay.width = width;
+                    flowOverlay.height = height;
+                    renderAbstract3DFlowPattern(flowOverlay.getContext('2d'), width, height, {
+                        style: state.flowStyle,
+                        colorPreset: state.flowColorPreset,
+                        bgColor: state.flowBgColor,
+                        direction: state.flowDirection,
+                        density: state.flowDensity,
+                        depth: state.flowDepth,
+                        depth3D: state.flow3DDepth,
+                        metallicShine: state.flowMetallicShine,
+                        glassTrans: state.flowGlassTrans,
+                        reflection: state.flowReflection,
+                        blur: state.flowBlur,
+                        glow: state.flowGlow,
+                        grain: state.flowGrain,
+                        scale: state.flowScale,
+                        rotation: state.flowRotation,
+                        seed: state.flowSeed
+                    });
+                    targetCtx.save();
+                    targetCtx.globalAlpha = Math.max(0.1, 1.0 - (state.flowGlassTrans / 100) * 0.7);
+                    targetCtx.globalCompositeOperation = 'screen';
+                    targetCtx.drawImage(flowOverlay, 0, 0);
+                    targetCtx.restore();
+                    disposeCanvas(flowOverlay);
                 }
 
                 // Engine 6: Geometric Pattern Engine
@@ -6933,6 +8105,17 @@
             setTxt('valGlassRotation', (state.glassRotation || 0) + '°');
             setTxt('valFracGlassBase', state.fracGlassBase + '%');
             setTxt('valFracGlassOptics', state.fracGlassOptics + '%');
+            setTxt('valFlowDensity', (state.flowDensity || 5) + ' ribbons');
+            setTxt('valFlowDepth', (state.flowDepth || 100) + '%');
+            setTxt('valFlow3DDepth', (state.flow3DDepth || 75) + '%');
+            setTxt('valFlowMetallicShine', (state.flowMetallicShine || 85) + '%');
+            setTxt('valFlowGlassTrans', (state.flowGlassTrans || 20) + '%');
+            setTxt('valFlowReflection', (state.flowReflection || 80) + '%');
+            setTxt('valFlowBlur', (state.flowBlur || 0) + ' px');
+            setTxt('valFlowGlow', (state.flowGlow || 35) + '%');
+            setTxt('valFlowGrain', (state.flowGrain || 10) + '%');
+            setTxt('valFlowScale', (state.flowScale || 100) + '%');
+            setTxt('valFlowRotation', (state.flowRotation || 0) + '°');
             setTxt('valGeoDensity', state.geoDensity);
             setTxt('valGeoOpacity', state.geoOpacity + '%');
             setTxt('valLightFlare', state.lightFlare + '%');
@@ -7121,6 +8304,33 @@
             setVal('rngGlassRotation', state.glassRotation || 0);
             setVal('rngFracGlassBase', state.fracGlassBase);
             setVal('rngFracGlassOptics', state.fracGlassOptics);
+            setChk('chkFlowEnable', state.flowPatternEnable);
+            setVal('selFlowStyle', state.flowStyle);
+            setVal('selFlowColorPreset', state.flowColorPreset || 'default');
+            setVal('inpFlowBgColor', state.flowBgColor || '#090a0f');
+            setVal('selFlowDirection', state.flowDirection || 'diagonal_nw_se');
+            setVal('rngFlowDensity', state.flowDensity || 5);
+            setVal('rngFlowDepth', state.flowDepth || 100);
+            setVal('rngFlow3DDepth', state.flow3DDepth || 75);
+            setVal('rngFlowMetallicShine', state.flowMetallicShine || 85);
+            setVal('rngFlowGlassTrans', state.flowGlassTrans || 20);
+            setVal('rngFlowReflection', state.flowReflection || 80);
+            setVal('rngFlowBlur', state.flowBlur || 0);
+            setVal('rngFlowGlow', state.flowGlow || 35);
+            setVal('rngFlowGrain', state.flowGrain || 10);
+            setVal('rngFlowScale', state.flowScale || 100);
+            setVal('rngFlowRotation', state.flowRotation || 0);
+            const flowModeBgBtn = document.getElementById('btnFlowModeBackground');
+            const flowModeOvBtn = document.getElementById('btnFlowModeOverlay');
+            if (flowModeBgBtn && flowModeOvBtn) {
+                flowModeBgBtn.classList.toggle('active', state.flowTargetMode === 'background');
+                flowModeOvBtn.classList.toggle('active', state.flowTargetMode === 'overlay');
+            }
+            document.querySelectorAll('[data-flow-preset]').forEach(card => {
+                const isActive = card.getAttribute('data-flow-preset') === state.flowStyle;
+                card.classList.toggle('active', isActive);
+                card.classList.toggle('border-accent-main', isActive);
+            });
             setChk('chkGeoEnable', state.geoEnable);
             setVal('selGeoPattern', state.geoPattern);
             setVal('selGeoBlend', state.geoBlend);
@@ -7680,8 +8890,25 @@
 
         document.querySelectorAll('[data-quick-glass]').forEach(btn => {
             btn.addEventListener('click', () => {
+                const targetStyle = btn.getAttribute('data-quick-glass');
+                if (targetStyle && targetStyle.startsWith('flow_')) {
+                    state.flowPatternEnable = true;
+                    state.flowStyle = targetStyle;
+                    const pDef = FLOW_PRESETS[targetStyle];
+                    if (pDef) {
+                        state.flowDirection = pDef.defaultDirection || 'diagonal_nw_se';
+                        state.flowMetallicShine = pDef.shine ?? 85;
+                        state.flowGlassTrans = pDef.trans ?? 20;
+                        state.flowReflection = pDef.reflection ?? 80;
+                        state.flowGlow = pDef.glow ?? 35;
+                        state.flowGrain = pDef.grain ?? 10;
+                    }
+                    syncUIFromState();
+                    triggerRedraw();
+                    return;
+                }
                 state.fracGlassEnable = true;
-                state.fracGlassStyle = btn.getAttribute('data-quick-glass');
+                state.fracGlassStyle = targetStyle;
                 state.glassDir = 'auto';
                 state.fracGlassBase = 100;
                 state.fracGlassOptics = 100;
@@ -7691,6 +8918,483 @@
                 triggerRedraw();
             });
         });
+
+        // ============================================================================
+        // ABSTRACT 3D METALLIC & GLASS FLOW PATTERNS STUDIO - EVENT HANDLERS
+        // ============================================================================
+        bindInput('chkFlowEnable', 'change', (e) => {
+            state.flowPatternEnable = e.target.checked;
+            triggerRedraw();
+        });
+
+        const setFlowTargetMode = (mode) => {
+            state.flowTargetMode = mode;
+            const flowModeBgBtn = document.getElementById('btnFlowModeBackground');
+            const flowModeOvBtn = document.getElementById('btnFlowModeOverlay');
+            if (flowModeBgBtn) flowModeBgBtn.classList.toggle('active', mode === 'background');
+            if (flowModeOvBtn) flowModeOvBtn.classList.toggle('active', mode === 'overlay');
+            triggerRedraw();
+        };
+
+        bindInput('btnFlowModeBackground', 'click', () => setFlowTargetMode('background'));
+        bindInput('btnFlowModeOverlay', 'click', () => setFlowTargetMode('overlay'));
+
+        // 16 Presets Cards Selection
+        document.querySelectorAll('[data-flow-preset]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const pId = btn.getAttribute('data-flow-preset');
+                state.flowStyle = pId;
+                const pDef = FLOW_PRESETS[pId];
+                if (pDef) {
+                    state.flowDirection = pDef.defaultDirection || 'diagonal_nw_se';
+                    state.flowMetallicShine = pDef.shine ?? 85;
+                    state.flowGlassTrans = pDef.trans ?? 20;
+                    state.flowReflection = pDef.reflection ?? 80;
+                    state.flowGlow = pDef.glow ?? 35;
+                    state.flowGrain = pDef.grain ?? 10;
+                    state.flowDepth = 100;
+                    state.flow3DDepth = 75;
+                }
+                state.flowPatternEnable = true;
+                syncUIFromState();
+                triggerRedraw();
+                if (typeof showToast === 'function') {
+                    showToast('Pattern Selected', `${pDef ? pDef.name : pId} activated`);
+                }
+            });
+        });
+
+        bindInput('selFlowStyle', 'change', (e) => {
+            const pId = e.target.value;
+            state.flowStyle = pId;
+            const pDef = FLOW_PRESETS[pId];
+            if (pDef) {
+                state.flowDirection = pDef.defaultDirection || 'diagonal_nw_se';
+                state.flowMetallicShine = pDef.shine ?? 85;
+                state.flowGlassTrans = pDef.trans ?? 20;
+                state.flowReflection = pDef.reflection ?? 80;
+                state.flowGlow = pDef.glow ?? 35;
+                state.flowGrain = pDef.grain ?? 10;
+            }
+            syncUIFromState();
+            triggerRedraw();
+        });
+
+        bindInput('selFlowColorPreset', 'change', (e) => { state.flowColorPreset = e.target.value; triggerRedraw(); });
+        bindInput('inpFlowBgColor', 'input', (e) => { state.flowBgColor = e.target.value; triggerRedraw(true); });
+        bindInput('inpFlowBgColor', 'change', () => pushHistory());
+        bindInput('btnFlowResetBgColor', 'click', () => {
+            const pDef = FLOW_PRESETS[state.flowStyle];
+            state.flowBgColor = pDef && pDef.bg ? pDef.bg[0] : '#090a0f';
+            const bgInput = document.getElementById('inpFlowBgColor');
+            if (bgInput) bgInput.value = state.flowBgColor;
+            triggerRedraw();
+        });
+
+        bindInput('selFlowDirection', 'change', (e) => { state.flowDirection = e.target.value; triggerRedraw(); });
+        bindInput('rngFlowDensity', 'input', (e) => { state.flowDensity = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngFlowDensity', 'change', () => pushHistory());
+        bindInput('rngFlowDepth', 'input', (e) => { state.flowDepth = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngFlowDepth', 'change', () => pushHistory());
+        bindInput('rngFlow3DDepth', 'input', (e) => { state.flow3DDepth = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngFlow3DDepth', 'change', () => pushHistory());
+        bindInput('rngFlowMetallicShine', 'input', (e) => { state.flowMetallicShine = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngFlowMetallicShine', 'change', () => pushHistory());
+        bindInput('rngFlowGlassTrans', 'input', (e) => { state.flowGlassTrans = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngFlowGlassTrans', 'change', () => pushHistory());
+        bindInput('rngFlowReflection', 'input', (e) => { state.flowReflection = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngFlowReflection', 'change', () => pushHistory());
+        bindInput('rngFlowBlur', 'input', (e) => { state.flowBlur = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngFlowBlur', 'change', () => pushHistory());
+        bindInput('rngFlowGlow', 'input', (e) => { state.flowGlow = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngFlowGlow', 'change', () => pushHistory());
+        bindInput('rngFlowGrain', 'input', (e) => { state.flowGrain = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngFlowGrain', 'change', () => pushHistory());
+        bindInput('rngFlowScale', 'input', (e) => { state.flowScale = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngFlowScale', 'change', () => pushHistory());
+        bindInput('rngFlowRotation', 'input', (e) => { state.flowRotation = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngFlowRotation', 'change', () => pushHistory());
+
+        // Random Pattern Generator
+        const randomizeFlowPattern = () => {
+            state.flowSeed = Math.floor(Math.random() * 900000) + 1000;
+            const dirs = ['diagonal_nw_se', 'horizontal_s', 'diagonal_ne_sw', 'vertical', 'organic_swirl', 'layered_curves'];
+            state.flowDirection = dirs[Math.floor(Math.random() * dirs.length)];
+            state.flowDensity = Math.floor(Math.random() * 6) + 3; // 3 to 8
+            state.flowDepth = Math.floor(Math.random() * 80) + 70; // 70 to 150%
+            state.flowRotation = Math.floor(Math.random() * 36) * 10;
+            syncUIFromState();
+            triggerRedraw();
+            if (typeof showToast === 'function') {
+                showToast('🎲 3D Flow Pattern Randomized', `Seed: ${state.flowSeed}`);
+            }
+        };
+
+        bindInput('btnFlowRandom', 'click', randomizeFlowPattern);
+        bindInput('btnFlowRandomQuick', 'click', randomizeFlowPattern);
+
+        // Reset Settings
+        bindInput('btnFlowReset', 'click', () => {
+            const pDef = FLOW_PRESETS[state.flowStyle] || FLOW_PRESETS.flow_1;
+            state.flowDirection = pDef.defaultDirection || 'diagonal_nw_se';
+            state.flowDensity = 5;
+            state.flowDepth = 100;
+            state.flow3DDepth = 75;
+            state.flowMetallicShine = pDef.shine ?? 85;
+            state.flowGlassTrans = pDef.trans ?? 20;
+            state.flowReflection = pDef.reflection ?? 80;
+            state.flowBlur = 0;
+            state.flowGlow = pDef.glow ?? 35;
+            state.flowGrain = pDef.grain ?? 10;
+            state.flowScale = 100;
+            state.flowRotation = 0;
+            state.flowColorPreset = 'default';
+            state.flowBgColor = pDef.bg ? pDef.bg[0] : '#090a0f';
+            syncUIFromState();
+            triggerRedraw();
+            if (typeof showToast === 'function') {
+                showToast('↺ Settings Reset', `${pDef.name} defaults restored`);
+            }
+        });
+
+        // Custom Presets Management (localStorage)
+        const loadSavedFlowPresetsFromStorage = () => {
+            const selectEl = document.getElementById('selFlowSavedPresets');
+            if (!selectEl) return;
+            try {
+                const raw = localStorage.getItem('ri_flow_custom_presets_v1');
+                const list = raw ? JSON.parse(raw) : [];
+                selectEl.innerHTML = `<option value="">Saved User Presets (${list.length})</option>`;
+                list.forEach((item, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = idx;
+                    opt.textContent = `${idx + 1}. ${item.name} (${item.style})`;
+                    selectEl.appendChild(opt);
+                });
+            } catch (err) {
+                console.warn('Failed loading flow presets from localStorage:', err);
+            }
+        };
+
+        bindInput('btnFlowSavePreset', 'click', () => {
+            const pName = prompt('Enter a name for this 3D Flow Preset:', `My Flow Preset ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
+            if (!pName || !pName.trim()) return;
+            try {
+                const raw = localStorage.getItem('ri_flow_custom_presets_v1');
+                const list = raw ? JSON.parse(raw) : [];
+                list.push({
+                    name: pName.trim(),
+                    style: state.flowStyle,
+                    colorPreset: state.flowColorPreset,
+                    bgColor: state.flowBgColor,
+                    direction: state.flowDirection,
+                    density: state.flowDensity,
+                    depth: state.flowDepth,
+                    depth3D: state.flow3DDepth,
+                    metallicShine: state.flowMetallicShine,
+                    glassTrans: state.flowGlassTrans,
+                    reflection: state.flowReflection,
+                    blur: state.flowBlur,
+                    glow: state.flowGlow,
+                    grain: state.flowGrain,
+                    scale: state.flowScale,
+                    rotation: state.flowRotation,
+                    seed: state.flowSeed
+                });
+                localStorage.setItem('ri_flow_custom_presets_v1', JSON.stringify(list));
+                loadSavedFlowPresetsFromStorage();
+                if (typeof showToast === 'function') {
+                    showToast('💾 Preset Saved', `"${pName.trim()}" saved to local library`);
+                }
+            } catch (err) {
+                alert('Could not save preset: ' + err.message);
+            }
+        });
+
+        bindInput('selFlowSavedPresets', 'change', (e) => {
+            const val = e.target.value;
+            if (val === '') return;
+            try {
+                const list = JSON.parse(localStorage.getItem('ri_flow_custom_presets_v1') || '[]');
+                const item = list[parseInt(val, 10)];
+                if (item) {
+                    state.flowStyle = item.style || state.flowStyle;
+                    state.flowColorPreset = item.colorPreset || 'default';
+                    state.flowBgColor = item.bgColor || state.flowBgColor;
+                    state.flowDirection = item.direction || state.flowDirection;
+                    state.flowDensity = item.density ?? state.flowDensity;
+                    state.flowDepth = item.depth ?? state.flowDepth;
+                    state.flow3DDepth = item.depth3D ?? state.flow3DDepth;
+                    state.flowMetallicShine = item.metallicShine ?? state.flowMetallicShine;
+                    state.flowGlassTrans = item.glassTrans ?? state.flowGlassTrans;
+                    state.flowReflection = item.reflection ?? state.flowReflection;
+                    state.flowBlur = item.blur ?? state.flowBlur;
+                    state.flowGlow = item.glow ?? state.flowGlow;
+                    state.flowGrain = item.grain ?? state.flowGrain;
+                    state.flowScale = item.scale ?? state.flowScale;
+                    state.flowRotation = item.rotation ?? state.flowRotation;
+                    state.flowSeed = item.seed ?? state.flowSeed;
+                    syncUIFromState();
+                    triggerRedraw();
+                    if (typeof showToast === 'function') {
+                        showToast('Loaded Preset', `"${item.name}" applied successfully`);
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
+        // Variations Modal Logic (4 Procedural Variations)
+        const renderFlowVariations = () => {
+            const container = document.getElementById('flowVariationsGrid');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const seeds = [
+                state.flowSeed,
+                state.flowSeed + 137,
+                state.flowSeed + 349,
+                state.flowSeed + 581
+            ];
+
+            seeds.forEach((candidateSeed, idx) => {
+                const card = document.createElement('div');
+                card.className = 'studio-card p-2 rounded-xl border flex flex-col gap-2 bg-[#090e1a] hover:border-accent-main transition cursor-pointer';
+
+                const header = document.createElement('div');
+                header.className = 'flex items-center justify-between text-[11px] font-bold px-1';
+                header.innerHTML = `<span>Variation #${idx + 1}</span><span class="font-mono text-[9px] text-emerald-400">Seed ${candidateSeed}</span>`;
+
+                const vCanvas = document.createElement('canvas');
+                vCanvas.width = 380;
+                vCanvas.height = 214;
+                vCanvas.className = 'w-full rounded-lg border border-white/10 shadow-md aspect-[16/9] object-cover';
+
+                // Render variation candidate
+                const vCtx = vCanvas.getContext('2d');
+                renderAbstract3DFlowPattern(vCtx, vCanvas.width, vCanvas.height, {
+                    style: state.flowStyle,
+                    colorPreset: state.flowColorPreset,
+                    bgColor: state.flowBgColor,
+                    direction: state.flowDirection,
+                    density: state.flowDensity,
+                    depth: state.flowDepth,
+                    depth3D: state.flow3DDepth,
+                    metallicShine: state.flowMetallicShine,
+                    glassTrans: state.flowGlassTrans,
+                    reflection: state.flowReflection,
+                    blur: state.flowBlur,
+                    glow: state.flowGlow,
+                    grain: state.flowGrain,
+                    scale: state.flowScale,
+                    rotation: state.flowRotation + (idx === 0 ? 0 : (idx * 15)),
+                    seed: candidateSeed
+                });
+
+                const btnApply = document.createElement('button');
+                btnApply.type = 'button';
+                btnApply.className = 'studio-primary-btn py-1 px-2 rounded-lg text-[10px] font-bold w-full transition flex items-center justify-center gap-1';
+                btnApply.innerHTML = `<span>✓ Apply Variation #${idx + 1}</span>`;
+
+                const applyAction = () => {
+                    state.flowSeed = candidateSeed;
+                    if (idx > 0) state.flowRotation = (state.flowRotation + idx * 15) % 360;
+                    syncUIFromState();
+                    triggerRedraw();
+                    const modal = document.getElementById('flowVariationsModal');
+                    if (modal) modal.classList.add('hidden');
+                    if (typeof showToast === 'function') {
+                        showToast('✓ Variation Applied', `Seed ${candidateSeed} is now live on canvas`);
+                    }
+                };
+
+                btnApply.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    applyAction();
+                });
+                card.addEventListener('click', applyAction);
+
+                card.appendChild(header);
+                card.appendChild(vCanvas);
+                card.appendChild(btnApply);
+                container.appendChild(card);
+            });
+        };
+
+        bindInput('btnFlowVariations', 'click', () => {
+            const modal = document.getElementById('flowVariationsModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                renderFlowVariations();
+            }
+        });
+
+        bindInput('btnCloseFlowVariationsModal', 'click', () => {
+            const modal = document.getElementById('flowVariationsModal');
+            if (modal) modal.classList.add('hidden');
+        });
+
+        bindInput('btnRerollFlowVariations', 'click', () => {
+            state.flowSeed = Math.floor(Math.random() * 900000) + 1000;
+            renderFlowVariations();
+        });
+
+        // Resolution Switcher (custom resolution input toggle)
+        bindInput('selFlowExportRes', 'change', (e) => {
+            const customBox = document.getElementById('flowCustomResInputs');
+            if (customBox) {
+                customBox.classList.toggle('hidden', e.target.value !== 'custom');
+            }
+        });
+
+        const getFlowExportDimensions = () => {
+            const resVal = document.getElementById('selFlowExportRes')?.value || '3840x2160';
+            if (resVal === 'custom') {
+                const w = parseInt(document.getElementById('inpFlowCustomW')?.value, 10) || 3840;
+                const h = parseInt(document.getElementById('inpFlowCustomH')?.value, 10) || 2160;
+                return { width: Math.max(256, Math.min(8192, w)), height: Math.max(256, Math.min(8192, h)) };
+            }
+            const parts = resVal.split('x');
+            return {
+                width: parseInt(parts[0], 10) || 3840,
+                height: parseInt(parts[1], 10) || 2160
+            };
+        };
+
+        const exportFlowImage = (format = 'png', overrideDimensions = null) => {
+            const dims = overrideDimensions || getFlowExportDimensions();
+            const expCanvas = document.createElement('canvas');
+            expCanvas.width = dims.width;
+            expCanvas.height = dims.height;
+            const expCtx = expCanvas.getContext('2d');
+
+            const pDef = FLOW_PRESETS[state.flowStyle] || FLOW_PRESETS.flow_1;
+            renderAbstract3DFlowPattern(expCtx, dims.width, dims.height, {
+                style: state.flowStyle,
+                colorPreset: state.flowColorPreset,
+                bgColor: state.flowBgColor,
+                direction: state.flowDirection,
+                density: state.flowDensity,
+                depth: state.flowDepth,
+                depth3D: state.flow3DDepth,
+                metallicShine: state.flowMetallicShine,
+                glassTrans: state.flowGlassTrans,
+                reflection: state.flowReflection,
+                blur: state.flowBlur,
+                glow: state.flowGlow,
+                grain: state.flowGrain,
+                scale: state.flowScale,
+                rotation: state.flowRotation,
+                seed: state.flowSeed
+            });
+
+            const mime = format === 'jpg' ? 'image/jpeg' : 'image/png';
+            const ext = format === 'jpg' ? 'jpg' : 'png';
+            const quality = format === 'jpg' ? 0.95 : undefined;
+            const safeName = pDef.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+            const filename = `RI_3DFlow_${safeName}_${dims.width}x${dims.height}_${Date.now()}.${ext}`;
+
+            expCanvas.toBlob((blob) => {
+                if (blob) {
+                    if (typeof triggerActualBlobDownload === 'function') {
+                        triggerActualBlobDownload(blob, filename);
+                    } else {
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    }
+                    if (typeof showToast === 'function') {
+                        showToast('📥 Download Started', `${dims.width}×${dims.height} ${ext.toUpperCase()}`);
+                    }
+                }
+                disposeCanvas(expCanvas);
+            }, mime, quality);
+        };
+
+        bindInput('btnFlowDownloadPng', 'click', () => exportFlowImage('png'));
+        bindInput('btnFlowDownloadJpg', 'click', () => exportFlowImage('jpg'));
+        bindInput('btnFlowDownload4K', 'click', () => exportFlowImage('png', { width: 3840, height: 2160 }));
+
+        // Bulk Variations ZIP Generator
+        bindInput('btnFlowBulkGenerate', 'click', async () => {
+            if (typeof JSZip === 'undefined') {
+                alert('JSZip library is loading. Please wait a moment and try again.');
+                return;
+            }
+            const btn = document.getElementById('btnFlowBulkGenerate');
+            const origText = btn ? btn.innerHTML : '';
+            if (btn) { btn.disabled = true; btn.innerHTML = '<span>⏳</span> Generating 8 Variations...'; }
+
+            try {
+                const zip = new JSZip();
+                const dims = getFlowExportDimensions();
+                const count = 8;
+                const pDef = FLOW_PRESETS[state.flowStyle] || FLOW_PRESETS.flow_1;
+                const safeName = pDef.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+                for (let i = 0; i < count; i++) {
+                    const bCanvas = document.createElement('canvas');
+                    bCanvas.width = dims.width;
+                    bCanvas.height = dims.height;
+                    const bCtx = bCanvas.getContext('2d');
+
+                    const vSeed = state.flowSeed + i * 277 + 43;
+                    renderAbstract3DFlowPattern(bCtx, dims.width, dims.height, {
+                        style: state.flowStyle,
+                        colorPreset: state.flowColorPreset,
+                        bgColor: state.flowBgColor,
+                        direction: state.flowDirection,
+                        density: state.flowDensity,
+                        depth: state.flowDepth,
+                        depth3D: state.flow3DDepth,
+                        metallicShine: state.flowMetallicShine,
+                        glassTrans: state.flowGlassTrans,
+                        reflection: state.flowReflection,
+                        blur: state.flowBlur,
+                        glow: state.flowGlow,
+                        grain: state.flowGrain,
+                        scale: state.flowScale,
+                        rotation: (state.flowRotation + i * 15) % 360,
+                        seed: vSeed
+                    });
+
+                    const blob = await new Promise((res) => bCanvas.toBlob(res, 'image/jpeg', 0.94));
+                    if (blob) {
+                        zip.file(`${safeName}_Variation_${i + 1}_${dims.width}x${dims.height}_Seed${vSeed}.jpg`, blob);
+                    }
+                    disposeCanvas(bCanvas);
+                }
+
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                const zipName = `RI_3DFlow_${safeName}_${dims.width}x${dims.height}_8Variations.zip`;
+                if (typeof triggerActualBlobDownload === 'function') {
+                    triggerActualBlobDownload(zipBlob, zipName);
+                } else {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(zipBlob);
+                    a.download = zipName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+                if (typeof showToast === 'function') {
+                    showToast('📦 Bulk ZIP Ready', `Downloaded 8 4K variations in ZIP package!`);
+                }
+            } catch (bulkErr) {
+                console.error(bulkErr);
+                alert('Bulk generation error: ' + bulkErr.message);
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = origText; }
+            }
+        });
+
+        // Initialize saved flow presets on startup
+        loadSavedFlowPresetsFromStorage();
+        // ============================================================================
 
         // Geometric, Lighting & Texture Controls
         bindInput('chkGeoEnable', 'change', (e) => {
@@ -11326,6 +13030,34 @@ Tip: You can get a free Google Gemini API key at aistudio.google.com, or select 
         </div>
     </div>
 
+
+    <!-- ==================================================================== -->
+    <!-- ABSTRACT 3D METALLIC & GLASS FLOW VARIATIONS MODAL (4 SEEDS PREVIEW) -->
+    <!-- ==================================================================== -->
+    <div id="flowVariationsModal" class="hidden fixed inset-0 z-[9999] bg-black/85 flex items-center justify-center p-3 sm:p-6 backdrop-blur-md">
+        <div class="studio-card w-full max-w-4xl rounded-2xl border p-4 sm:p-5 space-y-3 bg-[#0d1424] text-slate-100 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🔀</span>
+                    <div>
+                        <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-400">3D Flow Pattern Variations (4 Seeds)</h3>
+                        <p class="text-[10px] text-slate-400">Click any variation below to instantly apply it to your live canvas</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" id="btnRerollFlowVariations" class="studio-btn px-2.5 py-1 rounded-lg border text-xs font-semibold hover:border-accent-main transition">🎲 Reroll</button>
+                    <button type="button" id="btnCloseFlowVariationsModal" class="studio-btn px-2.5 py-1 rounded-lg border text-xs font-bold hover:bg-white/10 transition">✕ Close</button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto p-1 flex-1" id="flowVariationsGrid">
+                <!-- 4 variation cards rendered dynamically -->
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t border-white/10 text-[10px] text-slate-400 shrink-0">
+                <span>Procedural 3D Spline Ribbons &bull; Ultra-HD</span>
+                <span class="font-mono text-emerald-400 font-bold">1-Click Instant Apply</span>
+            </div>
+        </div>
+    </div>
 
     <!-- ==================================================================== -->
     <!-- RI CREATIVE LIQUIFY STUDIO PRO (Photoshop Engine v24.0 Fullscreen Modal) -->

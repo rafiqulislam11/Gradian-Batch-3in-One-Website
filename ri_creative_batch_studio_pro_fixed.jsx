@@ -262,7 +262,24 @@ app.bringToFront();
             "53. 3D Liquid Glass Droplets (Pro)",
             "54. 3D Luminous Ribbed Glass (Pro)",
             "55. 3D Holographic Glass Spheres (Pro)",
-            "56. 3D Stacked Layered Glass Panes (Pro)"
+            "56. 3D Stacked Layered Glass Panes (Pro)",
+            // 9. Abstract 3D Metallic & Glass Flow Patterns (16 Stock Presets)
+            "9.1 Silver Metallic Flow",
+            "9.2 Black & Gold Wave",
+            "9.3 Purple Satin Wave",
+            "9.4 Blue Liquid Wave",
+            "9.5 Champagne Gold Flow",
+            "9.6 Dark Chrome Wave",
+            "9.7 Iridescent Glass Flow",
+            "9.8 Red Chrome Ribbon",
+            "9.9 Blue-Purple Gradient Flow",
+            "9.10 Pearl Gold Wave",
+            "9.11 Emerald Metallic Flow",
+            "9.12 Crystal Blue Wave",
+            "9.13 Metallic Layered Curve",
+            "9.14 Neon Blue-Pink Flow",
+            "9.15 Silver Satin Texture",
+            "9.16 Deep Purple Glass Flow"
         ];
 
         var DEFAULT_CONFIG = {
@@ -1219,6 +1236,7 @@ app.bringToFront();
                 var isCategory6Glow = (style.indexOf("6.") === 0 || style.indexOf("Luminous") !== -1 || style.indexOf("Neon") !== -1 || style.indexOf("Aurora") !== -1 || style.indexOf("Glow") !== -1 || style.indexOf("Halo") !== -1 || style.indexOf("Beam") !== -1 || style.indexOf("Radiant") !== -1 || style.indexOf("Backlit") !== -1 || style.indexOf("54.") === 0);
                 var isCategory7Abstract = (style.indexOf("7.") === 0 || style.indexOf("Fragment") !== -1 || style.indexOf("Shard") !== -1 || style.indexOf("Mosaic") !== -1 || style.indexOf("Mesh") !== -1 || style.indexOf("Sheet") !== -1 || style.indexOf("Overlay") !== -1 || style.indexOf("56.") === 0);
                 var isCategory8Color = (style.indexOf("8.") === 0 || style.indexOf("Rose Gold") !== -1 || style.indexOf("Champagne") !== -1 || style.indexOf("Emerald") !== -1 || style.indexOf("Sapphire") !== -1 || style.indexOf("Amethyst") !== -1 || style.indexOf("Ruby") !== -1 || style.indexOf("Amber") !== -1 || style.indexOf("Ocean Blue") !== -1);
+                var isCategory9Flow = (style.indexOf("9.") === 0 || style.indexOf("Flow") !== -1 || style.indexOf("Chrome Wave") !== -1 || style.indexOf("Chrome Ribbon") !== -1 || style.indexOf("Gold Wave") !== -1 || style.indexOf("Metallic") !== -1);
                 var isSphere = (style.indexOf("Sphere") !== -1 || style.indexOf("Orb") !== -1 || style.indexOf("5.1") === 0 || style.indexOf("5.2") === 0 || style.indexOf("55.") === 0);
 
                 if (isCategory1Frosted) {
@@ -1360,6 +1378,32 @@ app.bringToFront();
                     } catch (eAbs) {}
                     glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.45));
                     glassLayer.opacity = opacity;
+
+                } else if (isCategory9Flow) {
+                    // Category 9: Abstract 3D Metallic & Glass Flow Patterns (16 Stock Presets)
+                    try {
+                        glassLayer.applyTwirl(Math.round((distortion * 0.8) + 35));
+                        glassLayer.applyZigZag(Math.round(distortion * 0.45), 5, ZigZagType.AROUNDCENTER);
+                    } catch (eFlow) {}
+                    glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.3));
+                    glassLayer.opacity = opacity;
+
+                    // Specular Ribbon Ridge Highlight
+                    try {
+                        var ridgeLayer = doc.artLayers.add();
+                        ridgeLayer.name = "RI 3D Metallic Flow Crest [Specular Sheen]";
+                        var rCol = new SolidColor();
+                        if (style.indexOf("Gold") !== -1) { rCol.rgb.red = 255; rCol.rgb.green = 225; rCol.rgb.blue = 120; }
+                        else if (style.indexOf("Neon") !== -1) { rCol.rgb.red = 0; rCol.rgb.green = 240; rCol.rgb.blue = 255; }
+                        else if (style.indexOf("Purple") !== -1) { rCol.rgb.red = 210; rCol.rgb.green = 140; rCol.rgb.blue = 255; }
+                        else { rCol.rgb.red = 255; rCol.rgb.green = 255; rCol.rgb.blue = 255; }
+
+                        doc.selection.selectAll();
+                        doc.selection.stroke(rCol, Math.max(6, Math.round(w * 0.004)), StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
+                        doc.selection.deselect();
+                        ridgeLayer.blendMode = BlendMode.SCREEN;
+                        ridgeLayer.opacity = 80;
+                    } catch (ridgeErr) {}
 
                 } else {
                     // Category 2: Ribbed, Fluted & Textured Glass (Vertical, Horizontal, Wavy & Cross-Grid)

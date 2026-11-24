@@ -315,6 +315,15 @@
                 padding-left: 0.75rem !important;
                 padding-right: 0.75rem !important;
             }
+            #studioHeaderActions {
+                overflow-x: auto !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            #studioHeaderActions::-webkit-scrollbar {
+                display: none !important;
+            }
             #studioTitle {
                 font-size: 0.8125rem !important;
             }
@@ -366,6 +375,18 @@
             }
         }
 
+        /* Tablets In-Between Widths (640px to 1023px) */
+        @media (min-width: 640px) and (max-width: 1023px) {
+            #studioSidebar, #studioRightSidebar {
+                max-width: 680px !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+            #mobilePipPreview {
+                width: 14rem !important;
+            }
+        }
+
         /* =========================================================================
            2. MOBILE & TABLET RESPONSIVE SUITE (< 1024px: Phones, Phablets, iPads, Android Tablets)
            ========================================================================= */
@@ -393,13 +414,20 @@
             #studioHeaderActions > * {
                 flex-shrink: 0 !important;
             }
+            /* Make Export and Batch immediate priority on mobile view */
+            #btnDownloadSingle {
+                order: -2 !important;
+            }
+            #btnRunBatch {
+                order: -1 !important;
+            }
 
-            /* Responsive 4-Tab Mobile Navigation Bar */
+            /* Responsive 4-Tab Mobile Navigation Bar with iPhone Home Indicator Safe Area */
             #mobileWorkspaceNav {
                 display: grid !important;
-                height: 3.25rem !important;
-                min-height: 3.25rem !important;
-                padding: 0.25rem 0.35rem !important;
+                height: calc(3.25rem + var(--sab)) !important;
+                min-height: calc(3.25rem + var(--sab)) !important;
+                padding: 0.25rem 0.35rem calc(0.25rem + var(--sab)) 0.35rem !important;
                 gap: 0.25rem !important;
             }
             #mobileWorkspaceNav button {
@@ -1508,7 +1536,7 @@
                             <span class="text-[10px] font-bold uppercase tracking-wider studio-heading">Creative Target Mode:</span>
                             <span id="lblFlowTargetMode" class="text-[9px] font-bold text-sky-400 font-mono">Full Background</span>
                         </div>
-                        <div class="grid grid-cols-5 gap-1 text-[9px] font-semibold" id="gridFlowModes">
+                        <div class="grid grid-cols-3 sm:grid-cols-5 gap-1 text-[9px] font-semibold" id="gridFlowModes">
                             <button type="button" data-flow-mode="background" id="btnFlowModeBackground" class="tab-btn active py-1 px-1 rounded border transition text-center flex flex-col items-center justify-center gap-0.5" title="Full 3D stock background beneath your photos">
                                 <span class="text-xs">🖼️</span><span>Background</span>
                             </button>
@@ -2002,7 +2030,7 @@
                             <!-- Quick Preset Angle Buttons -->
                             <div>
                                 <label class="text-[8px] font-bold uppercase tracking-wider studio-subtext block mb-1">Quick Angle Presets:</label>
-                                <div class="grid grid-cols-6 gap-1" id="gridFlowRotationPresets">
+                                <div class="grid grid-cols-3 sm:grid-cols-6 gap-1" id="gridFlowRotationPresets">
                                     <button type="button" data-flow-rot="0" class="studio-btn active py-1 px-0.5 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="0° Horizontal Flow">0° Horiz</button>
                                     <button type="button" data-flow-rot="32" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="32° Stock NW-SE Diagonal">32° Diag</button>
                                     <button type="button" data-flow-rot="45" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="45° Diagonal Wave">45°</button>
@@ -2013,7 +2041,7 @@
                             </div>
 
                             <!-- Rotation Stepping & Mirror/Flip Actions -->
-                            <div class="grid grid-cols-6 gap-1 pt-1 border-t border-black/5 dark:border-white/5">
+                            <div class="grid grid-cols-3 sm:grid-cols-6 gap-1 pt-1 border-t border-black/5 dark:border-white/5">
                                 <button type="button" id="btnFlowRotMinus90" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold truncate hover:border-sky-400 transition" title="Rotate Left 90°">↺ -90°</button>
                                 <button type="button" id="btnFlowRotPlus90" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold truncate hover:border-sky-400 transition" title="Rotate Right 90°">↻ +90°</button>
                                 <button type="button" id="btnFlowRotMinus15" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold truncate hover:border-sky-400 transition" title="Nudge Left 15°">↺ -15°</button>
@@ -2030,7 +2058,7 @@
                             <span>⚡ Advanced Actions</span>
                             <span class="font-mono text-[9px] studio-accent-text">Seeds &amp; Variations</span>
                         </div>
-                        <div class="grid grid-cols-5 gap-1">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-1">
                             <button id="btnFlowRemix" type="button" class="studio-btn py-1.5 px-1 rounded border text-[10px] font-semibold truncate hover:border-purple-400 bg-purple-500/10 text-purple-400 transition text-center" title="Smart Generative Mutation with Cohesive Colors &amp; Harmonics">✨ Remix</button>
                             <button id="btnFlowCyclePalette" type="button" class="studio-btn py-1.5 px-1 rounded border text-[10px] font-semibold truncate hover:border-sky-400 transition text-center" title="Cycle Next Color Palette">🎨 Palette</button>
                             <button id="btnFlowRandom" type="button" class="studio-btn py-1.5 px-1 rounded border text-[10px] font-semibold truncate hover:border-accent-main transition text-center" title="Generate Random Harmonic Seed">🎲 Random</button>
@@ -2126,7 +2154,7 @@
                             <label class="text-[9px] font-bold uppercase tracking-wider studio-subtext">Choose Glass Shape (20 Styles):</label>
                             <span id="lblActiveGlassShape" class="text-[9px] font-medium text-slate-400">None (Off)</span>
                         </div>
-                        <div class="grid grid-cols-5 gap-1" id="gridGlassShapes">
+                        <div class="grid grid-cols-4 sm:grid-cols-5 gap-1" id="gridGlassShapes">
                             <button type="button" data-glass-shape="frosted" class="studio-btn py-1 px-1 rounded-lg border text-[9px] font-semibold flex flex-col items-center justify-center gap-0.5 transition hover:border-accent-main" title="Frosted Glass (Rounded slab with blur)">
                                 <span class="text-xs">🌫️</span>
                                 <span class="truncate w-full text-center text-[8px]">Frosted</span>
@@ -4895,9 +4923,9 @@
             const aspect = outW / outH;
             
             const rect = wrapper.getBoundingClientRect();
-            const fallbackW = Math.max(280, window.innerWidth - (window.innerWidth >= 1024 ? 700 : 32));
-            const availW = Math.max(280, Math.floor((rect.width > 50 ? rect.width : fallbackW) - 16));
-            const availH = Math.max(180, Math.floor((rect.height > 50 ? rect.height : (window.innerHeight * (window.innerWidth >= 1024 ? 0.54 : 0.44))) - 16));
+            const fallbackW = Math.max(220, window.innerWidth - (window.innerWidth >= 1024 ? 700 : 24));
+            const availW = Math.max(180, Math.floor((rect.width > 50 ? rect.width : fallbackW) - 12));
+            const availH = Math.max(130, Math.floor((rect.height > 50 ? rect.height : (window.innerHeight * (window.innerWidth >= 1024 ? 0.54 : 0.44))) - 12));
             
             let targetW = availW;
             let targetH = Math.round(targetW / aspect);
@@ -13948,10 +13976,15 @@ const GLASS_SHAPES_INFO = {
                     applyCanvasTransform();
                 }
             };
-            window.addEventListener('resize', () => {
+            const handleViewportChange = () => {
                 resizeCanvas();
                 renderScene(ctx, canvas.width, canvas.height, previewTripletImages);
                 applyCanvasTransform();
+                syncMobilePipCanvas();
+            };
+            window.addEventListener('resize', handleViewportChange);
+            window.addEventListener('orientationchange', () => {
+                setTimeout(handleViewportChange, 120);
             });
             try {
                 const mq = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
@@ -13974,7 +14007,10 @@ const GLASS_SHAPES_INFO = {
                 setTimeout(() => {
                     resizeCanvas();
                     renderScene(ctx, canvas.width, canvas.height, previewTripletImages);
+                    applyCanvasTransform();
                 }, 30);
+            } else if (view === 'tools' || view === 'layers') {
+                setTimeout(syncMobilePipCanvas, 40);
             }
         }
         document.querySelectorAll('[data-mobile-view]').forEach(btn => {
@@ -17338,7 +17374,10 @@ Tip: You can get a free Google Gemini API key at aistudio.google.com, or select 
 
         function syncMobilePipCanvas() {
             const wrap = document.getElementById('mobilePipPreview');
-            if (!wrap || wrap.classList.contains('hidden') || wrap.offsetParent === null) return;
+            if (!wrap) return;
+            // Check if mobile mode and in tools or layers view
+            const isMobileVisible = window.innerWidth < 1024 && (document.body.classList.contains('mobile-view-tools') || document.body.classList.contains('mobile-view-layers'));
+            if (!isMobileVisible) return;
             const pCanvas = document.getElementById('pipCanvas');
             const srcCanvas = document.getElementById('previewCanvas');
             if (!pCanvas || !srcCanvas || srcCanvas.width === 0) return;
@@ -17354,7 +17393,7 @@ Tip: You can get a free Google Gemini API key at aistudio.google.com, or select 
     </script>
 
     <!-- Floating Picture-in-Picture (PiP) Mini-Preview for Mobile & Tablet Controls -->
-    <div id="mobilePipPreview" onclick="setMobileWorkspaceView('preview')" class="hidden fixed bottom-4 right-4 z-40 w-36 sm:w-44 bg-black/85 backdrop-blur-md rounded-2xl p-2 border border-white/20 shadow-2xl transition-all cursor-pointer select-none">
+    <div id="mobilePipPreview" onclick="setMobileWorkspaceView('preview')" class="fixed bottom-4 right-4 z-40 w-36 sm:w-44 bg-black/85 backdrop-blur-md rounded-2xl p-2 border border-white/20 shadow-2xl transition-all cursor-pointer select-none">
         <div class="flex items-center justify-between pb-1 text-[9px] font-bold text-white/90">
             <span class="flex items-center gap-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>

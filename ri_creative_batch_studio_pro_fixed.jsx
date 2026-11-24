@@ -72,10 +72,34 @@ app.bringToFront();
 
         var PS_VERSION = (typeof app !== "undefined" && app.version) ? String(app.version) : "9.0.2";
         var IS_CS2 = (PS_VERSION.indexOf("9.") === 0);
-        var DO_NOT_SAVE = (typeof SaveOptions !== "undefined" && typeof SaveOptions.DONOTSAVE !== "undefined") ? SaveOptions.DONOTSAVE : 2;
-        var PLACE_TOP = (typeof ElementPlacement !== "undefined" && typeof ElementPlacement.PLACEATBEGINNING !== "undefined") ? ElementPlacement.PLACEATBEGINNING : 1;
-        var DIALOG_NO = (typeof DialogModes !== "undefined" && typeof DialogModes.NO !== "undefined") ? DialogModes.NO : 3;
-        var UNITS_PX = (typeof Units !== "undefined" && typeof Units.PIXELS !== "undefined") ? Units.PIXELS : 1;
+
+        var DO_NOT_SAVE = 2;
+        try {
+            if (typeof SaveOptions !== "undefined") {
+                DO_NOT_SAVE = SaveOptions.DONOTSAVECHANGES;
+            }
+        } catch (eEnumSave) {}
+
+        var PLACE_TOP = 1;
+        try {
+            if (typeof ElementPlacement !== "undefined") {
+                PLACE_TOP = ElementPlacement.PLACEBEFORE;
+            }
+        } catch (eEnumPlace) {}
+
+        var DIALOG_NO = 3;
+        try {
+            if (typeof DialogModes !== "undefined") {
+                DIALOG_NO = DialogModes.NO;
+            }
+        } catch (eEnumDialog) {}
+
+        var UNITS_PX = 1;
+        try {
+            if (typeof Units !== "undefined") {
+                UNITS_PX = Units.PIXELS;
+            }
+        } catch (eEnumUnits) {}
 
 
         var RESOLUTION_PRESETS = [
@@ -639,11 +663,7 @@ app.bringToFront();
         function purgePhotoshopCachesSafe() {
             try {
                 if (typeof PurgeTarget !== "undefined") {
-                    if (PurgeTarget.ALLCACHES) {
-                        app.purge(PurgeTarget.ALLCACHES);
-                    } else if (PurgeTarget.ALL) {
-                        app.purge(PurgeTarget.ALL);
-                    }
+                    app.purge(PurgeTarget.ALLCACHES);
                 }
             } catch (purgeErr) {}
         }

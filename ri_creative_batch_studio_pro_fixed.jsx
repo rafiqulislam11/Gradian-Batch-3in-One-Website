@@ -1282,11 +1282,12 @@ app.bringToFront();
         // ====================================================================
         // PROCEDURAL 3D FLOW PATTERN ENGINE (Full-Frame Stock Wallpapers)
         // ====================================================================
-        function renderPhotoshopFlowPattern(doc, w, h, style, cfg) {
+                function renderPhotoshopFlowPattern(doc, w, h, style, cfg) {
             var pDef = getFlowPresetDef(style);
             var opacity = Math.max(30, Math.min(100, cfg.glassOpacity || 85));
             var distortion = Math.max(10, Math.min(100, cfg.glassDistortion || 35));
             var strokeW = Math.max(3, Math.round(w * 0.003));
+            var isStandalone = (cfg._isStandalone === true);
 
             try {
                 // 1. Studio Backdrop Base Layer
@@ -1297,6 +1298,10 @@ app.bringToFront();
                 doc.selection.selectAll();
                 doc.selection.fill(bgCol, ColorBlendMode.NORMAL, 100, false);
                 doc.selection.deselect();
+                if (!isStandalone) {
+                    bgArt.blendMode = BlendMode.SOFTLIGHT;
+                    bgArt.opacity = 55;
+                }
 
                 // 2. Generate 3 to 4 Multi-Tier Volumetric Flow Ribbons
                 var ribbonCount = 3;
@@ -1401,14 +1406,12 @@ app.bringToFront();
             }
         }
 
-        // ====================================================================
-        // PROCEDURAL 3D GLASS BACKGROUND ENGINE (25 Full-Frame Styles)
-        // ====================================================================
         function renderPhotoshop3DGlassBackground(doc, w, h, style, cfg) {
             var opacity = Math.max(30, Math.min(100, cfg.glassOpacity || 80));
             var frostBlur = Math.max(2, Math.min(100, cfg.glassFrostBlur || 20));
             var distortion = Math.max(10, Math.min(100, cfg.glassDistortion || 35));
             var strokeW = Math.max(3, Math.round(w * 0.0035));
+            var isStandalone = (cfg._isStandalone === true);
 
             try {
                 // Deep Oceanic Sapphire Studio Backdrop
@@ -1419,6 +1422,10 @@ app.bringToFront();
                 doc.selection.selectAll();
                 doc.selection.fill(bgCol, ColorBlendMode.NORMAL, 100, false);
                 doc.selection.deselect();
+                if (!isStandalone) {
+                    bgLayer.blendMode = BlendMode.SOFTLIGHT;
+                    bgLayer.opacity = 50;
+                }
 
                 var whiteCol = new SolidColor();
                 whiteCol.rgb.red = 255; whiteCol.rgb.green = 255; whiteCol.rgb.blue = 255;
@@ -1569,6 +1576,21 @@ app.bringToFront();
                         cubeArt.opacity = opacity;
                     }
 
+                } else if (style.indexOf("Ribbon") !== -1 || style.indexOf("10.05") !== -1) {
+                    // 10.05 3D Glass Ribbon: 4 Diagonal Twisting Glass Helixes
+                    for (var rb = 0; rb < 4; rb++) {
+                        var rbArt = doc.artLayers.add();
+                        rbArt.name = "RI 3D Glass Ribbon " + (rb + 1);
+                        var rY = Math.round(h * (0.2 + (rb * 0.18)));
+                        doc.selection.select([[0, rY], [w, rY + Math.round(h * 0.25)], [w, rY + Math.round(h * 0.38)], [0, rY + Math.round(h * 0.13)]]);
+                        doc.selection.fill(rb % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 40, false);
+                        doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
+                        doc.selection.deselect();
+                        try { rbArt.applyTwirl(Math.round(55 * (rb % 2 === 0 ? 1 : -1))); } catch (eTw) {}
+                        rbArt.blendMode = BlendMode.SCREEN;
+                        rbArt.opacity = opacity;
+                    }
+
                 } else if (style.indexOf("Hexagon") !== -1 || style.indexOf("10.06") !== -1) {
                     // 10.06 3D Hexagon: Floating Hexagonal Prisms
                     var hexCenters = [
@@ -1595,6 +1617,29 @@ app.bringToFront();
                         hexArt.opacity = opacity;
                     }
 
+                } else if (style.indexOf("Square") !== -1 || style.indexOf("Tiles") !== -1 || style.indexOf("10.07") !== -1 || style.indexOf("10.14") !== -1) {
+                    // 10.07 & 10.14: Staggered Matrix of Floating Frosted Glass Tiles
+                    var rows = 4, cols = 6;
+                    var tileW = Math.round(w / (cols + 2));
+                    var tileH = Math.round(h / (rows + 2));
+                    for (var tr = 0; tr < rows; tr++) {
+                        for (var tc = 0; tc < cols; tc++) {
+                            var tArt = doc.artLayers.add();
+                            tArt.name = "RI Glass Tile [" + tr + "," + tc + "]";
+                            var tx = Math.round((tc + 1) * tileW + (tr % 2 === 0 ? tileW * 0.2 : 0));
+                            var ty = Math.round((tr + 1) * tileH);
+                            var tDimW = Math.round(tileW * 0.85);
+                            var tDimH = Math.round(tileH * 0.85);
+                            doc.selection.select([[tx, ty], [tx + tDimW, ty], [tx + tDimW, ty + tDimH], [tx, ty + tDimH]]);
+                            doc.selection.fill((tr + tc) % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 35, false);
+                            doc.selection.stroke(whiteCol, Math.max(2, Math.round(strokeW * 0.6)), StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
+                            doc.selection.deselect();
+                            tArt.applyGaussianBlur(Math.max(1, frostBlur * 0.2));
+                            tArt.blendMode = BlendMode.SCREEN;
+                            tArt.opacity = opacity;
+                        }
+                    }
+
                 } else if (style.indexOf("Spiral") !== -1 || style.indexOf("Vortex") !== -1 || style.indexOf("10.08") !== -1) {
                     // 10.08 3D Glass Spiral Vortex
                     var spiralArt = doc.artLayers.add();
@@ -1606,6 +1651,23 @@ app.bringToFront();
                     spiralArt.applyZigZag(40, 6, ZigZagType.AROUNDCENTER);
                     spiralArt.blendMode = BlendMode.SCREEN;
                     spiralArt.opacity = opacity;
+
+                } else if (style.indexOf("Stripes") !== -1 || style.indexOf("10.09") !== -1) {
+                    // 10.09 3D Glass Stripes / Diagonal Translucent Louvers
+                    var numStripes = 8;
+                    var strW = Math.round((w + h) / (numStripes * 2));
+                    for (var st = 0; st < numStripes; st++) {
+                        var stArt = doc.artLayers.add();
+                        stArt.name = "RI Glass Stripe " + (st + 1);
+                        var sOffset = Math.round(st * strW * 2.2);
+                        doc.selection.select([[sOffset, 0], [sOffset + strW, 0], [sOffset - h + strW, h], [sOffset - h, h]]);
+                        doc.selection.fill(st % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 35, false);
+                        doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                        doc.selection.deselect();
+                        stArt.applyGaussianBlur(Math.max(2, frostBlur * 0.25));
+                        stArt.blendMode = BlendMode.SCREEN;
+                        stArt.opacity = opacity;
+                    }
 
                 } else if (style.indexOf("Prism") !== -1 || style.indexOf("10.11") !== -1) {
                     // 10.11 3D Prism: Triangular Prism Facet splitting into Rainbow Dispersion
@@ -1641,6 +1703,59 @@ app.bringToFront();
                         specArt.opacity = 65;
                     } catch (eSp) {}
 
+                } else if (style.indexOf("Liquid") !== -1 || style.indexOf("10.12") !== -1) {
+                    // 10.12 3D Liquid Glass: Molten glass droplets and organic pools
+                    var liqArt = doc.artLayers.add();
+                    liqArt.name = "RI 3D Liquid Glass";
+                    doc.selection.selectAll();
+                    doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 45, false);
+                    doc.selection.deselect();
+                    liqArt.applyTwirl(75);
+                    liqArt.applyZigZag(45, 5, ZigZagType.AROUNDCENTER);
+                    liqArt.applyGaussianBlur(Math.max(2, frostBlur * 0.4));
+                    liqArt.blendMode = BlendMode.SCREEN;
+                    liqArt.opacity = opacity;
+
+                } else if (style.indexOf("Streaks") !== -1 || style.indexOf("10.15") !== -1) {
+                    // 10.15 3D Glass Streaks: Directional Motion Glass Streaks
+                    var strkArt = doc.artLayers.add();
+                    strkArt.name = "RI 3D Glass Streaks";
+                    doc.selection.selectAll();
+                    doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 50, false);
+                    doc.selection.deselect();
+                    strkArt.applyMotionBlur(0, Math.round(distortion * 2.8));
+                    strkArt.blendMode = BlendMode.SCREEN;
+                    strkArt.opacity = opacity;
+
+                } else if (style.indexOf("Ring") !== -1 || style.indexOf("10.16") !== -1) {
+                    // 10.16 3D Glass Ring: Concentric 3D Torus Rings
+                    var rRad1 = Math.round(Math.min(w, h) * 0.35);
+                    var rRad2 = Math.round(Math.min(w, h) * 0.22);
+                    var ringArt1 = doc.artLayers.add();
+                    ringArt1.name = "RI 3D Glass Ring Outer";
+                    makeEllipticalSelectionSafe(doc, Math.round(h/2) - rRad1, Math.round(w/2) - rRad1, Math.round(h/2) + rRad1, Math.round(w/2) + rRad1);
+                    doc.selection.stroke(whiteCol, strokeW + 3, StrokeLocation.CENTER, ColorBlendMode.NORMAL, 90);
+                    doc.selection.deselect();
+                    ringArt1.blendMode = BlendMode.SCREEN;
+                    var ringArt2 = doc.artLayers.add();
+                    ringArt2.name = "RI 3D Glass Ring Inner";
+                    makeEllipticalSelectionSafe(doc, Math.round(h/2) - rRad2, Math.round(w/2) - rRad2, Math.round(h/2) + rRad2, Math.round(w/2) + rRad2);
+                    doc.selection.stroke(cyanCol, strokeW + 2, StrokeLocation.CENTER, ColorBlendMode.NORMAL, 90);
+                    doc.selection.deselect();
+                    ringArt2.blendMode = BlendMode.SCREEN;
+
+                } else if (style.indexOf("Curve") !== -1 || style.indexOf("10.17") !== -1) {
+                    // 10.17 3D Glass Curve: Sweeping Architectural Arch
+                    var crvArt = doc.artLayers.add();
+                    crvArt.name = "RI 3D Glass Curve Arch";
+                    doc.selection.select([[0, Math.round(h * 0.3)], [w, Math.round(h * 0.15)], [w, Math.round(h * 0.65)], [0, Math.round(h * 0.85)]]);
+                    doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 45, false);
+                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    doc.selection.deselect();
+                    try { crvArt.applyTwirl(-45); } catch (eCrv) {}
+                    crvArt.blendMode = BlendMode.SCREEN;
+                    crvArt.opacity = opacity;
+
                 } else if (style.indexOf("Mountains") !== -1 || style.indexOf("10.19") !== -1) {
                     // 10.19 3D Glass Mountains: 3 Triangular Crystalline Peaks
                     var peaks = [
@@ -1659,20 +1774,33 @@ app.bringToFront();
                         mArt.opacity = opacity;
                     }
 
+                } else if (style.indexOf("Diamond") !== -1 || style.indexOf("10.21") !== -1) {
+                    // 10.21 3D Layered Diamond: 4 Stepped Concentric Diamond Crystal Plaques
+                    for (var dm = 0; dm < 4; dm++) {
+                        var dmArt = doc.artLayers.add();
+                        dmArt.name = "RI 3D Diamond Layer " + (dm + 1);
+                        var dW = Math.round(w * (0.35 - (dm * 0.07)));
+                        var dH = Math.round(h * (0.40 - (dm * 0.07)));
+                        doc.selection.select([[Math.round(w/2), Math.round(h/2) - dH], [Math.round(w/2) + dW, Math.round(h/2)], [Math.round(w/2), Math.round(h/2) + dH], [Math.round(w/2) - dW, Math.round(h/2)]]);
+                        doc.selection.fill(dm % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 35, false);
+                        doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                        doc.selection.deselect();
+                        dmArt.blendMode = BlendMode.SCREEN;
+                        dmArt.opacity = opacity;
+                    }
+
                 } else {
-                    // Universal Volumetric 3D Glass Surface (Fluid, Bevel, Soft Glass, Ribbon, etc.)
+                    // 10.20 Fluid, 10.22 Flow, 10.24 Bevel, 10.25 Soft Glass
                     var uniArt = doc.artLayers.add();
                     uniArt.name = "RI 3D Glass Surface [" + style + "]";
                     doc.selection.selectAll();
                     doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 45, false);
                     doc.selection.deselect();
                     try {
-                        if (style.indexOf("Liquid") !== -1 || style.indexOf("Fluid") !== -1) {
+                        if (style.indexOf("Fluid") !== -1 || style.indexOf("Flow") !== -1) {
                             uniArt.applyTwirl(65);
                             uniArt.applyZigZag(Math.round(distortion * 0.6), 5, ZigZagType.AROUNDCENTER);
-                        } else if (style.indexOf("Streaks") !== -1) {
-                            uniArt.applyMotionBlur(0, Math.round(distortion * 2.5));
-                        } else if (style.indexOf("Tiles") !== -1 || style.indexOf("Square") !== -1) {
+                        } else if (style.indexOf("Bevel") !== -1) {
                             uniArt.applyRipple(Math.round(distortion * 0.8), RippleSize.LARGE);
                         } else {
                             uniArt.applyGaussianBlur(Math.max(2, frostBlur * 0.8));
@@ -1688,9 +1816,6 @@ app.bringToFront();
             }
         }
 
-        // ====================================================================
-        // PROCEDURAL 3D GLASS SHAPE ENGINE (20 Physical 3D Geometric Shapes)
-        // ====================================================================
         function renderPhotoshop3DGlassShape(doc, w, h, style, cfg) {
             var opacity = Math.max(30, Math.min(100, cfg.glassOpacity || 85));
             var frostBlur = Math.max(2, Math.min(100, cfg.glassFrostBlur || 20));
@@ -1706,9 +1831,11 @@ app.bringToFront();
                 sBlack.rgb.red = 0; sBlack.rgb.green = 0; sBlack.rgb.blue = 0;
                 var cyanCol = new SolidColor();
                 cyanCol.rgb.red = 56; cyanCol.rgb.green = 189; cyanCol.rgb.blue = 248;
+                var violetCol = new SolidColor();
+                violetCol.rgb.red = 168; violetCol.rgb.green = 85; violetCol.rgb.blue = 247;
 
                 if (style.indexOf("Cube") !== -1 || style.indexOf("11.03") !== -1 || style.indexOf("5.4") !== -1) {
-                    // 11.03 3D Glass Isometric Cube: 3 Visible Facets, Internal Corner Lines, Ground Shadow
+                    // 11.03 & 5.4: 3D Glass Isometric Cube: 3 Visible Facets, Internal Corner Lines, Ground Shadow
                     var csz = Math.round(Math.min(w, h) * 0.28);
                     var halfW = Math.round(csz * 0.866);
                     var halfH = Math.round(csz * 0.5);
@@ -1722,7 +1849,7 @@ app.bringToFront();
                     doc.selection.deselect();
                     cSh.opacity = 55;
 
-                    // Top Facet
+                    // Top Facet (Brightest)
                     var topArt = doc.artLayers.add();
                     topArt.name = "RI 3D Cube Top Facet";
                     doc.selection.select([[cx, cy - csz], [cx + halfW, cy - halfH], [cx, cy], [cx - halfW, cy - halfH]]);
@@ -1731,7 +1858,7 @@ app.bringToFront();
                     doc.selection.deselect();
                     topArt.blendMode = BlendMode.SCREEN;
 
-                    // Left Facet
+                    // Left Facet (Medium)
                     var leftArt = doc.artLayers.add();
                     leftArt.name = "RI 3D Cube Left Facet";
                     doc.selection.select([[cx - halfW, cy - halfH], [cx, cy], [cx, cy + csz], [cx - halfW, cy + halfH]]);
@@ -1740,7 +1867,7 @@ app.bringToFront();
                     doc.selection.deselect();
                     leftArt.blendMode = BlendMode.SCREEN;
 
-                    // Right Facet
+                    // Right Facet (Darker Shadow)
                     var rightArt = doc.artLayers.add();
                     rightArt.name = "RI 3D Cube Right Facet";
                     doc.selection.select([[cx, cy], [cx + halfW, cy - halfH], [cx + halfW, cy + halfH], [cx, cy + csz]]);
@@ -1750,7 +1877,7 @@ app.bringToFront();
                     rightArt.blendMode = BlendMode.SCREEN;
 
                 } else if (style.indexOf("Sphere") !== -1 || style.indexOf("Orb") !== -1 || style.indexOf("11.04") !== -1 || style.indexOf("5.1") !== -1 || style.indexOf("5.2") !== -1) {
-                    // 11.04 3D Crystal Sphere Orb: Circular selection, Spherize lens distortion, Fresnel rim & glare
+                    // 11.04 & 5.1 & 5.2: 3D Crystal Sphere Orb: Spherize lens distortion, Fresnel rim & glare
                     var r = Math.round(Math.min(w, h) * 0.32);
 
                     // Drop Shadow
@@ -1812,7 +1939,6 @@ app.bringToFront();
                     try { sOrb.applySpherize(100, SpherizeMode.NORMAL); } catch (eSt) {}
                     sOrb.blendMode = BlendMode.SCREEN;
 
-                    // Tilted Planetary Glass Ring
                     var ringArt = doc.artLayers.add();
                     ringArt.name = "RI Saturn Glass Ring";
                     var rW = Math.round(sRad * 2.2);
@@ -1822,8 +1948,25 @@ app.bringToFront();
                     doc.selection.deselect();
                     ringArt.blendMode = BlendMode.SCREEN;
 
+                } else if (style.indexOf("Shelves") !== -1 || style.indexOf("11.07") !== -1) {
+                    // 11.07 Layered Glass Shelves: 3 Stacked Floating Glass Panels
+                    for (var sh = 0; sh < 3; sh++) {
+                        var shArt = doc.artLayers.add();
+                        shArt.name = "RI Glass Shelf " + (sh + 1);
+                        var shW = Math.round(w * (0.65 - sh * 0.08));
+                        var shH = Math.round(h * 0.16);
+                        var shX = Math.round((w - shW) / 2);
+                        var shY = Math.round(h * (0.28 + sh * 0.18));
+                        doc.selection.select([[shX, shY], [shX + shW, shY], [shX + shW, shY + shH], [shX, shY + shH]]);
+                        doc.selection.fill(sh % 2 === 0 ? cyanCol : whiteCol, ColorBlendMode.NORMAL, 35, false);
+                        doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                        doc.selection.deselect();
+                        shArt.applyGaussianBlur(Math.max(2, frostBlur * 0.25));
+                        shArt.blendMode = BlendMode.SCREEN;
+                    }
+
                 } else if (style.indexOf("Diamond") !== -1 || style.indexOf("Gem") !== -1 || style.indexOf("11.08") !== -1 || style.indexOf("11.17") !== -1) {
-                    // 11.08 Faceted Diamond Crystal: Table facet, crown facets, and pavilion tip
+                    // 11.08 & 11.17: Faceted Diamond Crystal: Table facet, crown facets, and pavilion tip
                     var dW = Math.round(w * 0.22);
                     var dH = Math.round(h * 0.28);
                     var dArt = doc.artLayers.add();
@@ -1834,6 +1977,78 @@ app.bringToFront();
                     doc.selection.deselect();
                     dArt.blendMode = BlendMode.SCREEN;
                     dArt.opacity = opacity;
+
+                } else if (style.indexOf("Squircle") !== -1 || style.indexOf("App") !== -1 || style.indexOf("11.09") !== -1) {
+                    // 11.09 Squircle Glass Card
+                    var sqDim = Math.round(Math.min(w, h) * 0.55);
+                    var sqX = Math.round((w - sqDim) / 2);
+                    var sqY = Math.round((h - sqDim) / 2);
+                    var sqArt = doc.artLayers.add();
+                    sqArt.name = "RI 3D Squircle Glass Card";
+                    doc.selection.select([[sqX, sqY], [sqX + sqDim, sqY], [sqX + sqDim, sqY + sqDim], [sqX, sqY + sqDim]]);
+                    doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 35, false);
+                    doc.selection.stroke(whiteCol, strokeW + 2, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    doc.selection.deselect();
+                    sqArt.applyGaussianBlur(Math.max(2, frostBlur * 0.35));
+                    sqArt.blendMode = BlendMode.SCREEN;
+                    sqArt.opacity = opacity;
+
+                } else if (style.indexOf("Ring") !== -1 || style.indexOf("Torus") !== -1 || style.indexOf("11.10") !== -1 || style.indexOf("11.19") !== -1 || style.indexOf("5.3") !== -1 || style.indexOf("5.7") !== -1) {
+                    // 11.10 & 5.3 & 5.7: 3D Glass Ring Torus
+                    var tRadOuter = Math.round(Math.min(w, h) * 0.32);
+                    var tRadInner = Math.round(Math.min(w, h) * 0.18);
+                    var torusArt = doc.artLayers.add();
+                    torusArt.name = "RI 3D Glass Ring Torus";
+                    makeEllipticalSelectionSafe(doc, cy - tRadOuter, cx - tRadOuter, cy + tRadOuter, cx + tRadOuter);
+                    doc.selection.stroke(whiteCol, Math.round(tRadOuter - tRadInner), StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 75);
+                    doc.selection.deselect();
+                    torusArt.applyGaussianBlur(Math.max(2, frostBlur * 0.3));
+                    torusArt.blendMode = BlendMode.SCREEN;
+                    torusArt.opacity = opacity;
+
+                } else if (style.indexOf("Cylinder") !== -1 || style.indexOf("11.11") !== -1 || style.indexOf("5.5") !== -1) {
+                    // 11.11 & 5.5: 3D Glass Cylinder Column
+                    var cylW = Math.round(w * 0.28);
+                    var cylH = Math.round(h * 0.55);
+                    var cylX = Math.round((w - cylW) / 2);
+                    var cylY = Math.round((h - cylH) / 2);
+                    var cylArt = doc.artLayers.add();
+                    cylArt.name = "RI 3D Glass Cylinder";
+                    doc.selection.select([[cylX, cylY], [cylX + cylW, cylY], [cylX + cylW, cylY + cylH], [cylX, cylY + cylH]]);
+                    doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 40, false);
+                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    doc.selection.deselect();
+                    cylArt.blendMode = BlendMode.SCREEN;
+                    cylArt.opacity = opacity;
+
+                } else if (style.indexOf("Pyramid") !== -1 || style.indexOf("11.12") !== -1 || style.indexOf("5.8") !== -1) {
+                    // 11.12 & 5.8: 3D Glass Pyramid
+                    var pyrArt = doc.artLayers.add();
+                    pyrArt.name = "RI 3D Glass Pyramid";
+                    var pyrTop = [cx, Math.round(cy - h * 0.28)];
+                    var pyrLeft = [Math.round(cx - w * 0.22), Math.round(cy + h * 0.28)];
+                    var pyrRight = [Math.round(cx + w * 0.22), Math.round(cy + h * 0.28)];
+                    var pyrCenter = [cx, Math.round(cy + h * 0.15)];
+                    doc.selection.select([pyrTop, pyrCenter, pyrLeft]);
+                    doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 55, false);
+                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    doc.selection.select([pyrTop, pyrRight, pyrCenter]);
+                    doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 70, false);
+                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    doc.selection.deselect();
+                    pyrArt.blendMode = BlendMode.SCREEN;
+                    pyrArt.opacity = opacity;
+
+                } else if (style.indexOf("Prism") !== -1 || style.indexOf("11.13") !== -1) {
+                    // 11.13 Floating Glass Prism
+                    var fPrismArt = doc.artLayers.add();
+                    fPrismArt.name = "RI Floating Glass Prism";
+                    doc.selection.select([[cx, Math.round(cy - h * 0.25)], [Math.round(cx + w * 0.2), Math.round(cy + h * 0.25)], [Math.round(cx - w * 0.2), Math.round(cy + h * 0.25)]]);
+                    doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 45, false);
+                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
+                    doc.selection.deselect();
+                    fPrismArt.blendMode = BlendMode.SCREEN;
+                    fPrismArt.opacity = opacity;
 
                 } else if (style.indexOf("Star") !== -1 || style.indexOf("11.15") !== -1) {
                     // 11.15 3D Glass Star: 5-point faceted glass star
@@ -1869,8 +2084,30 @@ app.bringToFront();
                     heartArt.blendMode = BlendMode.SCREEN;
                     heartArt.opacity = opacity;
 
+                } else if (style.indexOf("Fluted") !== -1 || style.indexOf("11.20") !== -1) {
+                    // 11.20 Modern Fluted Glass Card
+                    var fltCardW = Math.round(w * 0.6);
+                    var fltCardH = Math.round(h * 0.6);
+                    var fltX = Math.round((w - fltCardW) / 2);
+                    var fltY = Math.round((h - fltCardH) / 2);
+                    var fltArt = doc.artLayers.add();
+                    fltArt.name = "RI Fluted Glass Card";
+                    doc.selection.select([[fltX, fltY], [fltX + fltCardW, fltY], [fltX + fltCardW, fltY + fltCardH], [fltX, fltY + fltCardH]]);
+                    doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 30, false);
+                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    var numFlt = 16;
+                    var fW = fltCardW / numFlt;
+                    for (var fi = 0; fi < numFlt; fi++) {
+                        var fx = Math.round(fltX + fi * fW);
+                        doc.selection.select([[fx, fltY], [fx + Math.max(2, Math.round(fW * 0.25)), fltY], [fx + Math.max(2, Math.round(fW * 0.25)), fltY + fltCardH], [fx, fltY + fltCardH]]);
+                        doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 45, false);
+                    }
+                    doc.selection.deselect();
+                    fltArt.blendMode = BlendMode.SCREEN;
+                    fltArt.opacity = opacity;
+
                 } else {
-                    // 11.01 Frosted Glass Panel / Slab: Centered floating card with drop shadow and bevel rim
+                    // 11.01 Frosted Glass Panel / Slab
                     var panW = Math.round(w * 0.65);
                     var panH = Math.round(h * 0.62);
                     var panX = Math.round((w - panW) / 2);
@@ -3080,6 +3317,8 @@ app.bringToFront();
 
             try {
                 var isStandalone = (primaryFile && primaryFile.isStandalone);
+            cfg._isStandalone = isStandalone;
+            if (isStandalone && !cfg.glassEnable) { cfg.glassEnable = true; }
                 if (isStandalone) {
                     var docTitle = cfg.filenamePrefix + (seqCounter < 10 ? "00" : (seqCounter < 100 ? "0" : "")) + seqCounter;
                     doc = app.documents.add(cfg.width, cfg.height, 300, docTitle, NewDocumentMode.RGB, DocumentFill.WHITE);

@@ -1,8 +1,8 @@
 /**
  * ============================================================================
  * RI CREATIVE — BATCH BACKGROUND PROCESSING STUDIO PRO
- * Version: 2.6.0 (3D Glass Effect & Ultra High Quality Master Edition)
- * Target: Adobe Photoshop CS6, CC 2014 - CC 2026 (Windows 10/11 & macOS)
+ * Version: 2.7.0 (Universal CS2 - CC 2026 Ultra High Quality Edition)
+ * Target: Adobe Photoshop CS2 (9.0), CS3, CS4, CS5, CS6, CC 2014 - CC 2026 (Windows & macOS)
  * Developed by: RI Creative Studio & AI Engineering Team
  * ============================================================================
  */
@@ -12,11 +12,61 @@ app.bringToFront();
 
 (function () {
     try {
+
+        // ========================================================================
+        // 0. ADOBE PHOTOSHOP CS2 (v9.0) - CC 2026 ES3 COMPATIBILITY POLYFILLS
+        // ========================================================================
+        if (!String.prototype.trim) {
+            String.prototype.trim = function () {
+                return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, "");
+            };
+        }
+
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (searchElement, fromIndex) {
+                if (this == null) throw new TypeError('"this" is null or not defined');
+                var o = Object(this);
+                var len = o.length >>> 0;
+                if (len === 0) return -1;
+                var n = fromIndex | 0;
+                if (n >= len) return -1;
+                var k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+                while (k < len) {
+                    if (k in o && o[k] === searchElement) return k;
+                    k++;
+                }
+                return -1;
+            };
+        }
+
+        if (!Array.prototype.lastIndexOf) {
+            Array.prototype.lastIndexOf = function (searchElement, fromIndex) {
+                if (this == null) throw new TypeError('"this" is null or not defined');
+                var o = Object(this);
+                var len = o.length >>> 0;
+                if (len === 0) return -1;
+                var n = len - 1;
+                if (arguments.length > 1) {
+                    n = fromIndex | 0;
+                    if (n !== n) n = 0;
+                    else if (n !== 0 && n !== (1 / 0) && n !== -(1 / 0)) {
+                        n = (n > 0 || -1) * Math.floor(Math.abs(n));
+                    }
+                }
+                var k = n >= 0 ? Math.min(n, len - 1) : len - Math.abs(n);
+                while (k >= 0) {
+                    if (k in o && o[k] === searchElement) return k;
+                    k--;
+                }
+                return -1;
+            };
+        }
+
         // ========================================================================
         // 1. GLOBAL CONSTANTS & DEFAULT CONFIGURATION
         // ========================================================================
         var SCRIPT_TITLE = "RI CREATIVE — BATCH BACKGROUND STUDIO PRO";
-        var SCRIPT_VERSION = "2.6.0";
+        var SCRIPT_VERSION = "2.7.0";
         var MAX_ALLOWED_BATCH = 1000;
         var SUPPORTED_EXTENSIONS = /\.(jpg|jpeg|png|tif|tiff|psd|bmp|webp)$/i;
 
@@ -483,12 +533,72 @@ app.bringToFront();
             }
         }
 
+        
+        function makeEllipticalSelectionSafe(doc, top, left, bottom, right) {
+            try {
+                var idsetd = charIDToTypeID("setd");
+                var desc = new ActionDescriptor();
+                var idnull = charIDToTypeID("null");
+                var ref = new ActionReference();
+                var idChnl = charIDToTypeID("Chnl");
+                var idfsel = charIDToTypeID("fsel");
+                ref.putProperty(idChnl, idfsel);
+                desc.putReference(idnull, ref);
+                var idT = charIDToTypeID("T   ");
+                var descElps = new ActionDescriptor();
+                descElps.putUnitDouble(charIDToTypeID("Top "), charIDToTypeID("#Pxl"), top);
+                descElps.putUnitDouble(charIDToTypeID("Left"), charIDToTypeID("#Pxl"), left);
+                descElps.putUnitDouble(charIDToTypeID("Btom"), charIDToTypeID("#Pxl"), bottom);
+                descElps.putUnitDouble(charIDToTypeID("Rght"), charIDToTypeID("#Pxl"), right);
+                desc.putObject(idT, charIDToTypeID("Elps"), descElps);
+                desc.putBoolean(charIDToTypeID("AntA"), true);
+                executeAction(idsetd, desc, DialogModes.NO);
+            } catch (e) {
+                try {
+                    var cx = (left + right) / 2;
+                    var cy = (top + bottom) / 2;
+                    var rx = Math.abs(right - left) / 2;
+                    var ry = Math.abs(bottom - top) / 2;
+                    var pts = [];
+                    for (var a = 0; a < 24; a++) {
+                        var angle = (a * 2 * Math.PI) / 24;
+                        pts.push([Math.round(cx + rx * Math.cos(angle)), Math.round(cy + ry * Math.sin(angle))]);
+                    }
+                    doc.selection.select(pts);
+                } catch (polyErr) {}
+            }
+        }
+
+        function purgePhotoshopCachesSafe() {
+            try {
+                if (typeof PurgeTarget !== "undefined") {
+                    if (PurgeTarget.ALLCACHES) {
+                        app.purge(PurgeTarget.ALLCACHES);
+                    } else if (PurgeTarget.ALL) {
+                        app.purge(PurgeTarget.ALL);
+                    }
+                }
+            } catch (purgeErr) {}
+        }
+
         function setDocumentResolution300DPI(doc) {
             try {
                 if (Math.round(doc.resolution) !== 300) {
-                    doc.resizeImage(undefined, undefined, 300, ResampleMethod.NONE);
+                    var resampleMode = (typeof ResampleMethod !== "undefined" && ResampleMethod.NONE) ? ResampleMethod.NONE : null;
+                    if (resampleMode) {
+                        doc.resizeImage(doc.width, doc.height, 300, resampleMode);
+                    } else {
+                        doc.resizeImage(doc.width, doc.height, 300);
+                    }
                 }
-            } catch (resErr) {}
+            } catch (resErr) {
+                try {
+                    var idImgS = charIDToTypeID("ImgS");
+                    var desc = new ActionDescriptor();
+                    desc.putUnitDouble(charIDToTypeID("Rslt"), charIDToTypeID("#Rsl"), 300);
+                    executeAction(idImgS, desc, DialogModes.NO);
+                } catch (amErr) {}
+            }
         }
 
         function resizeImageSmart(doc, targetW, targetH, mode) {
@@ -499,7 +609,7 @@ app.bringToFront();
                 return;
             }
 
-            var highResample = ResampleMethod.BICUBICSMOOTHER;
+            var highResample = (typeof ResampleMethod !== "undefined" && ResampleMethod.BICUBICSMOOTHER) ? ResampleMethod.BICUBICSMOOTHER : ((typeof ResampleMethod !== "undefined" && ResampleMethod.BICUBIC) ? ResampleMethod.BICUBIC : null);
 
             if (mode === "Stretch") {
                 doc.resizeImage(UnitValue(targetW, "px"), UnitValue(targetH, "px"), 300, highResample);
@@ -810,7 +920,7 @@ app.bringToFront();
                     var cx = Math.round(w / 2);
                     var cy = Math.round(h / 2);
 
-                    doc.selection.selectEllipse([[cx - radius, cy - radius], [cx + radius, cy - radius], [cx + radius, cy + radius], [cx - radius, cy + radius]]);
+                    makeEllipticalSelectionSafe(doc, cy - radius, cx - radius, cy + radius, cx + radius);
                     glassLayer.applySpherize(Math.round(distortion * 0.85), SpherizeMode.NORMAL);
                     glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.4));
                     doc.selection.invert();
@@ -830,7 +940,7 @@ app.bringToFront();
                             var glareR = Math.round(radius * 0.28);
                             var glareX = cx - Math.round(radius * 0.45);
                             var glareY = cy - Math.round(radius * 0.45);
-                            doc.selection.selectEllipse([[glareX - glareR, glareY - glareR], [glareX + glareR, glareY - glareR], [glareX + glareR, glareY + glareR], [glareX - glareR, glareY + glareR]]);
+                            makeEllipticalSelectionSafe(doc, glareY - glareR, glareX - glareR, glareY + glareR, glareX + glareR);
                             doc.selection.feather(Math.round(glareR * 0.5));
                             doc.selection.fill(flareCol, ColorBlendMode.NORMAL, 100, false);
                             doc.selection.deselect();
@@ -952,7 +1062,7 @@ app.bringToFront();
                     var insetX = Math.round(w * 0.08);
                     var insetY = Math.round(h * 0.08);
 
-                    doc.selection.selectEllipse([[insetX, insetY], [w - insetX, insetY], [w - insetX, h - insetY], [insetX, h - insetY]]);
+                    makeEllipticalSelectionSafe(doc, insetY, insetX, h - insetY, w - insetX);
                     doc.selection.invert();
                     doc.selection.feather(featherRadius);
                     doc.selection.fill(blackCol, ColorBlendMode.NORMAL, 100, false);
@@ -1370,10 +1480,20 @@ app.bringToFront();
                 doc.saveAs(outFile, tifOpts, true, Extension.LOWERCASE);
 
             } else if (cfg.exportFormat.indexOf("PNG") !== -1) {
-                var pngOpts = new PNGSaveOptions();
-                pngOpts.compression = 6;
-                pngOpts.interlaced = false;
-                doc.saveAs(outFile, pngOpts, true, Extension.LOWERCASE);
+                try {
+                    var pngOpts = new PNGSaveOptions();
+                    pngOpts.compression = 6;
+                    pngOpts.interlaced = false;
+                    doc.saveAs(outFile, pngOpts, true, Extension.LOWERCASE);
+                } catch (pngErr) {
+                    try {
+                        var sfwOpts = new ExportOptionsSaveForWeb();
+                        sfwOpts.format = SaveDocumentType.PNG;
+                        sfwOpts.PNG8 = false;
+                        sfwOpts.quality = 100;
+                        doc.exportDocument(outFile, ExportType.SAVEFORWEB, sfwOpts);
+                    } catch (sfwErr) {}
+                }
 
             } else if (isPSD) {
                 var psdOpts = new PhotoshopSaveOptions();
@@ -1766,7 +1886,7 @@ app.bringToFront();
                 titleText.graphics.font = ScriptUI.newFont("Arial", "BOLD", 12);
             } catch (fontErr) {}
 
-            var badgeText = headerGrp.add("statictext", undefined, "💎 3D GLASS & 16-BIT RETINA ENGINE");
+            var badgeText = headerGrp.add("statictext", undefined, "💎 3D GLASS & UNIVERSAL CS2-CC2026 ENGINE");
             try {
                 badgeText.graphics.font = ScriptUI.newFont("Arial", "REGULAR", 10);
             } catch (fontErr2) {}
@@ -2488,9 +2608,7 @@ app.bringToFront();
 
                         // Purge Photoshop History & Cache every 10 items to prevent RAM exhaustion
                         if ((idx % 10) === 0) {
-                            try {
-                                app.purge(PurgeTarget.ALLCACHES);
-                            } catch (purgeErr) {}
+                            purgePhotoshopCachesSafe();
                         }
                     }
                 } finally {

@@ -1,8 +1,9 @@
 /**
  * ============================================================================
- * RI CREATIVE - BATCH BACKGROUND PROCESSING STUDIO PRO
- * Version: 2.0.1 (Safe UI Loader + 16-Bit High-Precision Engine)
- * Target: Adobe Photoshop CC 2020 - 2026 (Windows 10/11)
+ * RI CREATIVE — BATCH BACKGROUND PROCESSING STUDIO PRO
+ * Version: 2.5.0 (Ultra High Quality Master Edition)
+ * Target: Adobe Photoshop CS6, CC 2014 - CC 2026 (Windows 10/11 & macOS)
+ * Developed by: RI Creative Studio & AI Engineering Team
  * ============================================================================
  */
 
@@ -15,54 +16,76 @@ app.bringToFront();
         // 1. GLOBAL CONSTANTS & DEFAULT CONFIGURATION
         // ========================================================================
         var SCRIPT_TITLE = "RI CREATIVE — BATCH BACKGROUND STUDIO PRO";
-        var SCRIPT_VERSION = "2.0.1";
-        var MAX_ALLOWED_BATCH = 500;
-        var SUPPORTED_EXTENSIONS = /\.(jpg|jpeg|png|tif|tiff|psd|bmp)$/i;
+        var SCRIPT_VERSION = "2.5.0";
+        var MAX_ALLOWED_BATCH = 1000;
+        var SUPPORTED_EXTENSIONS = /\.(jpg|jpeg|png|tif|tiff|psd|bmp|webp)$/i;
+
+        var RESOLUTION_PRESETS = [
+            { label: "4000 × 2000 (Standard Stock 2:1)", width: 4000, height: 2000 },
+            { label: "6000 × 3000 (6K Ultra Panorama)", width: 6000, height: 3000 },
+            { label: "6000 × 4000 (6K 3:2 Photo)", width: 6000, height: 4000 },
+            { label: "3840 × 2160 (4K UHD 16:9)", width: 3840, height: 2160 },
+            { label: "7680 × 4320 (8K UHD 16:9)", width: 7680, height: 4320 },
+            { label: "5000 × 3000 (5K Commercial)", width: 5000, height: 3000 },
+            { label: "3000 × 2000 (3K Stock Standard)", width: 3000, height: 2000 },
+            { label: "2560 × 1440 (2K QHD 16:9)", width: 2560, height: 1440 },
+            { label: "1920 × 1080 (Full HD 16:9)", width: 1920, height: 1080 },
+            { label: "4096 × 4096 (1:1 High-Res Square)", width: 4096, height: 4096 },
+            { label: "Custom Dimensions...", width: 4000, height: 2000 }
+        ];
 
         var DEFAULT_CONFIG = {
             sourcePath: "",
             outputPath: "",
             processMode: "3-Image Fusion (Anti-Similar)",
             selectedFiles: [],
+            resPresetIndex: 0,
             width: 4000,
             height: 2000,
             resizeMode: "Fit/Crop (Fill)",
+            seamlessBlend: true,
+            seamlessFeather: 60,
             maxBatchCount: 500,
+            // Export Engine
+            exportFormat: "JPEG (Baseline 300 DPI)", // JPEG, TIFF, PNG, PSD
+            jpegQuality: 12,
+            minFileSizeMB: 0,
+            embedProfile: true,
+            enforce300Dpi: true,
+            filenamePrefix: "RI_Background_",
             // 11 Photoshop Blur Engine Configuration
-            blurType: "None (Clean Stock Approved)", // Average, Blur, Blur More, Box Blur..., Gaussian Blur..., Lens Blur..., Motion Blur..., Radial Blur..., Shape Blur..., Smart Blur..., Surface Blur...
-            blurScope: "Full Composition", // Background Only, Full Composition, Left Zone, Center Zone, Right Zone
+            blurType: "None (Clean Stock Approved)",
+            blurScope: "Full Composition", // Full Composition, Background Only, Outer Panels
             blurRadius: 25,
             blurThreshold: 25,
             motionAngle: 0,
             motionDistance: 30,
             radialAmount: 25,
             radialMethod: "Spin", // Spin, Zoom
-            blurEnable: false, // Default false so stock photos remain 100% crisp and unblurred
-            // Blur Engine Optical Noise & Film Grain Integration
-            blurNoiseEnable: false,
-            blurNoiseAmount: 12,
-            blurNoiseDistribution: "Gaussian",
-            blurNoiseMono: true,
-            gaussianEnable: false,
-            gaussianRadius: 25,
-            deepAbstractBlur: false,
-            noiseEnable: false, // Default false so no noise rejection!
-            noiseAmount: 0,
-            noiseDistribution: "Uniform",
+            blurEnable: false,
+            // Optical Film Grain & Photoshop Noise Integration
+            noiseEnable: false,
+            noiseAmount: 6,
+            noiseDistribution: "Gaussian",
             noiseMonochromatic: true,
-            gradientEnable: false, // Default false so natural colors are preserved!
+            noiseFilmGrainOverlay: true, // Non-destructive 50% neutral gray overlay layer
+            // 30-Category Gradient Studio
+            gradientEnable: false,
             gradientPreset: "Random Preset",
             gradientType: "Random Type",
             gradientOpacity: 35,
             gradientBlendMode: "Soft Light",
             gradientMultiLayerMesh: false,
-            liquifyEnable: false, // Default false so no liquid distortion!
+            // Liquify Fluid Distortion
+            liquifyEnable: false,
             liquifyStyle: "Organic Fluid Wave",
-            liquifyIntensity: 0,
-            jpegQuality: 12,
-            minFileSizeMB: 0,
-            embedProfile: true,
-            filenamePrefix: "RI_Background_"
+            liquifyIntensity: 65,
+            // Optical Lighting & Vignette Engine
+            lightingEnable: false,
+            vignetteEnable: false,
+            vignetteAmount: 30,
+            anamorphicFlareEnable: false,
+            ambientSunlightEnable: false
         };
 
         function cloneConfig(src) {
@@ -289,16 +312,25 @@ app.bringToFront();
             };
         }
 
-        function getNextAvailableOutputFile(processedFolder, prefix, startSeq) {
+        function getExtensionForFormat(formatStr) {
+            if (formatStr.indexOf("TIFF") !== -1) return ".tif";
+            if (formatStr.indexOf("PNG") !== -1) return ".png";
+            if (formatStr.indexOf("PSD") !== -1) return ".psd";
+            return ".jpg";
+        }
+
+        function getNextAvailableOutputFile(processedFolder, prefix, startSeq, formatStr) {
+            var ext = getExtensionForFormat(formatStr || "JPEG");
             var seq = startSeq;
             var candidateFile;
             while (seq < 999999) {
-                var fileName = prefix + padNumber(seq, 4) + ".jpg";
+                var fileName = prefix + padNumber(seq, 4) + ext;
                 candidateFile = new File(processedFolder.fsName + "/" + fileName);
                 if (!candidateFile.exists) {
                     return {
                         file: candidateFile,
-                        nextSeq: seq + 1
+                        nextSeq: seq + 1,
+                        extension: ext
                     };
                 }
                 seq++;
@@ -383,17 +415,22 @@ app.bringToFront();
         }
 
         // ========================================================================
-        // 5. PHOTOSHOP NATIVE IMAGE PROCESSING ENGINE
+        // 5. PHOTOSHOP NATIVE HIGH-PRECISION IMAGE PROCESSING ENGINE
         // ========================================================================
+
+        /**
+         * Safely unlocks background layer across all Photoshop versions (CS6 - 2026).
+         * Assigning .name converts background layer to a floating ArtLayer without error.
+         */
         function prepareBaseLayer(doc) {
             try {
-                if (doc.layers.length > 1 || doc.activeLayer.kind !== LayerKind.NORMAL) {
+                if (doc.layers.length > 1) {
                     doc.flatten();
                 }
             } catch (e) {}
             try {
                 if (doc.activeLayer.isBackgroundLayer) {
-                    doc.activeLayer.isBackgroundLayer = false;
+                    doc.activeLayer.name = "Layer 0";
                 }
                 doc.activeLayer.allLocked = false;
                 doc.activeLayer.pixelsLocked = false;
@@ -417,8 +454,19 @@ app.bringToFront();
 
         function finalizeTo8BitDithered(doc) {
             if (doc.bitsPerChannel !== BitsPerChannelType.EIGHT) {
-                doc.bitsPerChannel = BitsPerChannelType.EIGHT;
+                try {
+                    doc.bitsPerChannel = BitsPerChannelType.EIGHT;
+                } catch (e) {}
             }
+        }
+
+        function setDocumentResolution300DPI(doc) {
+            try {
+                if (Math.round(doc.resolution) !== 300) {
+                    // ResampleMethod.NONE updates metadata to 300 DPI without altering pixel dimensions
+                    doc.resizeImage(undefined, undefined, 300, ResampleMethod.NONE);
+                }
+            } catch (resErr) {}
         }
 
         function resizeImageSmart(doc, targetW, targetH, mode) {
@@ -445,6 +493,7 @@ app.bringToFront();
                 app.backgroundColor = bgCol;
                 doc.resizeCanvas(UnitValue(targetW, "px"), UnitValue(targetH, "px"), AnchorPosition.MIDDLECENTER);
             } else {
+                // Fit/Crop (Fill)
                 var scaleFill = Math.max(targetW / origW, targetH / origH);
                 var scaledW = Math.round(origW * scaleFill);
                 var scaledH = Math.round(origH * scaleFill);
@@ -592,51 +641,158 @@ app.bringToFront();
                 applySmartBlurFilter(doc, cfg.blurRadius || 25, cfg.blurThreshold || 25);
             } else if (bType === "Surface Blur...") {
                 applySurfaceBlurFilter(doc, cfg.blurRadius || 25, cfg.blurThreshold || 25);
-            } else if (bType === "Zoom Blur" || bType.indexOf("Zoom") !== -1) {
+            } else if (bType.indexOf("Zoom") !== -1) {
                 applyRadialBlurFilter(doc, cfg.radialAmount || 25, "Zoom", "Best");
-            } else if (bType === "Spin Blur" || bType.indexOf("Spin") !== -1) {
+            } else if (bType.indexOf("Spin") !== -1) {
                 applyRadialBlurFilter(doc, cfg.radialAmount || 25, "Spin", "Best");
-            } else if (bType === "Bokeh Blur" || bType.indexOf("Bokeh") !== -1) {
-                applyLensBlur(doc, cfg.blurRadius || 25, 250);
-            } else if (bType === "Directional Blur" || bType.indexOf("Directional") !== -1) {
+            } else if (bType.indexOf("Bokeh") !== -1 || bType.indexOf("Depth") !== -1) {
+                applyLensBlur(doc, cfg.blurRadius || 25, 240);
+            } else if (bType.indexOf("Directional") !== -1) {
                 applyMotionBlurFilter(doc, cfg.motionAngle || 0, cfg.motionDistance || 30);
-            } else if (bType === "Tilt-Shift Blur" || bType.indexOf("Tilt-Shift") !== -1) {
+            } else {
                 applyGaussianBlurFilter(doc, cfg.blurRadius || 25);
-            } else if (bType === "Depth of Field" || bType.indexOf("Depth") !== -1) {
-                applyLensBlur(doc, cfg.blurRadius || 25, 230);
-            } else if (bType === "Progressive Blur" || bType.indexOf("Progressive") !== -1) {
-                applyGaussianBlurFilter(doc, cfg.blurRadius || 25);
-            } else if (bType === "Frosted Blur" || bType.indexOf("Frosted") !== -1) {
-                applyGaussianBlurFilter(doc, Math.max(2, (cfg.blurRadius || 25) * 0.45));
-                applyAddNoiseFilter(doc, 12, "Uniform", true);
-            } else if (bType === "Glow Blur" || bType.indexOf("Glow") !== -1) {
-                applyGaussianBlurFilter(doc, cfg.blurRadius || 25);
-            } else if (bType === "Soft Focus Blur" || bType.indexOf("Soft Focus") !== -1) {
-                applyGaussianBlurFilter(doc, cfg.blurRadius || 25);
-            }
-
-            // Optical Film Grain & Noise Integration (Photoshop Lens Blur Spec)
-            if (cfg.blurNoiseEnable && cfg.blurNoiseAmount > 0) {
-                applyAddNoiseFilter(doc, cfg.blurNoiseAmount, cfg.blurNoiseDistribution || "Gaussian", cfg.blurNoiseMono !== false);
-            } else if (cfg.noiseEnable && cfg.noiseAmount > 0) {
-                applyAddNoiseFilter(doc, cfg.noiseAmount, cfg.noiseDistribution || "Gaussian", cfg.noiseMonochromatic !== false);
             }
         }
 
+        // ====================================================================
+        // OPTICAL NOISE & NON-DESTRUCTIVE FILM GRAIN OVERLAY ENGINE
+        // ====================================================================
         function applyAddNoiseFilter(doc, amount, distributionStr, monochromatic) {
             try {
                 var distEnum = (distributionStr === "Gaussian") ? NoiseDistribution.GAUSSIAN : NoiseDistribution.UNIFORM;
                 doc.activeLayer.applyAddNoise(amount, distEnum, monochromatic);
             } catch (e) {
-                var idAdNs = charIDToTypeID("AdNs");
-                var desc = new ActionDescriptor();
-                desc.putEnumerated(charIDToTypeID("Dstr"), charIDToTypeID("Dstr"), (distributionStr === "Gaussian") ? charIDToTypeID("Gsn ") : charIDToTypeID("Unfr"));
-                desc.putUnitDouble(charIDToTypeID("Nose"), charIDToTypeID("#Prc"), amount);
-                desc.putBoolean(charIDToTypeID("Mnch"), monochromatic);
-                executeAction(idAdNs, desc, DialogModes.NO);
+                try {
+                    var idAdNs = charIDToTypeID("AdNs");
+                    var desc = new ActionDescriptor();
+                    desc.putEnumerated(charIDToTypeID("Dstr"), charIDToTypeID("Dstr"), (distributionStr === "Gaussian") ? charIDToTypeID("Gsn ") : charIDToTypeID("Unfr"));
+                    desc.putUnitDouble(charIDToTypeID("Nose"), charIDToTypeID("#Prc"), amount);
+                    desc.putBoolean(charIDToTypeID("Mnch"), monochromatic);
+                    executeAction(idAdNs, desc, DialogModes.NO);
+                } catch (e2) {}
             }
         }
 
+        /**
+         * Creates a non-destructive 50% neutral gray film grain overlay.
+         * Mode: Soft Light / Overlay. This produces genuine analog film texture without color distortion.
+         */
+        function applyProfessionalFilmGrainOverlay(doc, amount, monochromatic) {
+            try {
+                var grainLayer = doc.artLayers.add();
+                grainLayer.name = "RI Studio Film Grain [35mm Stock]";
+                
+                // Fill with 50% Neutral Gray (128, 128, 128)
+                var grayCol = new SolidColor();
+                grayCol.rgb.red = 128;
+                grayCol.rgb.green = 128;
+                grayCol.rgb.blue = 128;
+                app.foregroundColor = grayCol;
+
+                doc.selection.selectAll();
+                doc.selection.fill(grayCol, ColorBlendMode.NORMAL, 100, false);
+                doc.selection.deselect();
+
+                // Apply Gaussian monochromatic noise
+                var distEnum = NoiseDistribution.GAUSSIAN;
+                grainLayer.applyAddNoise(Math.max(1, Math.min(100, amount * 2.2)), distEnum, monochromatic);
+
+                // Subtle soft blur to avoid harsh digital pixelation
+                grainLayer.applyGaussianBlur(0.6);
+
+                // Set blend mode to Soft Light or Overlay
+                grainLayer.blendMode = BlendMode.SOFTLIGHT;
+                grainLayer.opacity = Math.max(10, Math.min(100, Math.round(amount * 4)));
+            } catch (grainErr) {
+                // Fallback to direct noise application
+                try {
+                    applyAddNoiseFilter(doc, Math.min(25, amount), "Gaussian", monochromatic);
+                } catch (fbErr) {}
+            }
+        }
+
+        // ====================================================================
+        // OPTICAL LIGHTING, HOLLYWOOD FLARE & STUDIO VIGNETTE ENGINE
+        // ====================================================================
+        function applyStudioOpticalLighting(doc, cfg) {
+            var w = doc.width.as("px");
+            var h = doc.height.as("px");
+
+            // 1. Studio Vignette (Soft Cosine-Fourth Radial Shadow)
+            if (cfg.vignetteEnable) {
+                try {
+                    var vigLayer = doc.artLayers.add();
+                    vigLayer.name = "RI Studio Optical Vignette";
+                    var blackCol = new SolidColor();
+                    blackCol.rgb.red = 0;
+                    blackCol.rgb.green = 0;
+                    blackCol.rgb.blue = 0;
+
+                    // Create centered elliptical feather mask
+                    var featherRadius = Math.round(Math.min(w, h) * 0.22);
+                    var insetX = Math.round(w * 0.08);
+                    var insetY = Math.round(h * 0.08);
+
+                    doc.selection.selectEllipse([[insetX, insetY], [w - insetX, insetY], [w - insetX, h - insetY], [insetX, h - insetY]]);
+                    doc.selection.invert();
+                    doc.selection.feather(featherRadius);
+                    doc.selection.fill(blackCol, ColorBlendMode.NORMAL, 100, false);
+                    doc.selection.deselect();
+
+                    vigLayer.blendMode = BlendMode.MULTIPLY;
+                    vigLayer.opacity = Math.max(10, Math.min(80, cfg.vignetteAmount || 30));
+                } catch (vigErr) {}
+            }
+
+            // 2. Hollywood Anamorphic Flare Streak
+            if (cfg.anamorphicFlareEnable) {
+                try {
+                    var flareLayer = doc.artLayers.add();
+                    flareLayer.name = "RI Hollywood Anamorphic Streak";
+                    var cyanGoldCol = new SolidColor();
+                    cyanGoldCol.rgb.red = 210;
+                    cyanGoldCol.rgb.green = 235;
+                    cyanGoldCol.rgb.blue = 255;
+
+                    var flareY = Math.round(h * 0.42);
+                    var streakH = Math.max(4, Math.round(h * 0.015));
+
+                    doc.selection.select([[0, flareY], [w, flareY], [w, flareY + streakH], [0, flareY + streakH]]);
+                    doc.selection.fill(cyanGoldCol, ColorBlendMode.NORMAL, 100, false);
+                    doc.selection.deselect();
+
+                    flareLayer.applyMotionBlur(0, Math.round(w * 0.35));
+                    flareLayer.applyGaussianBlur(Math.round(streakH * 1.5));
+                    flareLayer.blendMode = BlendMode.SCREEN;
+                    flareLayer.opacity = 45;
+                } catch (flareErr) {}
+            }
+
+            // 3. Top-Down Ambient Sunlight / Rim Glow
+            if (cfg.ambientSunlightEnable) {
+                try {
+                    var sunLayer = doc.artLayers.add();
+                    sunLayer.name = "RI Ambient Sunlight Rim";
+                    var sunCol = new SolidColor();
+                    sunCol.rgb.red = 255;
+                    sunCol.rgb.green = 245;
+                    sunCol.rgb.blue = 220;
+
+                    var sunH = Math.round(h * 0.35);
+                    doc.selection.select([[0, 0], [w, 0], [w, sunH], [0, sunH]]);
+                    doc.selection.feather(Math.round(h * 0.15));
+                    doc.selection.fill(sunCol, ColorBlendMode.NORMAL, 100, false);
+                    doc.selection.deselect();
+
+                    sunLayer.blendMode = BlendMode.SOFTLIGHT;
+                    sunLayer.opacity = 40;
+                } catch (sunErr) {}
+            }
+        }
+
+        // ====================================================================
+        // LIQUIFY & FLUID DISTORTION ENGINE
+        // ====================================================================
         function applyOrganicLiquifyFlow(doc, style, intensity) {
             var norm = Math.max(1, Math.min(150, intensity)) / 100.0;
             var chosenStyle = style;
@@ -729,6 +885,9 @@ app.bringToFront();
             }
         }
 
+        // ====================================================================
+        // GRADIENT FILL ENGINE
+        // ====================================================================
         function resolveGradientParameters(cfg) {
             var categoryName = cfg.gradientPreset;
             if (categoryName === "Random Preset" || !GRADIENT_PRESETS.hasOwnProperty(categoryName)) {
@@ -962,55 +1121,82 @@ app.bringToFront();
             return params;
         }
 
-        function exportBaselineJPEG(doc, outFile, quality, embedProfile) {
-            // 1. Ensure document is flattened and free of extra alpha channels
-            try {
-                if (doc.layers.length > 1) {
-                    doc.flatten();
-                }
-                while (doc.channels.length > 3) {
-                    doc.channels[doc.channels.length - 1].remove();
-                }
-            } catch (cleanErr) {}
+        // ====================================================================
+        // MULTI-FORMAT EXPORT ENGINE (JPEG 300 DPI, TIFF, PNG, PSD)
+        // ====================================================================
+        function exportDocumentMaster(doc, outFile, cfg) {
+            // 1. Flatten document if not PSD
+            var isPSD = (cfg.exportFormat.indexOf("PSD") !== -1);
+            if (!isPSD) {
+                try {
+                    if (doc.layers.length > 1) {
+                        doc.flatten();
+                    }
+                    while (doc.channels.length > 3) {
+                        doc.channels[doc.channels.length - 1].remove();
+                    }
+                } catch (cleanErr) {}
+            }
 
-            // 2. Convert to sRGB IEC61966-2.1 for accurate web/commercial colors
+            // 2. Convert to sRGB IEC61966-2.1 for commercial color accuracy
             try {
-                if (embedProfile) {
+                if (cfg.embedProfile) {
                     doc.convertProfile("sRGB IEC61966-2.1", Intent.PERCEPTUAL, true, true);
                 }
             } catch (profErr) {}
 
-            // 3. Clean JPEG Save Options (Removed conflicting 'scans' property for Baseline)
-            var jpgOpts = new JPEGSaveOptions();
-            jpgOpts.quality = Math.max(1, Math.min(12, Math.round(quality)));
-            jpgOpts.formatOptions = FormatOptions.STANDARDBASELINE;
-            jpgOpts.embedColorProfile = Boolean(embedProfile);
-            jpgOpts.matte = MatteType.NONE;
+            // 3. Ensure 300 DPI metadata
+            setDocumentResolution300DPI(doc);
 
-            try {
-                doc.saveAs(outFile, jpgOpts, true, Extension.LOWERCASE);
-            } catch (saveErr) {
-                // ActionManager Fallback (Export / Save a Copy as JPEG)
-                var idsave = charIDToTypeID("save");
-                var desc = new ActionDescriptor();
-                var descAs = new ActionDescriptor();
-                descAs.putInteger(charIDToTypeID("EQlt"), jpgOpts.quality);
-                descAs.putEnumerated(charIDToTypeID("MttC"), charIDToTypeID("MttC"), charIDToTypeID("None"));
-                desc.putObject(charIDToTypeID("As  "), charIDToTypeID("JPEG"), descAs);
-                desc.putPath(charIDToTypeID("In  "), outFile);
-                desc.putBoolean(charIDToTypeID("Cpy "), true);
-                desc.putBoolean(charIDToTypeID("LwCs"), true);
-                executeAction(idsave, desc, DialogModes.NO);
+            // 4. Save according to format
+            if (cfg.exportFormat.indexOf("TIFF") !== -1) {
+                var tifOpts = new TiffSaveOptions();
+                tifOpts.imageCompression = TIFFEncoding.TIFFLZW;
+                tifOpts.byteOrder = ByteOrder.IBM;
+                tifOpts.embedColorProfile = Boolean(cfg.embedProfile);
+                tifOpts.layers = false;
+                doc.saveAs(outFile, tifOpts, true, Extension.LOWERCASE);
+
+            } else if (cfg.exportFormat.indexOf("PNG") !== -1) {
+                var pngOpts = new PNGSaveOptions();
+                pngOpts.compression = 6;
+                pngOpts.interlaced = false;
+                doc.saveAs(outFile, pngOpts, true, Extension.LOWERCASE);
+
+            } else if (isPSD) {
+                var psdOpts = new PhotoshopSaveOptions();
+                psdOpts.layers = true;
+                psdOpts.embedColorProfile = Boolean(cfg.embedProfile);
+                doc.saveAs(outFile, psdOpts, true, Extension.LOWERCASE);
+
+            } else {
+                // Default: Standard Baseline JPEG (300 DPI)
+                var jpgOpts = new JPEGSaveOptions();
+                jpgOpts.quality = Math.max(1, Math.min(12, Math.round(cfg.jpegQuality)));
+                jpgOpts.formatOptions = FormatOptions.STANDARDBASELINE;
+                jpgOpts.embedColorProfile = Boolean(cfg.embedProfile);
+                jpgOpts.matte = MatteType.NONE;
+
+                try {
+                    doc.saveAs(outFile, jpgOpts, true, Extension.LOWERCASE);
+                } catch (saveErr) {
+                    var idsave = charIDToTypeID("save");
+                    var desc = new ActionDescriptor();
+                    var descAs = new ActionDescriptor();
+                    descAs.putInteger(charIDToTypeID("EQlt"), jpgOpts.quality);
+                    descAs.putEnumerated(charIDToTypeID("MttC"), charIDToTypeID("MttC"), charIDToTypeID("None"));
+                    desc.putObject(charIDToTypeID("As  "), charIDToTypeID("JPEG"), descAs);
+                    desc.putPath(charIDToTypeID("In  "), outFile);
+                    desc.putBoolean(charIDToTypeID("Cpy "), true);
+                    desc.putBoolean(charIDToTypeID("LwCs"), true);
+                    executeAction(idsave, desc, DialogModes.NO);
+                }
             }
         }
 
-        function verifyExportedJPEG(outFile, expectedW, expectedH, minBytes) {
+        function verifyExportedFile(outFile, expectedW, expectedH, minBytes) {
             if (!outFile || !outFile.exists) {
-                return { valid: false, reason: "Exported JPEG file was not created on disk.", sizeBytes: 0 };
-            }
-
-            if (!/\.jpe?g$/i.test(outFile.name)) {
-                return { valid: false, reason: "Invalid file extension (must be .jpg).", sizeBytes: outFile.length };
+                return { valid: false, reason: "Exported file was not created on disk.", sizeBytes: 0 };
             }
 
             var fileSize = outFile.length;
@@ -1037,6 +1223,11 @@ app.bringToFront();
         // ========================================================================
         // 6. SINGLE & 3-IMAGE FUSION PROCESSING PIPELINE (ANTI-SIMILAR ENGINE)
         // ========================================================================
+
+        /**
+         * Places an image into a designated spatial zone with robust layer selection
+         * and optional seamless soft edge feathering.
+         */
         function placeImageInSpatialZone(mainDoc, imgFile, zoneType, cfg, layerTag) {
             var extraDoc = null;
             try {
@@ -1047,14 +1238,20 @@ app.bringToFront();
 
                 var zoneW = Math.round(cfg.width / 3);
                 var zoneH = cfg.height;
-                resizeImageSmart(extraDoc, zoneW, zoneH, "Fit/Crop (Fill)");
+                var overlap = cfg.seamlessBlend ? Math.round(cfg.seamlessFeather || 60) : 0;
+                var extraW = zoneW + (zoneType === "CENTER" ? overlap * 2 : overlap);
 
+                resizeImageSmart(extraDoc, extraW, zoneH, "Fit/Crop (Fill)");
+
+                // Duplicate layer to main document
                 extraDoc.activeLayer.duplicate(mainDoc, ElementPlacement.PLACEATBEGINNING);
                 extraDoc.close(SaveOptions.DONOTSAVECHANGES);
                 extraDoc = null;
 
+                // Explicitly activate the newly duplicated layer (always at index 0)
                 app.activeDocument = mainDoc;
-                var pastedLayer = mainDoc.activeLayer;
+                var pastedLayer = mainDoc.layers[0];
+                mainDoc.activeLayer = pastedLayer;
                 pastedLayer.name = layerTag;
 
                 var bounds = pastedLayer.bounds;
@@ -1064,11 +1261,41 @@ app.bringToFront();
                 if (zoneType === "LEFT") {
                     targetX = 0;
                 } else if (zoneType === "RIGHT") {
-                    targetX = cfg.width - zoneW;
+                    targetX = cfg.width - extraW;
                 } else {
-                    targetX = zoneW;
+                    targetX = zoneW - overlap;
                 }
                 pastedLayer.translate(UnitValue(targetX - curX, "px"), UnitValue(0 - curY, "px"));
+
+                // Apply soft feathered edge blending on overlaps
+                if (cfg.seamlessBlend && overlap > 0) {
+                    try {
+                        if (zoneType === "CENTER") {
+                            // Feather left and right seams
+                            var b = pastedLayer.bounds;
+                            var leftSeamX = b[0].as("px");
+                            var rightSeamX = b[2].as("px");
+
+                            mainDoc.selection.select([[leftSeamX, 0], [leftSeamX + overlap, 0], [leftSeamX + overlap, cfg.height], [leftSeamX, cfg.height]]);
+                            mainDoc.selection.feather(overlap * 0.7);
+                            mainDoc.selection.clear();
+
+                            mainDoc.selection.select([[rightSeamX - overlap, 0], [rightSeamX, 0], [rightSeamX, cfg.height], [rightSeamX - overlap, cfg.height]]);
+                            mainDoc.selection.feather(overlap * 0.7);
+                            mainDoc.selection.clear();
+                            mainDoc.selection.deselect();
+                        } else if (zoneType === "RIGHT") {
+                            var bRight = pastedLayer.bounds;
+                            var seamX = bRight[0].as("px");
+                            mainDoc.selection.select([[seamX, 0], [seamX + overlap, 0], [seamX + overlap, cfg.height], [seamX, cfg.height]]);
+                            mainDoc.selection.feather(overlap * 0.7);
+                            mainDoc.selection.clear();
+                            mainDoc.selection.deselect();
+                        }
+                    } catch (blendErr) {
+                        try { mainDoc.selection.deselect(); } catch (e3) {}
+                    }
+                }
             } catch (err) {
                 if (extraDoc !== null) {
                     try { extraDoc.close(SaveOptions.DONOTSAVECHANGES); } catch (e2) {}
@@ -1118,6 +1345,7 @@ app.bringToFront();
                         doc.flatten();
                         prepareBaseLayer(doc);
                     } else {
+                        // Standard Panoramic Spatial Zone Placement
                         resizeImageSmart(doc, zoneW, cfg.height, "Fit/Crop (Fill)");
                         doc.resizeCanvas(UnitValue(cfg.width, "px"), UnitValue(cfg.height, "px"), AnchorPosition.MIDDLELEFT);
                         doc.activeLayer.name = "Left Zone [" + primaryFile.name + "]";
@@ -1131,7 +1359,7 @@ app.bringToFront();
                         doc.flatten();
                         prepareBaseLayer(doc);
 
-                        // Full Composition Scope: apply blur to the entire composition
+                        // Full Composition Scope: apply blur to the entire composite if enabled
                         if (cfg.blurScope === "Full Composition" && cfg.blurType && cfg.blurType !== "None (Clean Stock Approved)") {
                             applyPhotoshopBlurEngineJSX(doc, cfg);
                         }
@@ -1143,10 +1371,21 @@ app.bringToFront();
                     }
                 }
 
+                // Film Grain & Add Noise Filter
                 if (cfg.noiseEnable && cfg.noiseAmount > 0) {
-                    applyAddNoiseFilter(doc, cfg.noiseAmount, cfg.noiseDistribution, cfg.noiseMonochromatic);
+                    if (cfg.noiseFilmGrainOverlay) {
+                        applyProfessionalFilmGrainOverlay(doc, cfg.noiseAmount, cfg.noiseMonochromatic);
+                    } else {
+                        applyAddNoiseFilter(doc, cfg.noiseAmount, cfg.noiseDistribution, cfg.noiseMonochromatic);
+                    }
                 }
 
+                // Optical Lighting & Vignette Engine
+                if (cfg.lightingEnable) {
+                    applyStudioOpticalLighting(doc, cfg);
+                }
+
+                // Creative 30-Category Gradient Layer
                 var appliedGradInfo = null;
                 if (cfg.gradientEnable) {
                     appliedGradInfo = applyEditableGradientLayer(doc, cfg);
@@ -1156,6 +1395,7 @@ app.bringToFront();
                     doc.flatten();
                 }
 
+                // Liquify & Fluid Flow Distortion
                 if (cfg.liquifyEnable && cfg.liquifyIntensity > 0) {
                     prepareBaseLayer(doc);
                     applyOrganicLiquifyFlow(doc, cfg.liquifyStyle, cfg.liquifyIntensity);
@@ -1163,7 +1403,7 @@ app.bringToFront();
 
                 finalizeTo8BitDithered(doc);
 
-                var slot = getNextAvailableOutputFile(folders.processed, cfg.filenamePrefix, seqCounter);
+                var slot = getNextAvailableOutputFile(folders.processed, cfg.filenamePrefix, seqCounter, cfg.exportFormat);
                 tempOutputFile = slot.file;
 
                 // Verify active document dimensions match target before exporting
@@ -1173,9 +1413,9 @@ app.bringToFront();
                     doc.resizeImage(UnitValue(cfg.width, "px"), UnitValue(cfg.height, "px"), 300, ResampleMethod.BICUBICSMOOTHER);
                 }
 
-                exportBaselineJPEG(doc, tempOutputFile, cfg.jpegQuality, cfg.embedProfile);
+                exportDocumentMaster(doc, tempOutputFile, cfg);
 
-                var qcResult = verifyExportedJPEG(tempOutputFile, cfg.width, cfg.height, minRequiredBytes);
+                var qcResult = verifyExportedFile(tempOutputFile, cfg.width, cfg.height, minRequiredBytes);
 
                 if (!qcResult.valid && qcResult.belowMinSize) {
                     if (tempOutputFile.exists) {
@@ -1188,8 +1428,8 @@ app.bringToFront();
                         applyAddNoiseFilter(doc, 10, "Gaussian", false);
                     } catch (detailErr) {}
 
-                    exportBaselineJPEG(doc, tempOutputFile, 12, cfg.embedProfile);
-                    qcResult = verifyExportedJPEG(tempOutputFile, cfg.width, cfg.height, minRequiredBytes);
+                    exportDocumentMaster(doc, tempOutputFile, cfg);
+                    qcResult = verifyExportedFile(tempOutputFile, cfg.width, cfg.height, minRequiredBytes);
                 }
 
                 doc.close(SaveOptions.DONOTSAVECHANGES);
@@ -1245,21 +1485,21 @@ app.bringToFront();
             var summaryLines = [
                 "====================================================================",
                 "RI CREATIVE - BATCH BACKGROUND PROCESSING STUDIO PRO",
-                "PROCESSING SUMMARY REPORT",
+                "PROCESSING SUMMARY REPORT (ULTRA PRO MASTER EDITION)",
                 "====================================================================",
                 "Start Time           : " + (batchState.startTime || "N/A"),
                 "End Time             : " + endTime,
                 "Source Folder        : " + config.sourcePath,
                 "Output Folder        : " + folders.root.fsName,
                 "--------------------------------------------------------------------",
-                "Target Dimensions    : " + config.width + " x " + config.height + " px (2:1)",
+                "Target Dimensions    : " + config.width + " x " + config.height + " px (300 DPI)",
                 "Resize Mode          : " + config.resizeMode,
-                "Blur Effect          : " + (config.blurEnable ? ("Enabled (" + config.blurRadius + " px)") : "Disabled"),
-                "Gaussian Blur        : " + (config.gaussianEnable ? ("Enabled (" + config.gaussianRadius + " px)") : "Disabled"),
-                "Add Noise            : " + (config.noiseEnable ? ("Enabled (" + config.noiseAmount + "%, " + config.noiseDistribution + ", Mono: " + config.noiseMonochromatic + ")") : "Disabled"),
+                "Export Format        : " + config.exportFormat + " (Quality: " + config.jpegQuality + "/12, ICC: " + config.embedProfile + ")",
+                "Blur Filter          : " + (config.blurEnable ? (config.blurType + " - Radius: " + config.blurRadius + " px") : "Disabled"),
+                "Noise & Film Grain   : " + (config.noiseEnable ? (config.noiseAmount + "% " + config.noiseDistribution + " (Film Grain Overlay: " + config.noiseFilmGrainOverlay + ")") : "Disabled"),
+                "Optical Lighting     : " + (config.lightingEnable ? "Enabled (Vignette: " + config.vignetteEnable + ", Flare: " + config.anamorphicFlareEnable + ")" : "Disabled"),
                 "Liquify Fluid Flow   : " + (config.liquifyEnable ? ("Enabled (" + config.liquifyStyle + ", Intensity: " + config.liquifyIntensity + "%)") : "Disabled"),
                 "Gradient Overlay     : " + (config.gradientEnable ? ("Enabled (" + config.gradientPreset + ", " + config.gradientOpacity + "%, " + config.gradientBlendMode + ")") : "Disabled"),
-                "JPEG Quality         : " + config.jpegQuality + " / 12 (Baseline, ICC: " + config.embedProfile + ")",
                 "Minimum File Size    : " + config.minFileSizeMB + " MB",
                 "--------------------------------------------------------------------",
                 "Total Supported Found: " + totalScanned,
@@ -1307,6 +1547,7 @@ app.bringToFront();
             win.spacing = 8;
             win.margins = 12;
 
+            // TOP HEADER
             var headerGrp = win.add("group");
             headerGrp.orientation = "row";
             headerGrp.alignChildren = ["left", "center"];
@@ -1315,83 +1556,122 @@ app.bringToFront();
                 titleText.graphics.font = ScriptUI.newFont("Arial", "BOLD", 12);
             } catch (fontErr) {}
 
+            var badgeText = headerGrp.add("statictext", undefined, "⚡ 16-BIT RETINA ENGINE");
+            try {
+                badgeText.graphics.font = ScriptUI.newFont("Arial", "REGULAR", 10);
+            } catch (fontErr2) {}
+
             var tabPanel = win.add("tabbedpanel");
             tabPanel.alignChildren = ["fill", "fill"];
-            tabPanel.preferredSize = [520, 240];
+            tabPanel.preferredSize = [530, 275];
 
-            // TAB 1: FOLDERS, RESIZE & EXPORT
+            // --------------------------------------------------------------------
+            // TAB 1: FOLDERS, RESOLUTION & EXPORT
+            // --------------------------------------------------------------------
             var tabSetup = tabPanel.add("tab", undefined, "1. Folders & Export");
             tabSetup.orientation = "column";
             tabSetup.alignChildren = ["fill", "top"];
-            tabSetup.spacing = 8;
+            tabSetup.spacing = 7;
             tabSetup.margins = 10;
 
             var srcRow = tabSetup.add("group");
             var btnBrowseSrc = srcRow.add("button", undefined, "Source Folder...");
-            btnBrowseSrc.preferredSize = [115, 24];
+            btnBrowseSrc.preferredSize = [115, 23];
             var txtSrcPath = srcRow.add("edittext", undefined, "", { readonly: true });
-            txtSrcPath.preferredSize = [370, 22];
+            txtSrcPath.preferredSize = [385, 21];
 
             var outRow = tabSetup.add("group");
             var btnBrowseOut = outRow.add("button", undefined, "Output Folder...");
-            btnBrowseOut.preferredSize = [115, 24];
+            btnBrowseOut.preferredSize = [115, 23];
             var txtOutPath = outRow.add("edittext", undefined, "", { readonly: true });
-            txtOutPath.preferredSize = [370, 22];
+            txtOutPath.preferredSize = [385, 21];
 
             var modeRow = tabSetup.add("group");
             modeRow.add("statictext", undefined, "Mode:");
             var ddBatchScope = modeRow.add("dropdownlist", undefined, ["3-Image Fusion (Anti-Similar)", "All Images (1-by-1)", "Selected Images"]);
             ddBatchScope.selection = 0;
-            ddBatchScope.preferredSize = [185, 22];
+            ddBatchScope.preferredSize = [190, 21];
 
             var btnSelectSpecific = modeRow.add("button", undefined, "Pick Files...");
-            btnSelectSpecific.preferredSize = [80, 22];
+            btnSelectSpecific.preferredSize = [75, 21];
             btnSelectSpecific.enabled = false;
 
             var lblScannedInfo = modeRow.add("statictext", undefined, "Found: 0 images");
-            lblScannedInfo.preferredSize = [155, 20];
+            lblScannedInfo.preferredSize = [165, 20];
 
             var sep1 = tabSetup.add("panel");
             sep1.alignment = "fill";
 
-            var dimRow = tabSetup.add("group");
-            dimRow.add("statictext", undefined, "Size:");
-            var inpWidth = dimRow.add("edittext", undefined, String(DEFAULT_CONFIG.width));
-            inpWidth.preferredSize = [52, 22];
-            dimRow.add("statictext", undefined, "x");
-            var inpHeight = dimRow.add("edittext", undefined, String(DEFAULT_CONFIG.height));
-            inpHeight.preferredSize = [52, 22];
-            dimRow.add("statictext", undefined, "Mode:");
-            var ddResizeMode = dimRow.add("dropdownlist", undefined, ["Fit/Crop (Fill)", "Fit (Contain)", "Stretch"]);
-            ddResizeMode.selection = 0;
-            ddResizeMode.preferredSize = [115, 22];
-            dimRow.add("statictext", undefined, "Max:");
-            var inpMaxBatch = dimRow.add("edittext", undefined, String(DEFAULT_CONFIG.maxBatchCount));
-            inpMaxBatch.preferredSize = [42, 22];
+            // Resolution Preset Row
+            var resPresetLabels = [];
+            for (var r = 0; r < RESOLUTION_PRESETS.length; r++) {
+                resPresetLabels.push(RESOLUTION_PRESETS[r].label);
+            }
 
+            var dimPresetRow = tabSetup.add("group");
+            dimPresetRow.add("statictext", undefined, "Resolution Preset:");
+            var ddResPreset = dimPresetRow.add("dropdownlist", undefined, resPresetLabels);
+            ddResPreset.selection = 0;
+            ddResPreset.preferredSize = [235, 21];
+
+            dimPresetRow.add("statictext", undefined, "W:");
+            var inpWidth = dimPresetRow.add("edittext", undefined, String(DEFAULT_CONFIG.width));
+            inpWidth.preferredSize = [50, 21];
+            dimPresetRow.add("statictext", undefined, "H:");
+            var inpHeight = dimPresetRow.add("edittext", undefined, String(DEFAULT_CONFIG.height));
+            inpHeight.preferredSize = [50, 21];
+
+            var dimRow2 = tabSetup.add("group");
+            dimRow2.add("statictext", undefined, "Resize Mode:");
+            var ddResizeMode = dimRow2.add("dropdownlist", undefined, ["Fit/Crop (Fill)", "Fit (Contain)", "Stretch"]);
+            ddResizeMode.selection = 0;
+            ddResizeMode.preferredSize = [120, 21];
+
+            var chkSeamless = dimRow2.add("checkbox", undefined, "Seamless Seam Blending");
+            chkSeamless.value = DEFAULT_CONFIG.seamlessBlend;
+
+            dimRow2.add("statictext", undefined, "Max Batch:");
+            var inpMaxBatch = dimRow2.add("edittext", undefined, String(DEFAULT_CONFIG.maxBatchCount));
+            inpMaxBatch.preferredSize = [42, 21];
+
+            // Export Format & Quality Row
             var expRow1 = tabSetup.add("group");
-            expRow1.add("statictext", undefined, "Quality (1-12):");
+            expRow1.add("statictext", undefined, "Export Format:");
+            var ddExportFormat = expRow1.add("dropdownlist", undefined, [
+                "JPEG (Baseline 300 DPI)",
+                "TIFF (Lossless LZW 300 DPI)",
+                "PNG (Lossless 24-bit)",
+                "PSD (Master Layered Archive)"
+            ]);
+            ddExportFormat.selection = 0;
+            ddExportFormat.preferredSize = [170, 21];
+
+            expRow1.add("statictext", undefined, "JPEG Q (1-12):");
             var inpJpegQuality = expRow1.add("edittext", undefined, String(DEFAULT_CONFIG.jpegQuality));
-            inpJpegQuality.preferredSize = [36, 22];
+            inpJpegQuality.preferredSize = [32, 21];
+
             expRow1.add("statictext", undefined, "Min MB:");
             var inpMinSizeMB = expRow1.add("edittext", undefined, String(DEFAULT_CONFIG.minFileSizeMB));
-            inpMinSizeMB.preferredSize = [42, 22];
+            inpMinSizeMB.preferredSize = [38, 21];
+
             expRow1.add("statictext", undefined, "Prefix:");
             var inpPrefix = expRow1.add("edittext", undefined, DEFAULT_CONFIG.filenamePrefix);
-            inpPrefix.preferredSize = [135, 22];
+            inpPrefix.preferredSize = [95, 21];
 
-            var chkEmbedProfile = tabSetup.add("checkbox", undefined, "Embed ICC Color Profile (Standard Baseline JPEG)");
+            var chkEmbedProfile = tabSetup.add("checkbox", undefined, "Embed sRGB Color Profile (300 DPI Commercial Print Standard)");
             chkEmbedProfile.value = DEFAULT_CONFIG.embedProfile;
 
-            // TAB 2: BLUR & NOISE EFFECTS
+            // --------------------------------------------------------------------
+            // TAB 2: BLUR & NOISE / FILM GRAIN
+            // --------------------------------------------------------------------
             var tabEffects = tabPanel.add("tab", undefined, "2. Blur & Noise");
             tabEffects.orientation = "column";
             tabEffects.alignChildren = ["fill", "top"];
-            tabEffects.spacing = 10;
-            tabEffects.margins = 12;
+            tabEffects.spacing = 8;
+            tabEffects.margins = 10;
 
             var blurRow1 = tabEffects.add("group");
-            blurRow1.add("statictext", undefined, "Filter > Blur Menu (11 Photoshop Blurs):");
+            blurRow1.add("statictext", undefined, "Photoshop Blur Filter (11 Algorithms):");
             var ddBlurType = blurRow1.add("dropdownlist", undefined, [
                 "None (Clean Stock Approved)",
                 "Average",
@@ -1407,156 +1687,187 @@ app.bringToFront();
                 "Surface Blur..."
             ]);
             ddBlurType.selection = 0;
-            ddBlurType.preferredSize = [230, 22];
+            ddBlurType.preferredSize = [230, 21];
 
             var blurRow2 = tabEffects.add("group");
             blurRow2.add("statictext", undefined, "Radius (px):");
             var inpBlurRad = blurRow2.add("edittext", undefined, String(DEFAULT_CONFIG.blurRadius));
-            inpBlurRad.preferredSize = [50, 22];
+            inpBlurRad.preferredSize = [46, 21];
             blurRow2.add("statictext", undefined, "Threshold:");
             var inpBlurThresh = blurRow2.add("edittext", undefined, String(DEFAULT_CONFIG.blurThreshold));
-            inpBlurThresh.preferredSize = [50, 22];
+            inpBlurThresh.preferredSize = [46, 21];
             blurRow2.add("statictext", undefined, "Angle (°):");
             var inpMotionAngle = blurRow2.add("edittext", undefined, String(DEFAULT_CONFIG.motionAngle));
-            inpMotionAngle.preferredSize = [45, 22];
-            blurRow2.add("statictext", undefined, "Distance:");
+            inpMotionAngle.preferredSize = [42, 21];
+            blurRow2.add("statictext", undefined, "Dist:");
             var inpMotionDist = blurRow2.add("edittext", undefined, String(DEFAULT_CONFIG.motionDistance));
-            inpMotionDist.preferredSize = [45, 22];
+            inpMotionDist.preferredSize = [42, 21];
 
             var blurRow3 = tabEffects.add("group");
             blurRow3.add("statictext", undefined, "Radial Method:");
             var ddRadialMethod = blurRow3.add("dropdownlist", undefined, ["Spin", "Zoom"]);
             ddRadialMethod.selection = 0;
-            ddRadialMethod.preferredSize = [85, 22];
-            blurRow3.add("statictext", undefined, "Target Scope:");
-            var ddBlurScope = blurRow3.add("dropdownlist", undefined, ["Full Composition", "Background Only", "Outer Panels (Center Sharp)"]);
+            ddRadialMethod.preferredSize = [80, 21];
+            blurRow3.add("statictext", undefined, "Blur Scope:");
+            var ddBlurScope = blurRow3.add("dropdownlist", undefined, ["Full Composition", "Background Only", "Outer Panels"]);
             ddBlurScope.selection = 0;
-            ddBlurScope.preferredSize = [140, 22];
+            ddBlurScope.preferredSize = [145, 21];
 
             var sep2 = tabEffects.add("panel");
             sep2.alignment = "fill";
 
             var noiseRow1 = tabEffects.add("group");
-            var chkNoise = noiseRow1.add("checkbox", undefined, "Enable Add Noise Filter");
+            var chkNoise = noiseRow1.add("checkbox", undefined, "Enable Noise & Film Grain");
             chkNoise.value = DEFAULT_CONFIG.noiseEnable;
-            chkNoise.preferredSize = [220, 20];
+            chkNoise.preferredSize = [185, 20];
             noiseRow1.add("statictext", undefined, "Amount (%):");
             var inpNoiseAmt = noiseRow1.add("edittext", undefined, String(DEFAULT_CONFIG.noiseAmount));
-            inpNoiseAmt.preferredSize = [55, 22];
+            inpNoiseAmt.preferredSize = [48, 21];
+            var chkFilmGrainOverlay = noiseRow1.add("checkbox", undefined, "Pro 50% Gray Film Grain Layer");
+            chkFilmGrainOverlay.value = DEFAULT_CONFIG.noiseFilmGrainOverlay;
 
             var noiseRow2 = tabEffects.add("group");
             noiseRow2.add("statictext", undefined, "Noise Distribution:");
-            var ddNoiseDist = noiseRow2.add("dropdownlist", undefined, ["Uniform", "Gaussian"]);
+            var ddNoiseDist = noiseRow2.add("dropdownlist", undefined, ["Gaussian", "Uniform"]);
             ddNoiseDist.selection = 0;
-            ddNoiseDist.preferredSize = [110, 22];
+            ddNoiseDist.preferredSize = [110, 21];
             var chkNoiseMono = noiseRow2.add("checkbox", undefined, "Monochromatic Noise");
             chkNoiseMono.value = DEFAULT_CONFIG.noiseMonochromatic;
 
-            // TAB 3: CREATIVE GRADIENT & LIQUIFY STUDIO
-            var tabCreative = tabPanel.add("tab", undefined, "3. Gradient & Liquify");
+            // --------------------------------------------------------------------
+            // TAB 3: CREATIVE GRADIENT, LIGHTING & LIQUIFY
+            // --------------------------------------------------------------------
+            var tabCreative = tabPanel.add("tab", undefined, "3. Creative & Lighting");
             tabCreative.orientation = "column";
             tabCreative.alignChildren = ["fill", "top"];
-            tabCreative.spacing = 8;
+            tabCreative.spacing = 7;
             tabCreative.margins = 10;
 
+            // Gradient Section
             var gradRow1 = tabCreative.add("group");
             var chkGradient = gradRow1.add("checkbox", undefined, "Enable Gradient Overlay");
             chkGradient.value = DEFAULT_CONFIG.gradientEnable;
-            chkGradient.preferredSize = [185, 20];
+            chkGradient.preferredSize = [175, 20];
             gradRow1.add("statictext", undefined, "Opacity (%):");
             var inpGradOpacity = gradRow1.add("edittext", undefined, String(DEFAULT_CONFIG.gradientOpacity));
-            inpGradOpacity.preferredSize = [45, 22];
+            inpGradOpacity.preferredSize = [45, 21];
+            gradRow1.add("statictext", undefined, "Blend:");
+            var ddGradBlend = gradRow1.add("dropdownlist", undefined, ["Soft Light", "Overlay", "Normal", "Multiply", "Screen", "Color", "Hard Light"]);
+            ddGradBlend.selection = 0;
+            ddGradBlend.preferredSize = [105, 21];
 
             var gradRow2 = tabCreative.add("group");
-            gradRow2.add("statictext", undefined, "Preset:");
+            gradRow2.add("statictext", undefined, "Preset (30 Categories):");
             var ddGradPreset = gradRow2.add("dropdownlist", undefined, PRESET_NAMES);
             ddGradPreset.selection = 0;
-            ddGradPreset.preferredSize = [175, 22];
+            ddGradPreset.preferredSize = [175, 21];
             gradRow2.add("statictext", undefined, "Type:");
             var ddGradType = gradRow2.add("dropdownlist", undefined, ["Random Type", "Linear", "Radial", "Angle", "Reflected", "Diamond"]);
             ddGradType.selection = 0;
-            ddGradType.preferredSize = [115, 22];
-
-            var gradRow3 = tabCreative.add("group");
-            gradRow3.add("statictext", undefined, "Blend Mode:");
-            var ddGradBlend = gradRow3.add("dropdownlist", undefined, ["Soft Light", "Overlay", "Normal", "Multiply", "Screen", "Color", "Hard Light"]);
-            ddGradBlend.selection = 0;
-            ddGradBlend.preferredSize = [105, 22];
-            var chkMultiLayerMesh = gradRow3.add("checkbox", undefined, "Dual-Layer 3D Mesh Glow");
+            ddGradType.preferredSize = [115, 21];
+            var chkMultiLayerMesh = gradRow2.add("checkbox", undefined, "Dual Mesh");
             chkMultiLayerMesh.value = DEFAULT_CONFIG.gradientMultiLayerMesh;
 
             var sep3 = tabCreative.add("panel");
             sep3.alignment = "fill";
 
+            // Optical Lighting Section
+            var lightRow = tabCreative.add("group");
+            var chkLighting = lightRow.add("checkbox", undefined, "Optical Lighting Engine");
+            chkLighting.value = DEFAULT_CONFIG.lightingEnable;
+            var chkVignette = lightRow.add("checkbox", undefined, "Studio Vignette");
+            chkVignette.value = DEFAULT_CONFIG.vignetteEnable;
+            var chkAnamorphic = lightRow.add("checkbox", undefined, "Anamorphic Flare");
+            chkAnamorphic.value = DEFAULT_CONFIG.anamorphicFlareEnable;
+            var chkSunlight = lightRow.add("checkbox", undefined, "Sunlight Rim");
+            chkSunlight.value = DEFAULT_CONFIG.ambientSunlightEnable;
+
+            var sep4 = tabCreative.add("panel");
+            sep4.alignment = "fill";
+
+            // Liquify Distortion Section
             var liqRow1 = tabCreative.add("group");
-            var chkLiquify = liqRow1.add("checkbox", undefined, "Enable Liquify / Fluid Flow");
+            var chkLiquify = liqRow1.add("checkbox", undefined, "Enable Liquify Fluid Flow");
             chkLiquify.value = DEFAULT_CONFIG.liquifyEnable;
-            chkLiquify.preferredSize = [185, 20];
+            chkLiquify.preferredSize = [175, 20];
             liqRow1.add("statictext", undefined, "Intensity (%):");
             var inpLiqIntensity = liqRow1.add("edittext", undefined, String(DEFAULT_CONFIG.liquifyIntensity));
-            inpLiqIntensity.preferredSize = [45, 22];
+            inpLiqIntensity.preferredSize = [45, 21];
 
             var liqRow2 = tabCreative.add("group");
-            liqRow2.add("statictext", undefined, "Fluid Distortion Style:");
+            liqRow2.add("statictext", undefined, "Fluid Style:");
             var ddLiqStyle = liqRow2.add("dropdownlist", undefined, [
                 "Organic Fluid Wave", "Silk Swirl Vortex", "Liquid Marble Flow", 
                 "Abstract Mesh Warp", "Spherical 3D Bulge", "Hourglass Silhouette", 
                 "Pinch & Pucker Vortex", "Spiral Wave Flow", "Directional Ripple Warp", "Random Fluid"
             ]);
             ddLiqStyle.selection = 0;
-            ddLiqStyle.preferredSize = [185, 22];
+            ddLiqStyle.preferredSize = [200, 21];
 
             tabPanel.selection = tabSetup;
 
+            // --------------------------------------------------------------------
             // COMPACT PROGRESS & TELEMETRY BAR
-            var progPanel = win.add("panel", undefined, "Batch Progress");
+            // --------------------------------------------------------------------
+            var progPanel = win.add("panel", undefined, "Batch Execution Telemetry");
             progPanel.orientation = "column";
             progPanel.alignChildren = ["fill", "top"];
-            progPanel.spacing = 4;
-            progPanel.margins = 8;
+            progPanel.spacing = 3;
+            progPanel.margins = 7;
 
             var progressBar = progPanel.add("progressbar", undefined, 0, 100);
-            progressBar.preferredSize = [500, 14];
+            progressBar.preferredSize = [510, 14];
 
             var lblCurrentFile = progPanel.add("statictext", undefined, "Ready. Select Source & Output folders, then click START.");
             var lblStats = progPanel.add("statictext", undefined, "Success: 0  |  Failed: 0  |  Below Min MB: 0  |  Remaining: 0");
 
+            // --------------------------------------------------------------------
             // COMPACT ACTION BUTTON BAR
+            // --------------------------------------------------------------------
             var ctrlGrp = win.add("group");
             ctrlGrp.orientation = "row";
             ctrlGrp.alignChildren = ["center", "center"];
-            ctrlGrp.spacing = 5;
+            ctrlGrp.spacing = 6;
 
             var btnStart = ctrlGrp.add("button", undefined, "START");
-            btnStart.preferredSize = [68, 28];
+            btnStart.preferredSize = [70, 28];
 
             var btnPause = ctrlGrp.add("button", undefined, "PAUSE");
-            btnPause.preferredSize = [58, 28];
+            btnPause.preferredSize = [60, 28];
             btnPause.enabled = false;
 
             var btnResume = ctrlGrp.add("button", undefined, "RESUME");
-            btnResume.preferredSize = [64, 28];
+            btnResume.preferredSize = [65, 28];
             btnResume.enabled = false;
 
             var btnStop = ctrlGrp.add("button", undefined, "STOP");
-            btnStop.preferredSize = [54, 28];
+            btnStop.preferredSize = [55, 28];
             btnStop.enabled = false;
 
             var btnSkip = ctrlGrp.add("button", undefined, "SKIP");
-            btnSkip.preferredSize = [50, 28];
+            btnSkip.preferredSize = [52, 28];
             btnSkip.enabled = false;
 
             var btnRetry = ctrlGrp.add("button", undefined, "RETRY");
-            btnRetry.preferredSize = [56, 28];
+            btnRetry.preferredSize = [58, 28];
             btnRetry.enabled = false;
 
             var btnReset = ctrlGrp.add("button", undefined, "RESET");
-            btnReset.preferredSize = [56, 28];
+            btnReset.preferredSize = [58, 28];
 
             var btnClose = ctrlGrp.add("button", undefined, "CLOSE");
             btnClose.preferredSize = [58, 28];
 
             var scannedFilesCache = [];
+
+            // UI Synchronization functions
+            ddResPreset.onChange = function () {
+                var idx = ddResPreset.selection ? ddResPreset.selection.index : 0;
+                if (idx < RESOLUTION_PRESETS.length - 1) {
+                    inpWidth.text = String(RESOLUTION_PRESETS[idx].width);
+                    inpHeight.text = String(RESOLUTION_PRESETS[idx].height);
+                }
+            };
 
             function updateStatsUI(remainingCount, statusMsg) {
                 if (statusMsg !== undefined) {
@@ -1566,7 +1877,9 @@ app.bringToFront();
                     "  |  Failed: " + batchState.failedCount +
                     "  |  Below Min MB: " + batchState.belowMinSizeCount +
                     "  |  Remaining: " + remainingCount;
-                win.update();
+                if (win && typeof win.update === "function") {
+                    try { win.update(); } catch (uErr) {}
+                }
             }
 
             function setControlsRunningState(running) {
@@ -1580,7 +1893,9 @@ app.bringToFront();
                 btnClose.enabled = true;
                 btnBrowseSrc.enabled = !running;
                 btnBrowseOut.enabled = !running;
-                win.update();
+                if (win && typeof win.update === "function") {
+                    try { win.update(); } catch (uErr) {}
+                }
             }
 
             function parseIntSafe(val, fallback, minV, maxV) {
@@ -1606,7 +1921,14 @@ app.bringToFront();
                 config.width = parseIntSafe(inpWidth.text, 4000, 100, 30000);
                 config.height = parseIntSafe(inpHeight.text, 2000, 100, 30000);
                 config.resizeMode = ddResizeMode.selection ? ddResizeMode.selection.text : "Fit/Crop (Fill)";
+                config.seamlessBlend = chkSeamless.value;
                 config.maxBatchCount = parseIntSafe(inpMaxBatch.text, 500, 1, MAX_ALLOWED_BATCH);
+
+                config.exportFormat = ddExportFormat.selection ? ddExportFormat.selection.text : "JPEG (Baseline 300 DPI)";
+                config.jpegQuality = parseIntSafe(inpJpegQuality.text, 12, 1, 12);
+                config.minFileSizeMB = parseFloatSafe(inpMinSizeMB.text, 0, 0, 100);
+                config.embedProfile = chkEmbedProfile.value;
+                config.filenamePrefix = sanitizeFilenamePrefix(inpPrefix.text);
 
                 config.blurType = ddBlurType.selection ? ddBlurType.selection.text : "None (Clean Stock Approved)";
                 config.blurRadius = parseFloatSafe(inpBlurRad.text, 25, 0.1, 250);
@@ -1618,9 +1940,15 @@ app.bringToFront();
                 config.blurEnable = (config.blurType !== "None (Clean Stock Approved)");
 
                 config.noiseEnable = chkNoise.value;
-                config.noiseAmount = parseFloatSafe(inpNoiseAmt.text, 50, 1, 100);
-                config.noiseDistribution = ddNoiseDist.selection ? ddNoiseDist.selection.text : "Uniform";
+                config.noiseAmount = parseFloatSafe(inpNoiseAmt.text, 6, 1, 100);
+                config.noiseFilmGrainOverlay = chkFilmGrainOverlay.value;
+                config.noiseDistribution = ddNoiseDist.selection ? ddNoiseDist.selection.text : "Gaussian";
                 config.noiseMonochromatic = chkNoiseMono.value;
+
+                config.lightingEnable = chkLighting.value;
+                config.vignetteEnable = chkVignette.value;
+                config.anamorphicFlareEnable = chkAnamorphic.value;
+                config.ambientSunlightEnable = chkSunlight.value;
 
                 config.gradientEnable = chkGradient.value;
                 config.gradientPreset = ddGradPreset.selection ? ddGradPreset.selection.text : "Random Preset";
@@ -1631,20 +1959,23 @@ app.bringToFront();
 
                 config.liquifyEnable = chkLiquify.value;
                 config.liquifyStyle = ddLiqStyle.selection ? ddLiqStyle.selection.text : "Organic Fluid Wave";
-                config.liquifyIntensity = parseIntSafe(inpLiqIntensity.text, 75, 1, 150);
-
-                config.jpegQuality = parseIntSafe(inpJpegQuality.text, 12, 1, 12);
-                config.minFileSizeMB = parseFloatSafe(inpMinSizeMB.text, 0, 0, 100);
-                config.embedProfile = chkEmbedProfile.value;
-                config.filenamePrefix = sanitizeFilenamePrefix(inpPrefix.text);
+                config.liquifyIntensity = parseIntSafe(inpLiqIntensity.text, 65, 1, 150);
             }
 
             function resetSettingsToDefault() {
                 config = cloneConfig(DEFAULT_CONFIG);
+                ddResPreset.selection = 0;
                 inpWidth.text = String(config.width);
                 inpHeight.text = String(config.height);
                 ddResizeMode.selection = 0;
+                chkSeamless.value = config.seamlessBlend;
                 inpMaxBatch.text = String(config.maxBatchCount);
+
+                ddExportFormat.selection = 0;
+                inpJpegQuality.text = String(config.jpegQuality);
+                inpMinSizeMB.text = String(config.minFileSizeMB);
+                chkEmbedProfile.value = config.embedProfile;
+                inpPrefix.text = config.filenamePrefix;
 
                 ddBlurType.selection = 0;
                 inpBlurRad.text = String(config.blurRadius);
@@ -1656,8 +1987,14 @@ app.bringToFront();
 
                 chkNoise.value = config.noiseEnable;
                 inpNoiseAmt.text = String(config.noiseAmount);
+                chkFilmGrainOverlay.value = config.noiseFilmGrainOverlay;
                 ddNoiseDist.selection = 0;
                 chkNoiseMono.value = config.noiseMonochromatic;
+
+                chkLighting.value = config.lightingEnable;
+                chkVignette.value = config.vignetteEnable;
+                chkAnamorphic.value = config.anamorphicFlareEnable;
+                chkSunlight.value = config.ambientSunlightEnable;
 
                 chkGradient.value = config.gradientEnable;
                 ddGradPreset.selection = 0;
@@ -1669,11 +2006,6 @@ app.bringToFront();
                 chkLiquify.value = config.liquifyEnable;
                 ddLiqStyle.selection = 0;
                 inpLiqIntensity.text = String(config.liquifyIntensity);
-
-                inpJpegQuality.text = String(config.jpegQuality);
-                inpMinSizeMB.text = String(config.minFileSizeMB);
-                chkEmbedProfile.value = config.embedProfile;
-                inpPrefix.text = config.filenamePrefix;
             }
 
             btnBrowseSrc.onClick = function () {
@@ -1699,13 +2031,14 @@ app.bringToFront();
             };
 
             btnSelectSpecific.onClick = function () {
+                var filterPattern = ($.os.indexOf("Windows") !== -1) ?
+                    "Supported Images:*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.psd;*.bmp,All Files:*.*" :
+                    function (f) { return (f instanceof Folder) || SUPPORTED_EXTENSIONS.test(f.name); };
                 var picked = null;
                 try {
-                    picked = File.openDialog("Select Images to Process", function (f) {
-                        return (f instanceof Folder) || SUPPORTED_EXTENSIONS.test(f.name);
-                    }, true);
+                    picked = File.openDialog("Select Images to Process", filterPattern, true);
                 } catch (dialogErr) {
-                    picked = File.openDialog("Select Images to Process", "Images:*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.psd;*.bmp", true);
+                    picked = File.openDialog("Select Images to Process", "*.*", true);
                 }
                 if (picked && picked.length > 0) {
                     config.selectedFiles = picked;
@@ -1818,8 +2151,10 @@ app.bringToFront();
 
                         while (batchState.isPaused && !batchState.stopRequested) {
                             app.refresh();
-                            if (win && win.update) win.update();
-                            $.sleep(150);
+                            if (win && typeof win.update === "function") {
+                                try { win.update(); } catch (uErr) {}
+                            }
+                            $.sleep(120);
                         }
 
                         if (batchState.stopRequested) {
@@ -1858,6 +2193,13 @@ app.bringToFront();
 
                         saveCheckpoint(folders.reports);
                         updateStatsUI(totalItems - (idx + 1));
+
+                        // Purge Photoshop History & Cache every 10 items to prevent RAM exhaustion
+                        if ((idx % 10) === 0) {
+                            try {
+                                app.purge(PurgeTarget.ALLCACHES);
+                            } catch (purgeErr) {}
+                        }
                     }
                 } finally {
                     app.displayDialogs = prevDialogs;

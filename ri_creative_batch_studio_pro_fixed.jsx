@@ -398,17 +398,21 @@ app.bringToFront();
         }
 
         function ensureOutputStructure(baseOutputPath) {
-            var rootFolder = new Folder(baseOutputPath + "/RI_CREATIVE_OUTPUT");
+            var basePath = String(baseOutputPath).replace(/\\/g, "/");
+            while (basePath.charAt(basePath.length - 1) === "/") {
+                basePath = basePath.substring(0, basePath.length - 1);
+            }
+            var rootFolder = new Folder(basePath + "/RI_CREATIVE_OUTPUT");
             if (!rootFolder.exists && !rootFolder.create()) {
                 throw new Error("Unable to create root output directory: " + rootFolder.fsName);
             }
 
-            var processedFolder = new Folder(rootFolder.fsName + "/Processed_Images");
+            var processedFolder = new Folder(rootFolder.fullName + "/Processed_Images");
             if (!processedFolder.exists && !processedFolder.create()) {
                 throw new Error("Unable to create Processed_Images directory: " + processedFolder.fsName);
             }
 
-            var reportsFolder = new Folder(rootFolder.fsName + "/Reports");
+            var reportsFolder = new Folder(rootFolder.fullName + "/Reports");
             if (!reportsFolder.exists && !reportsFolder.create()) {
                 throw new Error("Unable to create Reports directory: " + reportsFolder.fsName);
             }
@@ -432,9 +436,10 @@ app.bringToFront();
             var ext = getExtensionForFormat(formatStr || "JPEG");
             var seq = startSeq;
             var candidateFile;
+            var folderPath = processedFolder.fullName;
             while (seq < 999999) {
                 var fileName = prefix + padNumber(seq, 4) + ext;
-                candidateFile = new File(processedFolder.fsName + "/" + fileName);
+                candidateFile = new File(folderPath + "/" + fileName);
                 if (!candidateFile.exists) {
                     return {
                         file: candidateFile,
@@ -668,6 +673,11 @@ app.bringToFront();
             safeFlattenDoc(doc);
             try {
                 if (doc.activeLayer && doc.activeLayer.isBackgroundLayer) {
+                    doc.activeLayer.name = "Layer 0";
+                }
+            } catch (renameErr) {}
+            try {
+                if (doc.activeLayer && doc.activeLayer.isBackgroundLayer) {
                     doc.activeLayer.isBackgroundLayer = false;
                 }
             } catch (lockErr) {}
@@ -766,7 +776,11 @@ app.bringToFront();
         function purgePhotoshopCachesSafe() {
             try {
                 if (typeof PurgeTarget !== "undefined") {
-                    app.purge(PurgeTarget.ALLCACHES);
+                    if (PurgeTarget.ALLCACHES) {
+                        app.purge(PurgeTarget.ALLCACHES);
+                    } else if (PurgeTarget.ALL) {
+                        app.purge(PurgeTarget.ALL);
+                    }
                 }
             } catch (purgeErr) {}
         }
@@ -1816,18 +1830,34 @@ app.bringToFront();
 
                 resizeImageSmart(extraDoc, extraW, zoneH, "Fit/Crop (Fill)");
 
+                var copied = false;
                 try {
                     extraDoc.activeLayer.duplicate(mainDoc);
+                    copied = true;
                 } catch (dupErr1) {
                     try {
                         extraDoc.activeLayer.duplicate(mainDoc, PLACE_TOP);
+                        copied = true;
                     } catch (dupErr2) {}
                 }
+
+                if (!copied) {
+                    try {
+                        extraDoc.selection.selectAll();
+                        extraDoc.selection.copy();
+                        app.activeDocument = mainDoc;
+                        mainDoc.paste();
+                        copied = true;
+                    } catch (copyErr) {}
+                }
+
                 extraDoc.close(DO_NOT_SAVE);
                 extraDoc = null;
 
+                if (!copied) return;
+
                 app.activeDocument = mainDoc;
-                var pastedLayer = mainDoc.layers[0];
+                var pastedLayer = mainDoc.activeLayer || mainDoc.layers[0];
                 mainDoc.activeLayer = pastedLayer;
                 pastedLayer.name = layerTag;
 
@@ -1987,6 +2017,10 @@ app.bringToFront();
                     safeResizeImage(doc, cfg.width, cfg.height, 300);
                 }
 
+                if (tempOutputFile && tempOutputFile.exists) {
+                    try { tempOutputFile.remove(); } catch (eRemInit) {}
+                }
+
                 exportDocumentMaster(doc, tempOutputFile, cfg);
 
                 var qcResult = verifyExportedFile(tempOutputFile, cfg.width, cfg.height, minRequiredBytes);
@@ -2002,7 +2036,11 @@ app.bringToFront();
                         applyAddNoiseFilter(doc, 10, "Gaussian", false);
                     } catch (detailErr) {}
 
-                    exportDocumentMaster(doc, tempOutputFile, cfg);
+                    if (tempOutputFile && tempOutputFile.exists) {
+                    try { tempOutputFile.remove(); } catch (eRemInit) {}
+                }
+
+                exportDocumentMaster(doc, tempOutputFile, cfg);
                     qcResult = verifyExportedFile(tempOutputFile, cfg.width, cfg.height, minRequiredBytes);
                 }
 
@@ -2932,11 +2970,10 @@ app.bringToFront();
                         batchState.currentIndex = idx;
 
                         while (batchState.isPaused && !batchState.stopRequested) {
-                            app.refresh();
                             if (win && typeof win.update === "function") {
                                 try { win.update(); } catch (uErr) {}
                             }
-                            $.sleep(120);
+                            $.sleep(100);
                         }
 
                         if (batchState.stopRequested) {
@@ -2954,10 +2991,27 @@ app.bringToFront();
 
                         progressBar.value = Math.round(((idx + 1) / totalItems) * 100);
                         updateStatsUI(totalItems - idx, "Processing [" + (idx + 1) + "/" + totalItems + "]: " + itemLabel);
-                        app.refresh();
 
-                        var result = processSingleImage(item, folders, seqCounter, config);
-                        seqCounter = result.nextSeq;
+                        // Give Windows OS message pump time to process ScriptUI paint messages without freezing
+                        $.sleep(30);
+
+                        var result = null;
+                        try {
+                            result = processSingleImage(item, folders, seqCounter, config);
+                            if (!result) throw new Error("Empty processing result");
+                            seqCounter = result.nextSeq || (seqCounter + 1);
+                        } catch (itemExecErr) {
+                            result = {
+                                success: false,
+                                reason: itemExecErr.message || "Execution exception",
+                                sourceName: itemLabel,
+                                outputName: "N/A",
+                                sizeMB: "0.00",
+                                extraInfo: "",
+                                nextSeq: seqCounter + 1
+                            };
+                            seqCounter++;
+                        }
 
                         if (result.success) {
                             batchState.successCount++;
@@ -2969,20 +3023,21 @@ app.bringToFront();
                                 batchState.belowMinSizeCount++;
                             }
                             batchState.failedQueue.push(item);
-                            batchState.failedDetails.push("[FAILED] " + result.sourceName + " -> " + result.reason);
-                            batchState.logs.push("[FAILED] " + result.sourceName + " -> " + result.reason);
+                            var errDetail = (result.reason || result.error || "Processing failed");
+                            batchState.failedDetails.push("[FAILED] " + result.sourceName + " -> " + errDetail);
+                            batchState.logs.push("[FAILED] " + result.sourceName + " -> " + errDetail);
                         }
 
                         saveCheckpoint(folders.reports);
                         updateStatsUI(totalItems - (idx + 1));
 
-                        // Purge Photoshop History & Cache every 10 items to prevent RAM exhaustion
-                        if ((idx % 10) === 0) {
-                            try {
-                                app.purge(PurgeTarget.ALLCACHES);
-                            } catch (purgeErr) {}
+                        // Purge Photoshop History & Cache every 10 items to prevent RAM exhaustion (skip first item)
+                        if (idx > 0 && (idx % 10) === 0) {
+                            purgePhotoshopCachesSafe();
                         }
                     }
+                } catch (batchLoopErr) {
+                    batchState.logs.push("[CRITICAL] Batch loop error: " + batchLoopErr.message);
                 } finally {
                     try { if (prevDialogs !== null) app.displayDialogs = prevDialogs; } catch (eR1) {}
                     try { if (prevRulerUnits !== null) app.preferences.rulerUnits = prevRulerUnits; } catch (eR2) {}
@@ -3006,34 +3061,38 @@ app.bringToFront();
             }
 
             btnStart.onClick = function () {
-                syncConfigFromUI();
-                if (config.processMode === "Selected Images") {
-                    if (!config.selectedFiles || config.selectedFiles.length === 0) {
-                        alert("Please select images first.\nClick 'Pick Files...' button.");
-                        lblCurrentFile.text = "Error: Please click 'Pick Files...' to select images.";
+                try {
+                    syncConfigFromUI();
+                    if (config.processMode === "Selected Images") {
+                        if (!config.selectedFiles || config.selectedFiles.length === 0) {
+                            alert("Please select images first.\nClick 'Pick Files...' button.");
+                            lblCurrentFile.text = "Error: Please click 'Pick Files...' to select images.";
+                            return;
+                        }
+                    } else {
+                        if (!config.sourcePath || config.sourcePath === "" || !(new Folder(config.sourcePath)).exists) {
+                            alert("Please select a Source Folder first.\nClick 'Source Folder...' button.");
+                            lblCurrentFile.text = "Error: Please select a valid Source Folder.";
+                            return;
+                        }
+                    }
+                    if (!config.outputPath || config.outputPath === "" || !(new Folder(config.outputPath)).exists) {
+                        alert("Please select an Output Folder first.\nClick 'Output Folder...' button.");
+                        lblCurrentFile.text = "Error: Please select a valid Output Folder.";
                         return;
                     }
-                } else {
-                    if (!config.sourcePath || config.sourcePath === "" || !(new Folder(config.sourcePath)).exists) {
-                        alert("Please select a Source Folder first.\nClick 'Source Folder...' button.");
-                        lblCurrentFile.text = "Error: Please select a valid Source Folder.";
+
+                    var built = buildProcessingQueue();
+                    if (!built || !built.queue || built.queue.length === 0) {
+                        alert("No supported images (JPG, PNG, TIF, PSD, BMP) found in:\n" + config.sourcePath);
+                        lblCurrentFile.text = "Error: No supported images found to process.";
                         return;
                     }
-                }
-                if (!config.outputPath || config.outputPath === "" || !(new Folder(config.outputPath)).exists) {
-                    alert("Please select an Output Folder first.\nClick 'Output Folder...' button.");
-                    lblCurrentFile.text = "Error: Please select a valid Output Folder.";
-                    return;
-                }
 
-                var built = buildProcessingQueue();
-                if (!built || !built.queue || built.queue.length === 0) {
-                    alert("No supported images (JPG, PNG, TIF, PSD, BMP) found in:\n" + config.sourcePath);
-                    lblCurrentFile.text = "Error: No supported images found to process.";
-                    return;
+                    executeBatchQueue(built.queue, built.totalScanned);
+                } catch (startErr) {
+                    alert("Error starting batch processing:\n" + startErr.message);
                 }
-
-                executeBatchQueue(built.queue, built.totalScanned);
             };
 
             btnRetry.onClick = function () {

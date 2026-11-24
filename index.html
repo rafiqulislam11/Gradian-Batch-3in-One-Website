@@ -4671,12 +4671,33 @@
         let toastTimer = null;
         function showToast(title, body) {
             const box = document.getElementById('toastBox');
-            document.getElementById('toastTitle').textContent = title;
-            document.getElementById('toastBody').textContent = body;
+            if (!box) return;
+            const tTitle = document.getElementById('toastTitle');
+            const tBody = document.getElementById('toastBody');
+            if (tTitle) tTitle.textContent = title;
+            if (tBody) tBody.textContent = body;
             box.classList.remove('hidden');
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => box.classList.add('hidden'), 4200);
         }
+
+        // Global Error Boundary: Catches runtime exceptions and unhandled promises gracefully
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error('[RI Studio Error]', message, 'at', source, ':', lineno, error);
+            if (typeof showToast === 'function') {
+                const cleanMsg = typeof message === 'string' ? message.replace(/^Uncaught\s*/i, '').slice(0, 85) : 'Studio operation notice';
+                showToast('⚠️ Studio Notice', cleanMsg);
+            }
+            return false;
+        };
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('[RI Studio Unhandled Rejection]', e.reason);
+            if (typeof showToast === 'function') {
+                const msg = e.reason && e.reason.message ? e.reason.message : 'Async background operation notice';
+                showToast('⚠️ Studio Notice', String(msg).slice(0, 85));
+            }
+        });
 
         // Layer Manager UI Renderer
         function renderLayerStackUI() {
@@ -11286,8 +11307,7 @@ const GLASS_SHAPES_INFO = {
             }
             setTxt('valGradOpacity', state.gradOpacity + '%');
             setTxt('valGradDither', state.gradDither + '%');
-            setTxt('valStdBlur', state.stdBlur + ' px');
-            setTxt('valBlur', state.blur + ' px');
+            setTxt('valBlurRadius', (state.blurRadius !== undefined ? state.blurRadius : 0) + ' px');
             setTxt('valLiquify', state.liquify + '%');
             setTxt('valNoise', state.noise + '%');
             setTxt('valOverlayOpacity', state.overlayOpacity + '%');
@@ -13113,7 +13133,7 @@ const GLASS_SHAPES_INFO = {
             };
         };
 
-        const exportFlowImage = (format = 'png', overrideDimensions = null) => {
+        const exportFlowImage = async (format = 'png', overrideDimensions = null) => {
             const dims = overrideDimensions || getFlowExportDimensions();
             const expCanvas = document.createElement('canvas');
             expCanvas.width = dims.width;
@@ -13125,12 +13145,22 @@ const GLASS_SHAPES_INFO = {
 
             const mime = format === 'jpg' ? 'image/jpeg' : 'image/png';
             const ext = format === 'jpg' ? 'jpg' : 'png';
-            const quality = format === 'jpg' ? 0.95 : undefined;
+            const quality = format === 'jpg' ? 0.96 : undefined;
             const safeName = pDef.name.replace(/[^a-zA-Z0-9_-]/g, '_');
             const filename = `RI_3DFlow_${safeName}_${dims.width}x${dims.height}_${Date.now()}.${ext}`;
 
-            expCanvas.toBlob((blob) => {
+            try {
+                let blob = await new Promise((res) => expCanvas.toBlob(res, mime, quality));
                 if (blob) {
+                    if (mime === 'image/jpeg') {
+                        if (typeof inject300DpiToJpegBlob === 'function') {
+                            blob = await inject300DpiToJpegBlob(blob);
+                        }
+                        const is4K = (dims.width >= 3840 || dims.height >= 2160 || dims.width * dims.height >= 8000000);
+                        if (is4K && typeof padJpegBlobToMinSize === 'function') {
+                            blob = await padJpegBlobToMinSize(blob, Math.round(10.5 * 1024 * 1024));
+                        }
+                    }
                     if (typeof triggerActualBlobDownload === 'function') {
                         triggerActualBlobDownload(blob, filename);
                     } else {
@@ -13142,11 +13172,13 @@ const GLASS_SHAPES_INFO = {
                         document.body.removeChild(a);
                     }
                     if (typeof showToast === 'function') {
-                        showToast('📥 Download Started', `${dims.width}×${dims.height} ${ext.toUpperCase()}`);
+                        const finalMB = (blob.size / (1024 * 1024)).toFixed(2);
+                        showToast('📥 Download Started', `${dims.width}×${dims.height} ${ext.toUpperCase()} (${finalMB} MB)`);
                     }
                 }
+            } finally {
                 disposeCanvas(expCanvas);
-            }, mime, quality);
+            }
         };
 
         bindInput('btnFlowDownloadPng', 'click', () => exportFlowImage('png'));
@@ -16008,7 +16040,6 @@ const GLASS_SHAPES_INFO = {
         // Wire Up Studio Events & Interactivity
         function initLiquifyStudioEvents() {
             // Modal Open & Close Triggers
-            bindInput('btnOpenLiquifyStudio', 'click', () => LiquifyStudioPro.open());
             bindInput('btnLaunchLiquifyStudioModal', 'click', () => LiquifyStudioPro.open());
             bindInput('btnQuickLaunchLiquify', 'click', () => LiquifyStudioPro.open());
             bindInput('btnHeaderOpenLiquify', 'click', () => LiquifyStudioPro.open());

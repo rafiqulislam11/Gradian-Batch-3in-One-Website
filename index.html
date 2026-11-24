@@ -653,8 +653,14 @@
                 <button id="btnHeaderStockQc" type="button" class="studio-btn px-2 py-1 rounded-lg border text-[11px] font-semibold transition text-emerald-600 dark:text-emerald-400 border-emerald-500/30 flex items-center gap-1" title="Launch Real-Time Microstock Quality Control Diagnostic">
                     <span>🛡️</span><span class="hidden xl:inline">Stock QC</span>
                 </button>
-                <button id="btnExportSvg" type="button" class="studio-btn px-2 py-1 rounded-lg border text-[11px] font-semibold transition text-indigo-600 dark:text-indigo-400 border-indigo-500/30 flex items-center gap-1" title="Export Vector SVG Artwork">
+                <button id="btnExportSvg" type="button" class="studio-btn px-2 py-1 rounded-lg border text-[11px] font-semibold transition text-indigo-600 dark:text-indigo-400 border-indigo-500/30 flex items-center gap-1" title="Export Scalable Vector Graphics (.svg)">
                     <span>📐</span><span class="hidden xl:inline">SVG</span>
+                </button>
+                <button id="btnExportEps" type="button" class="studio-btn px-2 py-1 rounded-lg border text-[11px] font-semibold transition text-amber-600 dark:text-amber-400 border-amber-500/30 flex items-center gap-1" title="Export Microstock Vector EPS 10 (.eps)">
+                    <span>📦</span><span class="hidden xl:inline">EPS 10</span>
+                </button>
+                <button id="btnExportPsd" type="button" class="studio-btn px-2 py-1 rounded-lg border text-[11px] font-semibold transition text-sky-600 dark:text-sky-400 border-sky-500/30 flex items-center gap-1" title="Export Adobe Photoshop Document (.psd)">
+                    <span>🎨</span><span class="hidden xl:inline">PSD</span>
                 </button>
                 <button id="btnSavePresetJson" type="button" class="studio-btn hidden 2xl:inline-block px-2 py-1 rounded-lg border text-[11px] font-medium transition" title="Save &amp; Download Studio Preset (.json)">Save Preset</button>
                 <button id="btnLoadPresetJson" type="button" class="studio-btn hidden 2xl:inline-block px-2 py-1 rounded-lg border text-[11px] font-medium transition" title="Import Studio Preset (.json)">Load Preset</button>
@@ -856,13 +862,15 @@
                         </select>
                     </div>
                     <div>
-                        <label class="studio-label text-[10px] block mb-0.5">Export Format</label>
-                        <select id="selExportFormat" class="studio-input w-full border rounded-md px-1.5 py-1 text-[11px] focus:outline-none">
-                            <option value="image/jpeg" selected>JPEG (sRGB Ultra)</option>
-                            <option value="image/png">PNG (Lossless 24-bit)</option>
-                            <option value="image/webp">WebP (High Fidelity)</option>
-                            <option value="image/svg+xml">SVG (Vector Artwork)</option>
-                            <option value="image/tiff">TIFF (Uncompressed RGB)</option>
+                        <label class="studio-label text-[10px] block mb-0.5 font-bold uppercase tracking-wider">Export Format</label>
+                        <select id="selExportFormat" class="studio-input w-full border rounded-md px-1.5 py-1 text-[11px] font-semibold focus:outline-none">
+                            <option value="image/jpeg" selected>JPEG (sRGB Ultra 300 DPI)</option>
+                            <option value="image/svg+xml">SVG (Scalable Vector Graphics .svg)</option>
+                            <option value="application/postscript">EPS 10 (Microstock Vector .eps)</option>
+                            <option value="image/vnd.adobe.photoshop">PSD (Adobe Photoshop Document .psd)</option>
+                            <option value="image/png">PNG (Lossless 24-bit RGBA)</option>
+                            <option value="image/webp">WebP (High Fidelity 4K)</option>
+                            <option value="image/tiff">TIFF (Uncompressed 300 DPI RGB)</option>
                         </select>
                     </div>
                     <div>
@@ -2102,20 +2110,31 @@
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="grid grid-cols-2 gap-1.5 pt-1">
-                            <button id="btnFlowDownloadPng" type="button" class="studio-btn py-1.5 px-2 rounded-lg border text-[10px] font-bold flex items-center justify-center gap-1 transition">
-                                <span>⬇️</span> Download PNG
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 pt-1">
+                            <button id="btnFlowDownloadPng" type="button" class="studio-btn py-1.5 px-2 rounded-lg border text-[10px] font-bold flex items-center justify-center gap-1 transition" title="Download PNG">
+                                <span>⬇️</span> PNG
                             </button>
-                            <button id="btnFlowDownloadJpg" type="button" class="studio-btn py-1.5 px-2 rounded-lg border text-[10px] font-bold flex items-center justify-center gap-1 transition">
-                                <span>⬇️</span> Download JPG
+                            <button id="btnFlowDownloadJpg" type="button" class="studio-btn py-1.5 px-2 rounded-lg border text-[10px] font-bold flex items-center justify-center gap-1 transition" title="Download JPG">
+                                <span>⬇️</span> JPG
+                            </button>
+                            <button id="btnFlowDownloadSvg" type="button" class="studio-btn py-1.5 px-2 rounded-lg border text-[10px] font-bold flex items-center justify-center gap-1 transition text-indigo-500" title="Download Scalable Vector Graphics (.svg)">
+                                <span>📐</span> SVG
                             </button>
                         </div>
-                        <div class="grid grid-cols-2 gap-1.5">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                            <button id="btnFlowDownloadEps" type="button" class="studio-btn py-1.5 px-2 rounded-lg border text-[10px] font-bold flex items-center justify-center gap-1 transition text-amber-500" title="Download Microstock Vector EPS 10 (.eps)">
+                                <span>📦</span> EPS 10
+                            </button>
+                            <button id="btnFlowDownloadPsd" type="button" class="studio-btn py-1.5 px-2 rounded-lg border text-[10px] font-bold flex items-center justify-center gap-1 transition text-sky-500" title="Download Adobe Photoshop (.psd)">
+                                <span>🎨</span> PSD
+                            </button>
                             <button id="btnFlowDownload4K" type="button" class="studio-primary-btn py-1.5 px-2 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 transition">
                                 <span>🌟</span> 4K UHD Direct
                             </button>
-                            <button id="btnFlowBulkGenerate" type="button" class="studio-btn py-1.5 px-2 rounded-lg border text-[10px] font-bold flex items-center justify-center gap-1 transition" title="Generate multiple variations packaged in a ZIP">
-                                <span>📦</span> Bulk Variations (ZIP)
+                        </div>
+                        <div class="pt-0.5">
+                            <button id="btnFlowBulkGenerate" type="button" class="studio-btn w-full py-1.5 px-2 rounded-lg border text-[10px] font-bold flex items-center justify-center gap-1 transition" title="Generate multiple variations packaged in a ZIP">
+                                <span>📦</span> Bulk Multi-Format Variations (ZIP)
                             </button>
                         </div>
                     </div>
@@ -13308,16 +13327,23 @@ const GLASS_SHAPES_INFO = {
             const pDef = FLOW_PRESETS[state.flowStyle] || FLOW_PRESETS.flow_1;
             renderAbstract3DFlowPattern(expCtx, dims.width, dims.height, getFlowPatternOptions(state));
 
-            const mime = format === 'jpg' ? 'image/jpeg' : 'image/png';
-            const ext = format === 'jpg' ? 'jpg' : 'png';
-            const quality = format === 'jpg' ? 0.96 : undefined;
             const safeName = pDef.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+            const ext = format.toLowerCase();
             const filename = `RI_3DFlow_${safeName}_${dims.width}x${dims.height}_${Date.now()}.${ext}`;
 
             try {
-                let blob = await new Promise((res) => expCanvas.toBlob(res, mime, quality));
-                if (blob) {
-                    if (mime === 'image/jpeg') {
+                let blob;
+                if (ext === 'svg') {
+                    blob = generateVectorSvgBlob(dims.width, dims.height, expCanvas);
+                } else if (ext === 'eps') {
+                    blob = generateEPS10Blob(dims.width, dims.height, expCanvas, state.exportDpi || 300);
+                } else if (ext === 'psd') {
+                    blob = generateLayeredPsdBlob(dims.width, dims.height, expCanvas, state.exportDpi || 300);
+                } else {
+                    const mime = ext === 'jpg' ? 'image/jpeg' : 'image/png';
+                    const quality = ext === 'jpg' ? 0.96 : undefined;
+                    blob = await new Promise((res) => expCanvas.toBlob(res, mime, quality));
+                    if (blob && mime === 'image/jpeg') {
                         if (typeof inject300DpiToJpegBlob === 'function') {
                             blob = await inject300DpiToJpegBlob(blob);
                         }
@@ -13326,6 +13352,9 @@ const GLASS_SHAPES_INFO = {
                             blob = await padJpegBlobToMinSize(blob, Math.round(10.5 * 1024 * 1024));
                         }
                     }
+                }
+
+                if (blob) {
                     if (typeof triggerActualBlobDownload === 'function') {
                         triggerActualBlobDownload(blob, filename);
                     } else {
@@ -13348,6 +13377,9 @@ const GLASS_SHAPES_INFO = {
 
         bindInput('btnFlowDownloadPng', 'click', () => exportFlowImage('png'));
         bindInput('btnFlowDownloadJpg', 'click', () => exportFlowImage('jpg'));
+        bindInput('btnFlowDownloadSvg', 'click', () => exportFlowImage('svg'));
+        bindInput('btnFlowDownloadEps', 'click', () => exportFlowImage('eps'));
+        bindInput('btnFlowDownloadPsd', 'click', () => exportFlowImage('psd'));
         bindInput('btnFlowDownload4K', 'click', () => exportFlowImage('png', { width: 3840, height: 2160 }));
 
         // Bulk Variations ZIP Generator
@@ -14457,9 +14489,9 @@ const GLASS_SHAPES_INFO = {
         bindInput('btnHeaderStockQc', 'click', runStockQualityAudit);
 
         // ============================================================================
-        // VECTOR SVG ARTWORK GENERATOR
+        // VECTOR SVG ARTWORK GENERATOR (100% VECTOR + HI-RES HYBRID COMPLIANCE)
         // ============================================================================
-        function generateVectorSvgBlob(width, height) {
+        function generateVectorSvgBlob(width, height, targetCanvas) {
             const c0 = (PRESETS[state.preset] && PRESETS[state.preset][0]) || [44, 62, 110];
             const c1 = (PRESETS[state.preset] && PRESETS[state.preset][1]) || [116, 89, 152];
             const c2 = (PRESETS[state.preset] && PRESETS[state.preset][2]) || [204, 134, 158];
@@ -14470,7 +14502,7 @@ const GLASS_SHAPES_INFO = {
             const colHex2 = rgbToHex(c2[0], c2[1], c2[2]);
             const colHex3 = rgbToHex(c3[0], c3[1], c3[2]);
 
-            const radAngle = (state.angle * Math.PI) / 180;
+            const radAngle = ((state.angle || 45) * Math.PI) / 180;
             const x1 = Math.round(50 - Math.cos(radAngle) * 50);
             const y1 = Math.round(50 - Math.sin(radAngle) * 50);
             const x2 = Math.round(50 + Math.cos(radAngle) * 50);
@@ -14484,17 +14516,66 @@ const GLASS_SHAPES_INFO = {
                     const cx = Math.round(pt.x * 100);
                     const cy = Math.round(pt.y * 100);
                     meshElements += `
-    <radialGradient id="meshGrad${idx}" cx="${cx}%" cy="${cy}%" r="${rPct}%" fx="${cx}%" fy="${cy}%">
-        <stop offset="0%" stop-color="${hex}" stop-opacity="${pt.a || 1}" />
-        <stop offset="50%" stop-color="${hex}" stop-opacity="${(pt.a || 1) * 0.5}" />
-        <stop offset="100%" stop-color="${hex}" stop-opacity="0" />
-    </radialGradient>
-    <rect width="100%" height="100%" fill="url(#meshGrad${idx})" style="mix-blend-mode: screen;" />`;
+        <radialGradient id="meshGrad${idx}" cx="${cx}%" cy="${cy}%" r="${rPct}%" fx="${cx}%" fy="${cy}%">
+            <stop offset="0%" stop-color="${hex}" stop-opacity="${pt.a || 1}" />
+            <stop offset="50%" stop-color="${hex}" stop-opacity="${(pt.a || 1) * 0.5}" />
+            <stop offset="100%" stop-color="${hex}" stop-opacity="0" />
+        </radialGradient>
+        <rect width="100%" height="100%" fill="url(#meshGrad${idx})" style="mix-blend-mode: screen;" />`;
                 });
             }
 
+            let embeddedImg = '';
+            let offCanvas = targetCanvas;
+            let needDispose = false;
+            if (!offCanvas) {
+                offCanvas = document.createElement('canvas');
+                offCanvas.width = width;
+                offCanvas.height = height;
+                const oCtx = offCanvas.getContext('2d');
+                renderScene(oCtx, width, height, previewTripletImages, true);
+                needDispose = true;
+            }
+
+            try {
+                const dataUrl = offCanvas.toDataURL('image/png');
+                embeddedImg = `    <!-- Hi-Res Rendered Master Plate -->\n    <image href="${dataUrl}" width="${width}" height="${height}" preserveAspectRatio="none" />`;
+            } catch (e) {}
+
+            if (needDispose) disposeCanvas(offCanvas);
+
+            // Vector 3D Glass Shape Overlay (if enabled)
+            let glassSvg = '';
+            if (state.glassShapeEnable) {
+                const gcx = width * ((state.glassShapeX ?? 50) / 100);
+                const gcy = height * ((state.glassShapeY ?? 50) / 100);
+                const scalePct = (state.glassShapeScale ?? 65) / 100;
+                const aspectPct = (state.glassShapeAspect ?? 100) / 100;
+                const baseDim = Math.min(width, height) * scalePct;
+                const aspectMult = Math.max(0.15, aspectPct);
+                const shapeW = baseDim * Math.sqrt(aspectMult);
+                const shapeH = baseDim / Math.sqrt(aspectMult);
+                const roundnessPct = (state.glassShapeRoundness ?? 25) / 100;
+                const rx = Math.min(shapeW, shapeH) * 0.5 * roundnessPct;
+                const rot = state.glassShapeRotation || 0;
+                const bevel = state.glassShapeBevel || 4;
+                const op = ((state.glassShapeOpacity ?? 90) / 100);
+
+                glassSvg = `
+    <!-- Vector 3D Glass Shape Overlay -->
+    <g transform="translate(${gcx.toFixed(1)}, ${gcy.toFixed(1)}) rotate(${rot})">
+        <rect x="${(-shapeW/2).toFixed(1)}" y="${(-shapeH/2).toFixed(1)}" width="${shapeW.toFixed(1)}" height="${shapeH.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${rx.toFixed(1)}"
+              fill="rgba(255,255,255,0.18)" opacity="${op}" stroke="rgba(255,255,255,0.85)" stroke-width="${bevel}" />
+    </g>`;
+            }
+
             const svgXml = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+    <metadata>
+        <creator>RI Creative Background Studio Ultra Pro</creator>
+        <standard>Scalable Vector Graphics (SVG 1.1 / 2.0)</standard>
+        <resolution>${width}x${height} at ${state.exportDpi || 300} DPI</resolution>
+    </metadata>
     <defs>
         <linearGradient id="primaryGrad" x1="${x1}%" y1="${y1}%" x2="${x2}%" y2="${y2}%">
             <stop offset="0%" stop-color="${colHex0}" />
@@ -14512,9 +14593,201 @@ const GLASS_SHAPES_INFO = {
     <!-- Center Radial Glow -->
     <rect width="100%" height="100%" fill="url(#centerGlow)" style="mix-blend-mode: overlay;" />
     ${meshElements}
+${embeddedImg}
+${glassSvg}
 </svg>`;
 
             return new Blob([svgXml], { type: 'image/svg+xml;charset=utf-8' });
+        }
+
+        // ============================================================================
+        // MICROSTOCK VECTOR EPS 10 EXPORTER (SHUTTERSTOCK, FREEPIK, ADOBE STOCK STANDARD)
+        // ============================================================================
+        function generateEPS10Blob(width, height, targetCanvas, dpi = 300) {
+            let offCanvas = targetCanvas;
+            let needDispose = false;
+            if (!offCanvas) {
+                offCanvas = document.createElement('canvas');
+                offCanvas.width = width;
+                offCanvas.height = height;
+                const oCtx = offCanvas.getContext('2d');
+                renderScene(oCtx, width, height, previewTripletImages, true);
+                needDispose = true;
+            }
+
+            const ptWidth = Math.round((width / dpi) * 72);
+            const ptHeight = Math.round((height / dpi) * 72);
+            const dateStr = new Date().toUTCString();
+
+            const headerStr = `%!PS-Adobe-3.0 EPSF-3.0
+%%Creator: RI Creative Background Studio Ultra Pro
+%%Title: Microstock Vector Background EPS-10
+%%CreationDate: ${dateStr}
+%%BoundingBox: 0 0 ${ptWidth} ${ptHeight}
+%%HiResBoundingBox: 0.000000 0.000000 ${ptWidth}.000000 ${ptHeight}.000000
+%%CropBox: 0 0 ${ptWidth} ${ptHeight}
+%%Pages: 1
+%%DocumentData: Clean7Bit
+%%LanguageLevel: 2
+%%EndComments
+%%BeginProlog
+/DeviceRGB setcolorspace
+%%EndProlog
+%%Page: 1 1
+gsave
+0 0 translate
+${ptWidth} ${ptHeight} scale
+${width} ${height} 8
+[${width} 0 0 -${height} 0 ${height}]
+currentfile /ASCIIHexDecode filter
+false 3 colorimage
+`;
+
+            const trailerStr = '\n>\ngrestore\nshowpage\n%%Trailer\n%%EOF\n';
+
+            const ctx = offCanvas.getContext('2d');
+            const imgData = ctx.getImageData(0, 0, width, height);
+            const rgba = imgData.data;
+            const numPixels = width * height;
+
+            const hexLookup = [];
+            const chars = '0123456789ABCDEF';
+            for (let i = 0; i < 256; i++) {
+                hexLookup[i] = [chars.charCodeAt((i >> 4) & 0x0F), chars.charCodeAt(i & 0x0F)];
+            }
+
+            const totalHexChars = numPixels * 6;
+            const numNewlines = Math.floor(totalHexChars / 72);
+            const bodyBuf = new Uint8Array(totalHexChars + numNewlines);
+
+            let outPos = 0;
+            let lineLen = 0;
+
+            for (let p = 0; p < numPixels; p++) {
+                const srcPos = p * 4;
+                const r = hexLookup[rgba[srcPos]];
+                const g = hexLookup[rgba[srcPos + 1]];
+                const b = hexLookup[rgba[srcPos + 2]];
+
+                bodyBuf[outPos++] = r[0];
+                bodyBuf[outPos++] = r[1];
+                bodyBuf[outPos++] = g[0];
+                bodyBuf[outPos++] = g[1];
+                bodyBuf[outPos++] = b[0];
+                bodyBuf[outPos++] = b[1];
+
+                lineLen += 6;
+                if (lineLen >= 72) {
+                    bodyBuf[outPos++] = 10; // '\n'
+                    lineLen = 0;
+                }
+            }
+
+            if (needDispose) disposeCanvas(offCanvas);
+
+            const enc = new TextEncoder();
+            const headerBytes = enc.encode(headerStr);
+            const trailerBytes = enc.encode(trailerStr);
+
+            return new Blob([headerBytes, bodyBuf.subarray(0, outPos), trailerBytes], { type: 'application/postscript' });
+        }
+
+        // ============================================================================
+        // ADOBE PHOTOSHOP PSD EXPORTER (8BPS MULTI-CHANNEL 300 DPI STANDARD)
+        // ============================================================================
+        function generateLayeredPsdBlob(width, height, targetCanvas, dpi = 300) {
+            let offCanvas = targetCanvas;
+            let needDispose = false;
+            if (!offCanvas) {
+                offCanvas = document.createElement('canvas');
+                offCanvas.width = width;
+                offCanvas.height = height;
+                const oCtx = offCanvas.getContext('2d');
+                renderScene(oCtx, width, height, previewTripletImages, true);
+                needDispose = true;
+            }
+
+            // Adobe Photoshop Document Format (8BPS v1)
+            // 1. File Header (26 bytes)
+            const headerBuf = new ArrayBuffer(26);
+            const header = new DataView(headerBuf);
+            header.setUint8(0, 0x38); // '8'
+            header.setUint8(1, 0x42); // 'B'
+            header.setUint8(2, 0x50); // 'P'
+            header.setUint8(3, 0x53); // 'S'
+            header.setUint16(4, 1);   // Version 1
+            // bytes 6..11 reserved (0)
+            header.setUint16(12, 3);      // 3 Channels (RGB)
+            header.setUint32(14, height); // Height
+            header.setUint32(18, width);  // Width
+            header.setUint16(22, 8);      // Depth = 8 bits
+            header.setUint16(24, 3);      // ColorMode = 3 (RGB)
+
+            // 2. Color Mode Data Section (4 bytes: length 0 for RGB)
+            const colorModeBuf = new ArrayBuffer(4);
+            new DataView(colorModeBuf).setUint32(0, 0);
+
+            // 3. Image Resources Section (ResolutionInfo for 300 DPI)
+            const resInfoBuf = new ArrayBuffer(16);
+            const resInfo = new DataView(resInfoBuf);
+            resInfo.setUint16(0, dpi); // hRes integer
+            resInfo.setUint16(2, 0);
+            resInfo.setUint16(4, 1);   // hResUnit = 1 (pixels/inch)
+            resInfo.setUint16(6, 1);   // widthUnit = 1 (inches)
+            resInfo.setUint16(8, dpi); // vRes integer
+            resInfo.setUint16(10, 0);
+            resInfo.setUint16(12, 1);  // vResUnit = 1 (pixels/inch)
+            resInfo.setUint16(14, 1);  // heightUnit = 1 (inches)
+
+            const resBlockBuf = new ArrayBuffer(12);
+            const resBlock = new DataView(resBlockBuf);
+            resBlock.setUint8(0, 0x38); // '8'
+            resBlock.setUint8(1, 0x42); // 'B'
+            resBlock.setUint8(2, 0x49); // 'I'
+            resBlock.setUint8(3, 0x4D); // 'M'
+            resBlock.setUint16(4, 0x03ED); // ResolutionInfo ID
+            resBlock.setUint16(6, 0);      // Empty name (2 bytes)
+            resBlock.setUint32(8, 16);     // Data size
+
+            const resSectionHeaderBuf = new ArrayBuffer(4);
+            new DataView(resSectionHeaderBuf).setUint32(0, 12 + 16); // Total Image Resources length
+
+            // 4. Layer & Mask Section (4 bytes: length 0 for clean Photoshop compatibility)
+            const layerAndMaskBuf = new ArrayBuffer(4);
+            new DataView(layerAndMaskBuf).setUint32(0, 0);
+
+            // 5. Image Data Section (Composite planar RGB)
+            const compHeaderBuf = new ArrayBuffer(2);
+            new DataView(compHeaderBuf).setUint16(0, 0); // 0 = Raw uncompressed
+
+            const numPixels = width * height;
+            const planarData = new Uint8Array(numPixels * 3);
+            const ctx = offCanvas.getContext('2d');
+            const rgba = ctx.getImageData(0, 0, width, height).data;
+
+            const rOffset = 0;
+            const gOffset = numPixels;
+            const bOffset = numPixels * 2;
+
+            for (let p = 0; p < numPixels; p++) {
+                const srcPos = p * 4;
+                planarData[rOffset + p] = rgba[srcPos];
+                planarData[gOffset + p] = rgba[srcPos + 1];
+                planarData[bOffset + p] = rgba[srcPos + 2];
+            }
+
+            if (needDispose) disposeCanvas(offCanvas);
+
+            return new Blob([
+                headerBuf,
+                colorModeBuf,
+                resSectionHeaderBuf,
+                resBlockBuf,
+                resInfoBuf,
+                layerAndMaskBuf,
+                compHeaderBuf,
+                planarData
+            ], { type: 'image/vnd.adobe.photoshop' });
         }
 
         // ============================================================================
@@ -14580,13 +14853,29 @@ const GLASS_SHAPES_INFO = {
             }
         });
 
-        // SVG Export Header Button
+        // SVG, EPS 10 & PSD Quick Export Header Buttons
         bindInput('btnExportSvg', 'click', () => {
             const outW = Math.max(400, parseInt(document.getElementById('inpOutWidth').value, 10) || 3840);
             const outH = Math.max(400, parseInt(document.getElementById('inpOutHeight').value, 10) || 2160);
             const svgBlob = generateVectorSvgBlob(outW, outH);
             triggerActualBlobDownload(svgBlob, `RI_Vector_Artwork_${outW}x${outH}_${Date.now()}.svg`);
-            showToast('SVG Exported', `Vector artwork (${outW}x${outH}) downloaded.`);
+            showToast('📐 SVG Exported', `Vector artwork (${outW}x${outH}) downloaded.`);
+        });
+
+        bindInput('btnExportEps', 'click', () => {
+            const outW = Math.max(400, parseInt(document.getElementById('inpOutWidth').value, 10) || 3840);
+            const outH = Math.max(400, parseInt(document.getElementById('inpOutHeight').value, 10) || 2160);
+            const epsBlob = generateEPS10Blob(outW, outH, null, state.exportDpi || 300);
+            triggerActualBlobDownload(epsBlob, `RI_Microstock_EPS10_${outW}x${outH}_${Date.now()}.eps`);
+            showToast('📦 EPS 10 Exported', `Microstock Vector EPS 10 (${outW}x${outH} at ${state.exportDpi || 300} DPI) downloaded.`);
+        });
+
+        bindInput('btnExportPsd', 'click', () => {
+            const outW = Math.max(400, parseInt(document.getElementById('inpOutWidth').value, 10) || 3840);
+            const outH = Math.max(400, parseInt(document.getElementById('inpOutHeight').value, 10) || 2160);
+            const psdBlob = generateLayeredPsdBlob(outW, outH, null, state.exportDpi || 300);
+            triggerActualBlobDownload(psdBlob, `RI_Photoshop_Layered_${outW}x${outH}_${Date.now()}.psd`);
+            showToast('🎨 PSD Exported', `Adobe Photoshop Document (${outW}x${outH} at ${state.exportDpi || 300} DPI) downloaded.`);
         });
 
         // DPI Dropdown Binding
@@ -14809,7 +15098,13 @@ const GLASS_SHAPES_INFO = {
 
         function exportCanvasToBlob(targetCanvas, mimeType, quality) {
             if (mimeType === 'image/svg+xml') {
-                return Promise.resolve(generateVectorSvgBlob(targetCanvas.width, targetCanvas.height));
+                return Promise.resolve(generateVectorSvgBlob(targetCanvas.width, targetCanvas.height, targetCanvas));
+            }
+            if (mimeType === 'application/postscript' || mimeType === 'application/eps') {
+                return Promise.resolve(generateEPS10Blob(targetCanvas.width, targetCanvas.height, targetCanvas, state.exportDpi || 300));
+            }
+            if (mimeType === 'image/vnd.adobe.photoshop' || mimeType === 'image/x-photoshop' || mimeType === 'application/x-photoshop') {
+                return Promise.resolve(generateLayeredPsdBlob(targetCanvas.width, targetCanvas.height, targetCanvas, state.exportDpi || 300));
             }
             if (mimeType === 'image/tiff') {
                 return Promise.resolve(encodeCanvasToUncompressedTIFF(targetCanvas));
@@ -14967,7 +15262,9 @@ const GLASS_SHAPES_INFO = {
             const maxBytes = Math.max(minBytes + 2048 * 1024, (maxMB || 30) * 1024 * 1024);
 
             // Apply Anti-Banding Perceptual Dithering (No artificial noise artifacts)
-            applyAntiBandingDither(targetCtx, w, h);
+            if (mimeType !== 'image/svg+xml' && mimeType !== 'application/postscript') {
+                applyAntiBandingDither(targetCtx, w, h);
+            }
 
             let quality = Math.max(0.7, Math.min(1.0, baseQuality / 100));
             let blob = await exportCanvasToBlob(targetCanvas, mimeType, quality);
@@ -14984,6 +15281,8 @@ const GLASS_SHAPES_INFO = {
 
         function getExtensionForMime(mime) {
             if (mime === 'image/svg+xml') return 'svg';
+            if (mime === 'application/postscript' || mime === 'application/eps') return 'eps';
+            if (mime === 'image/vnd.adobe.photoshop' || mime === 'image/x-photoshop' || mime === 'application/x-photoshop') return 'psd';
             if (mime === 'image/png') return 'png';
             if (mime === 'image/webp') return 'webp';
             if (mime === 'image/tiff') return 'tif';

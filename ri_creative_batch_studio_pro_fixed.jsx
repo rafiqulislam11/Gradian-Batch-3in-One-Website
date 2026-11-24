@@ -624,6 +624,7 @@ app.bringToFront();
             if (formatStr.indexOf("TIFF") !== -1) return ".tif";
             if (formatStr.indexOf("PNG") !== -1) return ".png";
             if (formatStr.indexOf("PSD") !== -1) return ".psd";
+            if (formatStr.indexOf("EPS") !== -1) return ".eps";
             return ".jpg";
         }
 
@@ -3056,6 +3057,17 @@ app.bringToFront();
                     doc.saveAs(outFile, psdOpts);
                 }
 
+            } else if (cfg.exportFormat.indexOf("EPS") !== -1) {
+                var epsOpts = new EPSSaveOptions();
+                epsOpts.encoding = SaveEncoding.BINARY;
+                try { epsOpts.embedColorProfile = Boolean(cfg.embedProfile); } catch (e) {}
+                try { epsOpts.previewType = EPSPreviewType.MACTIFF; } catch (e) {}
+                try {
+                    doc.saveAs(outFile, epsOpts, true);
+                } catch (eEps) {
+                    doc.saveAs(outFile, epsOpts);
+                }
+
             } else {
                 // Universal JPEG Save Engine (Photoshop CS2 9.0.2 to CC Universal)
                 var jpgOpts = new JPEGSaveOptions();
@@ -3700,7 +3712,8 @@ app.bringToFront();
                 "JPEG (Baseline 300 DPI)",
                 "TIFF (Lossless LZW 300 DPI)",
                 "PNG (Lossless 24-bit)",
-                "PSD (Master Layered Archive)"
+                "PSD (Master Layered Archive)",
+                "EPS (EPS 10 Microstock Compatible)"
             ]);
             ddExportFormat.selection = 0;
             ddExportFormat.preferredSize = [170, 21];

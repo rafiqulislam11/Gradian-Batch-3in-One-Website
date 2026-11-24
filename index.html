@@ -1474,16 +1474,46 @@
                     <!-- Target Application Mode -->
                     <div class="p-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 space-y-1.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-wider studio-heading">Canvas Target Mode:</span>
-                            <span class="text-[9px] studio-subtext font-mono">Stock Background</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider studio-heading">Creative Target Mode:</span>
+                            <span id="lblFlowTargetMode" class="text-[9px] font-bold text-sky-400 font-mono">Full Background</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-1 text-[10px] font-semibold">
-                            <button type="button" id="btnFlowModeBackground" class="tab-btn active py-1 px-1.5 rounded border transition text-center flex items-center justify-center gap-1">
-                                <span>🖼️</span><span>Full Background</span>
+                        <div class="grid grid-cols-5 gap-1 text-[9px] font-semibold" id="gridFlowModes">
+                            <button type="button" data-flow-mode="background" id="btnFlowModeBackground" class="tab-btn active py-1 px-1 rounded border transition text-center flex flex-col items-center justify-center gap-0.5" title="Full 3D stock background beneath your photos">
+                                <span class="text-xs">🖼️</span><span>Background</span>
                             </button>
-                            <button type="button" id="btnFlowModeOverlay" class="tab-btn py-1 px-1.5 rounded border transition text-center flex items-center justify-center gap-1">
-                                <span>🔮</span><span>Glass/Metal Overlay</span>
+                            <button type="button" data-flow-mode="overlay" id="btnFlowModeOverlay" class="tab-btn py-1 px-1 rounded border transition text-center flex flex-col items-center justify-center gap-0.5" title="Translucent glass & metallic waves flowing over photos">
+                                <span class="text-xs">🔮</span><span>Overlay</span>
                             </button>
+                            <button type="button" data-flow-mode="mask" id="btnFlowModeMask" class="tab-btn py-1 px-1 rounded border transition text-center flex flex-col items-center justify-center gap-0.5" title="Photos sculpted & revealed inside the 3D flowing curves">
+                                <span class="text-xs">🎭</span><span>Fusion Mask</span>
+                            </button>
+                            <button type="button" data-flow-mode="center" id="btnFlowModeCenter" class="tab-btn py-1 px-1 rounded border transition text-center flex flex-col items-center justify-center gap-0.5" title="3D flow focused dynamically around Center Hero Panel">
+                                <span class="text-xs">🌟</span><span>Center Hero</span>
+                            </button>
+                            <button type="button" data-flow-mode="wings" id="btnFlowModeWings" class="tab-btn py-1 px-1 rounded border transition text-center flex flex-col items-center justify-center gap-0.5" title="3D flow draped across Left & Right flank panels">
+                                <span class="text-xs">🌊</span><span>Outer Wings</span>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5 pt-1.5 border-t border-black/5 dark:border-white/5" id="flowOverlayControls">
+                            <div>
+                                <label class="studio-label text-[9px] block mb-0.5">Blend Mode</label>
+                                <select id="selFlowBlendMode" class="studio-input w-full border rounded-md px-1.5 py-1 text-[10px] focus:outline-none">
+                                    <option value="screen" selected>Screen (Bright Glow)</option>
+                                    <option value="overlay">Overlay (Vibrant Fusion)</option>
+                                    <option value="soft-light">Soft Light (Subtle)</option>
+                                    <option value="color-dodge">Color Dodge (Electric)</option>
+                                    <option value="hard-light">Hard Light (Bold Metallic)</option>
+                                    <option value="luminosity">Luminosity (Relief)</option>
+                                    <option value="source-over">Normal (Opaque)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[9px] mb-0.5">
+                                    <span class="studio-subtext">Blend Opacity</span>
+                                    <span id="valFlowOverlayOpacity" class="font-mono font-bold studio-accent-text">85%</span>
+                                </div>
+                                <input id="rngFlowOverlayOpacity" type="range" min="10" max="100" value="85" class="w-full">
+                            </div>
                         </div>
                     </div>
 
@@ -1720,6 +1750,38 @@
                             </div>
                         </div>
 
+                        <!-- Material & Accent Trim Studio -->
+                        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-black/5 dark:border-white/5">
+                            <div>
+                                <label class="studio-label text-[9px] block mb-0.5">Surface Material Finish</label>
+                                <select id="selFlowMaterial" class="studio-input w-full border rounded-md px-1.5 py-1 text-[11px] focus:outline-none">
+                                    <option value="auto" selected>Auto (Style Default)</option>
+                                    <option value="satin">Sensual Satin Silk</option>
+                                    <option value="chrome">Liquid Mirror Chrome</option>
+                                    <option value="glass">Frosted Translucent Glass</option>
+                                    <option value="hologram">Prismatic Rainbow Hologram</option>
+                                    <option value="gold_leaf">24K Gold Foil &amp; Carbon</option>
+                                    <option value="cyber_neon">Cyberpunk Volumetric Neon</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="studio-label text-[9px] block mb-0.5">Metallic Accent Ribbon</label>
+                                <div class="flex items-center gap-1">
+                                    <select id="selFlowAccentType" class="studio-input w-full border rounded-md px-1.5 py-1 text-[11px] focus:outline-none flex-1">
+                                        <option value="auto" selected>Auto (Style Default)</option>
+                                        <option value="gold">24K Gold Ridge</option>
+                                        <option value="silver">Platinum Silver</option>
+                                        <option value="neon_cyan">Neon Cyan Laser</option>
+                                        <option value="hot_pink">Hot Pink Ridge</option>
+                                        <option value="emerald">Imperial Emerald</option>
+                                        <option value="custom">Custom Color Tint</option>
+                                        <option value="none">No Accent Trim</option>
+                                    </select>
+                                    <input id="colFlowAccent" type="color" value="#fde047" class="w-6 h-6 p-0.5 rounded border border-black/20 dark:border-white/20 cursor-pointer bg-transparent shrink-0" title="Custom Accent Color">
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Wave Sliders: Density & Depth -->
                         <div class="grid grid-cols-2 gap-2 pt-1 border-t border-black/5 dark:border-white/5">
                             <div>
@@ -1735,6 +1797,66 @@
                                     <span id="valFlowDepth" class="font-mono font-bold studio-accent-text">100%</span>
                                 </div>
                                 <input id="rngFlowDepth" type="range" min="20" max="200" value="100" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- Creative Wave Sculpting & Positioning -->
+                        <div class="p-2 rounded-xl bg-purple-500/5 dark:bg-purple-400/5 border border-purple-500/20 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[9px] font-bold uppercase tracking-wider studio-heading flex items-center gap-1">
+                                    <span>🌊</span> Creative Sculpting &amp; Position
+                                </span>
+                                <div class="flex items-center gap-1">
+                                    <button type="button" id="btnFlowResetOffsets" class="studio-btn px-1.5 py-0.5 rounded border text-[8px] font-mono hover:border-purple-400 transition" title="Center Wave Offset (0, 0)">↺ Center</button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <div class="flex justify-between text-[9px] mb-0.5">
+                                        <span class="studio-subtext">Harmonics (Ripples)</span>
+                                        <span id="valFlowHarmonics" class="font-mono font-bold studio-accent-text">1.0x</span>
+                                    </div>
+                                    <input id="rngFlowHarmonics" type="range" min="5" max="35" value="10" step="1" class="w-full">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[9px] mb-0.5">
+                                        <span class="studio-subtext">Fluid Turbulence</span>
+                                        <span id="valFlowTurbulence" class="font-mono font-bold studio-accent-text">35%</span>
+                                    </div>
+                                    <input id="rngFlowTurbulence" type="range" min="0" max="100" value="35" class="w-full">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-black/5 dark:border-white/5">
+                                <div>
+                                    <div class="flex justify-between text-[9px] mb-0.5">
+                                        <span class="studio-subtext">Pan Offset X</span>
+                                        <span id="valFlowOffsetX" class="font-mono font-bold studio-accent-text">0%</span>
+                                    </div>
+                                    <input id="rngFlowOffsetX" type="range" min="-80" max="80" value="0" class="w-full">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[9px] mb-0.5">
+                                        <span class="studio-subtext">Pan Offset Y</span>
+                                        <span id="valFlowOffsetY" class="font-mono font-bold studio-accent-text">0%</span>
+                                    </div>
+                                    <input id="rngFlowOffsetY" type="range" min="-80" max="80" value="0" class="w-full">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-black/5 dark:border-white/5">
+                                <div>
+                                    <div class="flex justify-between text-[9px] mb-0.5">
+                                        <span class="studio-subtext">Pinch &amp; Swell</span>
+                                        <span id="valFlowPinch" class="font-mono font-bold studio-accent-text">50%</span>
+                                    </div>
+                                    <input id="rngFlowPinch" type="range" min="10" max="100" value="50" class="w-full">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[9px] mb-0.5">
+                                        <span class="studio-subtext">Specular Sparkles</span>
+                                        <span id="valFlowSparkles" class="font-mono font-bold studio-accent-text">25%</span>
+                                    </div>
+                                    <input id="rngFlowSparkles" type="range" min="0" max="100" value="25" class="w-full">
+                                </div>
                             </div>
                         </div>
 
@@ -1877,8 +1999,10 @@
                             <span>⚡ Advanced Actions</span>
                             <span class="font-mono text-[9px] studio-accent-text">Seeds &amp; Variations</span>
                         </div>
-                        <div class="grid grid-cols-3 gap-1">
-                            <button id="btnFlowRandom" type="button" class="studio-btn py-1.5 px-1 rounded border text-[10px] font-semibold truncate hover:border-accent-main transition text-center" title="Generate Random Harmonic Seed">🎲 Randomize</button>
+                        <div class="grid grid-cols-5 gap-1">
+                            <button id="btnFlowRemix" type="button" class="studio-btn py-1.5 px-1 rounded border text-[10px] font-semibold truncate hover:border-purple-400 bg-purple-500/10 text-purple-400 transition text-center" title="Smart Generative Mutation with Cohesive Colors &amp; Harmonics">✨ Remix</button>
+                            <button id="btnFlowCyclePalette" type="button" class="studio-btn py-1.5 px-1 rounded border text-[10px] font-semibold truncate hover:border-sky-400 transition text-center" title="Cycle Next Color Palette">🎨 Palette</button>
+                            <button id="btnFlowRandom" type="button" class="studio-btn py-1.5 px-1 rounded border text-[10px] font-semibold truncate hover:border-accent-main transition text-center" title="Generate Random Harmonic Seed">🎲 Random</button>
                             <button id="btnFlowVariations" type="button" class="studio-btn py-1.5 px-1 rounded border text-[10px] font-semibold truncate hover:border-accent-main transition text-center" title="Show 4 Variations Grid">🔀 4 Variations</button>
                             <button id="btnFlowReset" type="button" class="studio-btn py-1.5 px-1 rounded border text-[10px] font-semibold truncate hover:border-accent-main transition text-center" title="Reset Current Preset Settings">↺ Reset</button>
                         </div>
@@ -3901,6 +4025,17 @@
             // Abstract 3D Metallic & Glass Flow Patterns
             flowPatternEnable: true,
             flowTargetMode: 'background',
+            flowBlendMode: 'screen',
+            flowOverlayOpacity: 85,
+            flowMaterial: 'auto',
+            flowAccentType: 'auto',
+            flowAccentCustomColor: '#fde047',
+            flowHarmonics: 1.0,
+            flowTurbulence: 35,
+            flowOffsetX: 0,
+            flowOffsetY: 0,
+            flowPinch: 50,
+            flowSparkles: 25,
             flowStyle: 'flow_1',
             flowColorPreset: 'default',
             flowBgColor: '#090a0f',
@@ -5952,11 +6087,44 @@
             else if (dirMode === 'custom_rot') baseAngleDeg = 0;
 
             const totalAngleRad = ((baseAngleDeg + userRotDeg) * Math.PI) / 180;
+            const harmonics = Math.max(0.2, Math.min(5.0, (options.harmonics ?? 10) / 10));
+            const turb = Math.max(0, Math.min(100, options.turbulence ?? 35)) / 100;
+            const pinchMult = Math.max(0.1, Math.min(2.0, (options.pinch ?? 50) / 50));
+            const offsetX = ((options.offsetX ?? 0) / 100) * width * 0.6;
+            const offsetY = ((options.offsetY ?? 0) / 100) * height * 0.6;
+            const materialMode = options.material || 'auto';
+            const accentMode = options.accentType || 'auto';
+            const customAccentCol = options.accentCustomColor || '#fde047';
+            const sparklesPct = (options.sparkles ?? 25) / 100;
+
+            let effShine = shinePct;
+            let effTrans = transPct;
+            let effGlow = glowPct;
+            let effReflect = reflectionPct;
+            if (materialMode === 'chrome') {
+                effShine = 1.0;
+                effReflect = 0.95;
+            } else if (materialMode === 'glass') {
+                effTrans = Math.max(0.45, effTrans);
+                effReflect = 0.9;
+            } else if (materialMode === 'satin') {
+                effShine = 0.6;
+                effGlow = 0.5;
+            } else if (materialMode === 'hologram') {
+                effTrans = 0.35;
+                effShine = 0.95;
+            } else if (materialMode === 'cyber_neon') {
+                effGlow = 0.85;
+                effShine = 0.9;
+            } else if (materialMode === 'gold_leaf') {
+                effShine = 0.95;
+            }
+
             const diag = Math.hypot(width, height) * 1.65;
             const spanX = diag * scaleFactor;
             const spanY = diag * 1.25 * scaleFactor;
 
-            targetCtx.translate(width / 2, height / 2);
+            targetCtx.translate(width / 2 + offsetX, height / 2 + offsetY);
             targetCtx.rotate(totalAngleRad);
             if (options.flipH || options.flipV) {
                 targetCtx.scale(options.flipH ? -1 : 1, options.flipV ? -1 : 1);
@@ -5982,10 +6150,10 @@
                 const baseY = -spanY / 2 + (i + 1) * ribbonStepY;
                 const amp = (spanY * 0.16) * depthPct * (0.8 + 0.4 * pseudoRand(seedI));
 
-                // Harmonics
-                const freq1 = (Math.PI * 2) / (spanX * 0.95);
-                const freq2 = (Math.PI * 2) / (spanX * 0.48);
-                const freq3 = (Math.PI * 2) / (spanX * 0.24);
+                // Harmonics & Frequencies
+                const freq1 = ((Math.PI * 2) / (spanX * 0.95)) * harmonics;
+                const freq2 = ((Math.PI * 2) / (spanX * 0.48)) * harmonics;
+                const freq3 = ((Math.PI * 2) / (spanX * 0.24)) * harmonics;
 
                 const phase1 = seedI * 0.15 + i * 1.35;
                 const phase2 = seedI * 0.28 + i * 0.92;
@@ -6001,19 +6169,22 @@
                 for (let j = 0; j <= numSegments; j++) {
                     const px = -spanX / 2 + j * dx;
 
-                    // S-Curve undulating center height
+                    // S-Curve undulating center height with harmonics & turbulence
                     let yCenter = baseY + amp * Math.sin(freq1 * px + phase1)
                                         + 0.38 * amp * Math.cos(freq2 * px + phase2)
                                         + 0.12 * amp * Math.sin(freq3 * px + phase3);
 
+                    if (turb > 0) {
+                        yCenter += Math.sin(freq1 * 2.4 * px + phase2 * 1.4) * amp * 0.35 * turb;
+                    }
                     if (dirMode === 'organic_swirl') {
                         yCenter += (px * px) / (spanX * 3.8);
                     } else if (dirMode === 'layered_curves') {
                         yCenter += Math.sin(freq1 * 0.5 * px + phase1) * amp * 0.5;
                     }
 
-                    // Thickness variations (sensual drapery pinch & swell)
-                    const thick = baseThickness * (0.75 + 0.45 * Math.sin(freq1 * 0.8 * px + phase1 + 1.2));
+                    // Thickness variations with creative pinch & swell
+                    const thick = baseThickness * (0.75 + 0.45 * pinchMult * Math.sin(freq1 * 0.8 * px + phase1 + 1.2));
                     const yTop = yCenter - thick * 0.52;
                     const yBot = yCenter + thick * 0.48;
                     const yCrest = yCenter - thick * 0.08;
@@ -6080,7 +6251,7 @@
                 targetCtx.shadowOffsetY = 0;
 
                 // 4. Razor Specular Ridge Highlight
-                if (shinePct > 0.1) {
+                if (effShine > 0.1) {
                     targetCtx.beginPath();
                     targetCtx.moveTo(crestPts[0].x, crestPts[0].y);
                     for (let j = 1; j < crestPts.length; j++) {
@@ -6090,14 +6261,32 @@
                         const my = (prev.y + curr.y) / 2;
                         targetCtx.quadraticCurveTo(prev.x, prev.y, mx, my);
                     }
-                    targetCtx.strokeStyle = `rgba(255, 255, 255, ${(0.85 * shinePct).toFixed(2)})`;
+                    targetCtx.strokeStyle = `rgba(255, 255, 255, ${(0.85 * effShine).toFixed(2)})`;
                     targetCtx.lineWidth = Math.max(1.5, 3.2 * scaleFactor);
                     targetCtx.stroke();
                 }
 
                 // 5. Secondary Contrasting Metallic Accent Ribbon (e.g. 24K Gold, Neon Cyan, Hot Pink, Silver)
-                if (preset.accentType && (i % 2 === 1 || i === numRibbons - 2)) {
-                    const accentColors = colorPal ? colorPal.accent : (preset.accentColor || ["#f59e0b", "#fde047", "#ffffff"]);
+                let activeAccent = null;
+                if (accentMode === 'none') {
+                    activeAccent = null;
+                } else if (accentMode === 'gold') {
+                    activeAccent = ["#b45309", "#fde047", "#ffffff"];
+                } else if (accentMode === 'silver') {
+                    activeAccent = ["#64748b", "#e2e8f0", "#ffffff"];
+                } else if (accentMode === 'neon_cyan') {
+                    activeAccent = ["#0284c7", "#00f0ff", "#ffffff"];
+                } else if (accentMode === 'hot_pink') {
+                    activeAccent = ["#be185d", "#f43f5e", "#ffffff"];
+                } else if (accentMode === 'emerald') {
+                    activeAccent = ["#065f46", "#10b981", "#fde047"];
+                } else if (accentMode === 'custom' && customAccentCol) {
+                    activeAccent = [customAccentCol, customAccentCol, "#ffffff"];
+                } else if (preset.accentType) {
+                    activeAccent = colorPal ? colorPal.accent : (preset.accentColor || ["#f59e0b", "#fde047", "#ffffff"]);
+                }
+
+                if (activeAccent && (i % 2 === 1 || i === numRibbons - 2)) {
                     targetCtx.save();
                     targetCtx.beginPath();
                     const accentOffset = baseThickness * 0.18;
@@ -6110,9 +6299,9 @@
                         targetCtx.quadraticCurveTo(prev.x, prev.y + accentOffset, mx, my);
                     }
                     const accentGrad = targetCtx.createLinearGradient(crestPts[0].x, crestPts[0].y, crestPts[crestPts.length - 1].x, crestPts[crestPts.length - 1].y);
-                    accentGrad.addColorStop(0, accentColors[0]);
-                    accentGrad.addColorStop(0.5, accentColors[1 % accentColors.length]);
-                    accentGrad.addColorStop(1, accentColors[accentColors.length - 1]);
+                    accentGrad.addColorStop(0, activeAccent[0]);
+                    accentGrad.addColorStop(0.5, activeAccent[1 % activeAccent.length]);
+                    accentGrad.addColorStop(1, activeAccent[activeAccent.length - 1]);
 
                     targetCtx.strokeStyle = accentGrad;
                     targetCtx.lineWidth = Math.max(2.2, 5.0 * scaleFactor);
@@ -6177,6 +6366,35 @@
                     targetCtx.globalAlpha = glowPct * 0.45;
                     targetCtx.lineWidth = Math.max(6, 18 * scaleFactor);
                     targetCtx.stroke();
+                    targetCtx.restore();
+                }
+
+                // 9. Diamond Specular Glint Sparkles along Wave Crest
+                if (sparklesPct > 0.05) {
+                    targetCtx.save();
+                    const numSp = Math.round(24 * sparklesPct);
+                    for (let sp = 0; sp < numSp; sp++) {
+                        const spSeed = seedI * 19.3 + sp * 7.77;
+                        const sIdx = Math.floor(pseudoRand(spSeed) * (crestPts.length - 1));
+                        const pt = crestPts[sIdx];
+                        const sx = pt.x + (pseudoRand(spSeed + 1) - 0.5) * 20 * scaleFactor;
+                        const sy = pt.y + (pseudoRand(spSeed + 2) - 0.5) * 15 * scaleFactor;
+                        const sR = (1.2 + pseudoRand(spSeed + 3) * 2.8) * scaleFactor;
+
+                        targetCtx.save();
+                        targetCtx.translate(sx, sy);
+                        targetCtx.fillStyle = '#ffffff';
+                        targetCtx.globalAlpha = 0.5 + 0.5 * pseudoRand(spSeed + 4);
+                        targetCtx.beginPath();
+                        targetCtx.moveTo(-sR * 2.6, 0); targetCtx.lineTo(0, -sR * 0.5);
+                        targetCtx.lineTo(sR * 2.6, 0); targetCtx.lineTo(0, sR * 0.5);
+                        targetCtx.closePath(); targetCtx.fill();
+                        targetCtx.beginPath();
+                        targetCtx.moveTo(0, -sR * 2.6); targetCtx.lineTo(-sR * 0.5, 0);
+                        targetCtx.lineTo(0, sR * 2.6); targetCtx.lineTo(sR * 0.5, 0);
+                        targetCtx.closePath(); targetCtx.fill();
+                        targetCtx.restore();
+                    }
                     targetCtx.restore();
                 }
 
@@ -6968,6 +7186,38 @@
             ctx.restore();
         }
 
+        function getFlowPatternOptions(s) {
+            return {
+                style: s.flowStyle || 'flow_1',
+                colorPreset: s.flowColorPreset || 'default',
+                bgColor: s.flowBgColor || '#090a0f',
+                direction: s.flowDirection || 'diagonal_nw_se',
+                density: s.flowDensity !== undefined ? s.flowDensity : 5,
+                depth: s.flowDepth !== undefined ? s.flowDepth : 100,
+                depth3D: s.flow3DDepth !== undefined ? s.flow3DDepth : 75,
+                metallicShine: s.flowMetallicShine !== undefined ? s.flowMetallicShine : 85,
+                glassTrans: s.flowGlassTrans !== undefined ? s.flowGlassTrans : 20,
+                reflection: s.flowReflection !== undefined ? s.flowReflection : 80,
+                blur: s.flowBlur !== undefined ? s.flowBlur : 0,
+                glow: s.flowGlow !== undefined ? s.flowGlow : 35,
+                grain: s.flowGrain !== undefined ? s.flowGrain : 10,
+                scale: s.flowScale !== undefined ? s.flowScale : 100,
+                rotation: s.flowRotation !== undefined ? s.flowRotation : 0,
+                flipH: !!s.flowFlipH,
+                flipV: !!s.flowFlipV,
+                harmonics: s.flowHarmonics !== undefined ? s.flowHarmonics : 1.0,
+                turbulence: s.flowTurbulence !== undefined ? s.flowTurbulence : 35,
+                offsetX: s.flowOffsetX !== undefined ? s.flowOffsetX : 0,
+                offsetY: s.flowOffsetY !== undefined ? s.flowOffsetY : 0,
+                pinch: s.flowPinch !== undefined ? s.flowPinch : 50,
+                sparkles: s.flowSparkles !== undefined ? s.flowSparkles : 25,
+                material: s.flowMaterial || 'auto',
+                accentType: s.flowAccentType || 'auto',
+                accentCustomColor: s.flowAccentCustomColor || '#fde047',
+                seed: s.flowSeed !== undefined ? s.flowSeed : 12345
+            };
+        }
+
         function renderScene(targetCtx, width, height, tripletImgs, skipSplitOverlay = false) {
             const colors = PRESETS[state.preset] || PRESETS["Aurora Gradient"];
             const c0 = colors[0];
@@ -7022,26 +7272,7 @@
             if (state.flowPatternEnable && state.flowTargetMode === 'background') {
                 const flowBgCanvas = getCachedOffscreenCanvas('flowBgBuffer', width, height);
                 const fCtx = flowBgCanvas.getContext('2d');
-                renderAbstract3DFlowPattern(fCtx, width, height, {
-                    style: state.flowStyle,
-                    colorPreset: state.flowColorPreset,
-                    bgColor: state.flowBgColor,
-                    direction: state.flowDirection,
-                    density: state.flowDensity,
-                    depth: state.flowDepth,
-                    depth3D: state.flow3DDepth,
-                    metallicShine: state.flowMetallicShine,
-                    glassTrans: state.flowGlassTrans,
-                    reflection: state.flowReflection,
-                    blur: state.flowBlur,
-                    glow: state.flowGlow,
-                    grain: state.flowGrain,
-                    scale: state.flowScale,
-                    rotation: state.flowRotation,
-                    flipH: state.flowFlipH,
-                    flipV: state.flowFlipV,
-                    seed: state.flowSeed
-                });
+                renderAbstract3DFlowPattern(fCtx, width, height, getFlowPatternOptions(state));
 
                 if (!state.tripletCleanBase || !tripletImgs || tripletImgs.length === 0 || !tripletImgs[0]) {
                     // Pristine Full-Frame Abstract Stock Background
@@ -7489,24 +7720,9 @@
                         const flowLayerCanvas = document.createElement('canvas');
                         flowLayerCanvas.width = workW;
                         flowLayerCanvas.height = workH;
-                        renderAbstract3DFlowPattern(flowLayerCanvas.getContext('2d'), workW, workH, {
-                            style: gStyle,
-                            colorPreset: state.flowColorPreset,
-                            bgColor: state.flowBgColor,
-                            direction: state.flowDirection,
-                            density: state.flowDensity,
-                            depth: state.flowDepth,
-                            depth3D: state.flow3DDepth,
-                            metallicShine: state.flowMetallicShine,
-                            glassTrans: state.flowGlassTrans,
-                            reflection: state.flowReflection,
-                            blur: state.flowBlur,
-                            glow: state.flowGlow,
-                            grain: state.flowGrain,
-                            scale: state.flowScale,
-                            rotation: state.flowRotation,
-                            seed: state.flowSeed
-                        });
+                        const fOpts = getFlowPatternOptions(state);
+                        fOpts.style = gStyle;
+                        renderAbstract3DFlowPattern(flowLayerCanvas.getContext('2d'), workW, workH, fOpts);
 
                         gCtx.save();
                         gCtx.globalAlpha = baseNorm;
@@ -8838,41 +9054,6 @@
                     disposeCanvas(glassOut);
                 }
 
-
-
-                // Overlay mode hook for Abstract 3D Metallic & Glass Flow Patterns
-                if (state.flowPatternEnable && state.flowTargetMode === 'overlay') {
-                    const flowOverlay = document.createElement('canvas');
-                    flowOverlay.width = width;
-                    flowOverlay.height = height;
-                    renderAbstract3DFlowPattern(flowOverlay.getContext('2d'), width, height, {
-                        style: state.flowStyle,
-                        colorPreset: state.flowColorPreset,
-                        bgColor: state.flowBgColor,
-                        direction: state.flowDirection,
-                        density: state.flowDensity,
-                        depth: state.flowDepth,
-                        depth3D: state.flow3DDepth,
-                        metallicShine: state.flowMetallicShine,
-                        glassTrans: state.flowGlassTrans,
-                        reflection: state.flowReflection,
-                        blur: state.flowBlur,
-                        glow: state.flowGlow,
-                        grain: state.flowGrain,
-                        scale: state.flowScale,
-                        rotation: state.flowRotation,
-                        flipH: state.flowFlipH,
-                        flipV: state.flowFlipV,
-                        seed: state.flowSeed
-                    });
-                    targetCtx.save();
-                    targetCtx.globalAlpha = Math.max(0.1, 1.0 - (state.flowGlassTrans / 100) * 0.7);
-                    targetCtx.globalCompositeOperation = 'screen';
-                    targetCtx.drawImage(flowOverlay, 0, 0);
-                    targetCtx.restore();
-                    disposeCanvas(flowOverlay);
-                }
-
                 // Engine 6: Geometric Pattern Engine
                 if (layer.id === 'geometric' && state.geoEnable && state.geoOpacity > 0) {
                     const gAlpha = (state.geoOpacity / 100) * layerAlpha;
@@ -9270,6 +9451,91 @@
             }
 
             // ========================================================================
+            // CREATIVE ABSTRACT 3D METALLIC & GLASS FLOW PATTERNS
+            // (Modes: Glass & Metal Overlay, Photo Fusion Mask, Center Hero, Outer Wings)
+            // ========================================================================
+            if (state.flowPatternEnable && state.flowTargetMode && state.flowTargetMode !== 'background') {
+                const flowCanvas = document.createElement('canvas');
+                flowCanvas.width = width;
+                flowCanvas.height = height;
+                renderAbstract3DFlowPattern(flowCanvas.getContext('2d'), width, height, getFlowPatternOptions(state));
+
+                const s1X = Math.round(width * (state.tripletSplit1 / 100));
+                const s2X = Math.round(width * (state.tripletSplit2 / 100));
+                const blendMode = state.flowBlendMode || 'screen';
+                const overlayOpacity = Math.max(0.05, Math.min(1.0, (state.flowOverlayOpacity !== undefined ? state.flowOverlayOpacity : 85) / 100));
+
+                targetCtx.save();
+                if (state.flowTargetMode === 'overlay') {
+                    // Translucent flowing glass & metallic ribbons overlaying whole composition
+                    targetCtx.globalCompositeOperation = blendMode;
+                    targetCtx.globalAlpha = overlayOpacity;
+                    targetCtx.drawImage(flowCanvas, 0, 0);
+                } else if (state.flowTargetMode === 'mask') {
+                    // Creative Photo Fusion Mask: Photos sculpted and flowing inside wave ribbons
+                    const maskCanvas = document.createElement('canvas');
+                    maskCanvas.width = width;
+                    maskCanvas.height = height;
+                    const mCtx = maskCanvas.getContext('2d');
+                    mCtx.drawImage(targetCtx.canvas, 0, 0);
+                    mCtx.globalCompositeOperation = 'destination-in';
+                    mCtx.drawImage(flowCanvas, 0, 0);
+
+                    // Luxury backdrop tone
+                    targetCtx.save();
+                    const bgGrad = targetCtx.createLinearGradient(0, 0, width, height);
+                    bgGrad.addColorStop(0, state.flowBgColor || '#0a0d18');
+                    bgGrad.addColorStop(1, '#020308');
+                    targetCtx.fillStyle = bgGrad;
+                    targetCtx.fillRect(0, 0, width, height);
+                    targetCtx.restore();
+
+                    // Subtle background flowing wave lines
+                    targetCtx.save();
+                    targetCtx.globalAlpha = 0.32;
+                    targetCtx.drawImage(flowCanvas, 0, 0);
+                    targetCtx.restore();
+
+                    // Sculpted masked photos with 3D drop shadow
+                    targetCtx.save();
+                    targetCtx.shadowColor = 'rgba(0, 0, 0, 0.72)';
+                    targetCtx.shadowBlur = 32;
+                    targetCtx.shadowOffsetY = 14;
+                    targetCtx.globalAlpha = overlayOpacity;
+                    targetCtx.drawImage(maskCanvas, 0, 0);
+                    targetCtx.restore();
+
+                    // Specular wave crest highlights over the fusion mask
+                    targetCtx.save();
+                    targetCtx.globalCompositeOperation = 'screen';
+                    targetCtx.globalAlpha = 0.65 * overlayOpacity;
+                    targetCtx.drawImage(flowCanvas, 0, 0);
+                    targetCtx.restore();
+
+                    disposeCanvas(maskCanvas);
+                } else if (state.flowTargetMode === 'center') {
+                    // Center Hero Wave: Flowing ribbons dynamically accenting the center panel
+                    targetCtx.beginPath();
+                    targetCtx.rect(s1X, 0, s2X - s1X, height);
+                    targetCtx.clip();
+                    targetCtx.globalCompositeOperation = blendMode;
+                    targetCtx.globalAlpha = overlayOpacity;
+                    targetCtx.drawImage(flowCanvas, 0, 0);
+                } else if (state.flowTargetMode === 'wings') {
+                    // Outer Wings Wave: Flowing ribbons draped across left & right flanking panels
+                    targetCtx.beginPath();
+                    targetCtx.rect(0, 0, s1X, height);
+                    targetCtx.rect(s2X, 0, width - s2X, height);
+                    targetCtx.clip();
+                    targetCtx.globalCompositeOperation = blendMode;
+                    targetCtx.globalAlpha = overlayOpacity;
+                    targetCtx.drawImage(flowCanvas, 0, 0);
+                }
+                targetCtx.restore();
+                disposeCanvas(flowCanvas);
+            }
+
+            // ========================================================================
             // 20 GLASS EFFECT SHAPES – APPLY ON YOUR IMAGE (TOP-LEVEL OVERLAY)
             // ========================================================================
             if (state.glassShapeEnable) {
@@ -9372,6 +9638,34 @@
             setTxt('valFlowGrain', (state.flowGrain || 10) + '%');
             setTxt('valFlowScale', (state.flowScale || 100) + '%');
             setTxt('valFlowRotation', (state.flowRotation || 0) + '°');
+
+            // Creative Target Mode label & button active states
+            const flowModeNames = {
+                background: 'Full Background',
+                overlay: 'Glass & Metal Overlay',
+                mask: 'Photo Fusion Mask',
+                center: 'Center Hero Wave',
+                wings: 'Outer Wings Wave'
+            };
+            setTxt('lblFlowTargetMode', flowModeNames[state.flowTargetMode] || 'Full Background');
+            document.querySelectorAll('#gridFlowModes [data-flow-mode]').forEach(btn => {
+                const m = btn.getAttribute('data-flow-mode');
+                const isAct = state.flowTargetMode === m;
+                btn.classList.toggle('active', isAct);
+                btn.classList.toggle('border-sky-400', isAct);
+                btn.classList.toggle('bg-sky-500/20', isAct);
+            });
+            const flowOvControls = document.getElementById('flowOverlayControls');
+            if (flowOvControls) {
+                flowOvControls.style.display = state.flowTargetMode === 'background' ? 'none' : 'grid';
+            }
+            setTxt('valFlowOverlayOpacity', (state.flowOverlayOpacity !== undefined ? state.flowOverlayOpacity : 85) + '%');
+            setTxt('valFlowHarmonics', ((state.flowHarmonics !== undefined ? state.flowHarmonics : 1.0)).toFixed(1) + 'x');
+            setTxt('valFlowTurbulence', (state.flowTurbulence !== undefined ? state.flowTurbulence : 35) + '%');
+            setTxt('valFlowOffsetX', (state.flowOffsetX !== undefined ? state.flowOffsetX : 0) + '%');
+            setTxt('valFlowOffsetY', (state.flowOffsetY !== undefined ? state.flowOffsetY : 0) + '%');
+            setTxt('valFlowPinch', (state.flowPinch !== undefined ? state.flowPinch : 50) + '%');
+            setTxt('valFlowSparkles', (state.flowSparkles !== undefined ? state.flowSparkles : 25) + '%');
             const numRotEl = document.getElementById('numFlowRotation');
             if (numRotEl && document.activeElement !== numRotEl) numRotEl.value = (state.flowRotation || 0);
             const rotCompass = document.getElementById('iconFlowRotationCompass');
@@ -9631,13 +9925,27 @@
             setVal('rngFlowScale', state.flowScale || 100);
             setVal('rngFlowRotation', state.flowRotation || 0);
             setVal('numFlowRotation', state.flowRotation || 0);
+            setVal('selFlowBlendMode', state.flowBlendMode || 'screen');
+            setVal('rngFlowOverlayOpacity', state.flowOverlayOpacity !== undefined ? state.flowOverlayOpacity : 85);
+            setVal('selFlowMaterial', state.flowMaterial || 'auto');
+            setVal('selFlowAccentType', state.flowAccentType || 'auto');
+            setVal('colFlowAccent', state.flowAccentCustomColor || '#fde047');
+            setVal('rngFlowHarmonics', Math.round((state.flowHarmonics !== undefined ? state.flowHarmonics : 1.0) * 10));
+            setVal('rngFlowTurbulence', state.flowTurbulence !== undefined ? state.flowTurbulence : 35);
+            setVal('rngFlowOffsetX', state.flowOffsetX !== undefined ? state.flowOffsetX : 0);
+            setVal('rngFlowOffsetY', state.flowOffsetY !== undefined ? state.flowOffsetY : 0);
+            setVal('rngFlowPinch', state.flowPinch !== undefined ? state.flowPinch : 50);
+            setVal('rngFlowSparkles', state.flowSparkles !== undefined ? state.flowSparkles : 25);
             setVal('rngGeoRotation', state.geoRotation || 0);
-            const flowModeBgBtn = document.getElementById('btnFlowModeBackground');
-            const flowModeOvBtn = document.getElementById('btnFlowModeOverlay');
-            if (flowModeBgBtn && flowModeOvBtn) {
-                flowModeBgBtn.classList.toggle('active', state.flowTargetMode === 'background');
-                flowModeOvBtn.classList.toggle('active', state.flowTargetMode === 'overlay');
-            }
+            document.querySelectorAll('#gridFlowModes [data-flow-mode]').forEach(btn => {
+                const m = btn.getAttribute('data-flow-mode');
+                const isAct = state.flowTargetMode === m;
+                btn.classList.toggle('active', isAct);
+                btn.classList.toggle('border-sky-400', isAct);
+                btn.classList.toggle('bg-sky-500/20', isAct);
+            });
+            const flowOvBox = document.getElementById('flowOverlayControls');
+            if (flowOvBox) flowOvBox.style.display = state.flowTargetMode === 'background' ? 'none' : 'grid';
             setChk('chkGlassShapeEnable', !!state.glassShapeEnable);
             const lblShape = document.getElementById('lblActiveGlassShape');
             if (lblShape) {
@@ -10284,15 +10592,111 @@
 
         const setFlowTargetMode = (mode) => {
             state.flowTargetMode = mode;
-            const flowModeBgBtn = document.getElementById('btnFlowModeBackground');
-            const flowModeOvBtn = document.getElementById('btnFlowModeOverlay');
-            if (flowModeBgBtn) flowModeBgBtn.classList.toggle('active', mode === 'background');
-            if (flowModeOvBtn) flowModeOvBtn.classList.toggle('active', mode === 'overlay');
+            updateLiveUiLabels();
+            syncUIFromState();
             triggerRedraw();
+            if (typeof showToast === 'function') {
+                const titles = {
+                    background: '🖼️ Full Background',
+                    overlay: '🔮 Glass & Metal Overlay',
+                    mask: '🎭 Photo Fusion Mask',
+                    center: '🌟 Center Hero Wave',
+                    wings: '🌊 Outer Wings Wave'
+                };
+                showToast('Creative Flow Mode', titles[mode] || mode);
+            }
         };
 
-        bindInput('btnFlowModeBackground', 'click', () => setFlowTargetMode('background'));
-        bindInput('btnFlowModeOverlay', 'click', () => setFlowTargetMode('overlay'));
+        document.querySelectorAll('#gridFlowModes [data-flow-mode]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setFlowTargetMode(btn.getAttribute('data-flow-mode'));
+            });
+        });
+
+        bindInput('selFlowBlendMode', 'change', (e) => {
+            state.flowBlendMode = e.target.value;
+            triggerRedraw();
+        });
+
+        bindInput('rngFlowOverlayOpacity', 'input', (e) => {
+            state.flowOverlayOpacity = parseInt(e.target.value, 10);
+            updateLiveUiLabels();
+            triggerRedraw(true);
+        });
+        bindInput('rngFlowOverlayOpacity', 'change', () => pushHistory());
+
+        bindInput('selFlowMaterial', 'change', (e) => {
+            state.flowMaterial = e.target.value;
+            triggerRedraw();
+        });
+
+        bindInput('selFlowAccentType', 'change', (e) => {
+            state.flowAccentType = e.target.value;
+            triggerRedraw();
+        });
+
+        bindInput('colFlowAccent', 'input', (e) => {
+            state.flowAccentCustomColor = e.target.value;
+            state.flowAccentType = 'custom';
+            const sel = document.getElementById('selFlowAccentType');
+            if (sel) sel.value = 'custom';
+            triggerRedraw(true);
+        });
+        bindInput('colFlowAccent', 'change', () => pushHistory());
+
+        // Creative Wave Sculpting Controls
+        bindInput('rngFlowHarmonics', 'input', (e) => {
+            state.flowHarmonics = parseInt(e.target.value, 10) / 10;
+            updateLiveUiLabels();
+            triggerRedraw(true);
+        });
+        bindInput('rngFlowHarmonics', 'change', () => pushHistory());
+
+        bindInput('rngFlowTurbulence', 'input', (e) => {
+            state.flowTurbulence = parseInt(e.target.value, 10);
+            updateLiveUiLabels();
+            triggerRedraw(true);
+        });
+        bindInput('rngFlowTurbulence', 'change', () => pushHistory());
+
+        bindInput('rngFlowOffsetX', 'input', (e) => {
+            state.flowOffsetX = parseInt(e.target.value, 10);
+            updateLiveUiLabels();
+            triggerRedraw(true);
+        });
+        bindInput('rngFlowOffsetX', 'change', () => pushHistory());
+
+        bindInput('rngFlowOffsetY', 'input', (e) => {
+            state.flowOffsetY = parseInt(e.target.value, 10);
+            updateLiveUiLabels();
+            triggerRedraw(true);
+        });
+        bindInput('rngFlowOffsetY', 'change', () => pushHistory());
+
+        bindInput('btnFlowResetOffsets', 'click', () => {
+            state.flowOffsetX = 0;
+            state.flowOffsetY = 0;
+            updateLiveUiLabels();
+            syncUIFromState();
+            triggerRedraw();
+            if (typeof showToast === 'function') {
+                showToast('↺ Wave Offsets Centered', 'Offset X/Y reset to 0%');
+            }
+        });
+
+        bindInput('rngFlowPinch', 'input', (e) => {
+            state.flowPinch = parseInt(e.target.value, 10);
+            updateLiveUiLabels();
+            triggerRedraw(true);
+        });
+        bindInput('rngFlowPinch', 'change', () => pushHistory());
+
+        bindInput('rngFlowSparkles', 'input', (e) => {
+            state.flowSparkles = parseInt(e.target.value, 10);
+            updateLiveUiLabels();
+            triggerRedraw(true);
+        });
+        bindInput('rngFlowSparkles', 'change', () => pushHistory());
 
         // 16 Presets Cards Selection
         document.querySelectorAll('[data-flow-preset]').forEach(btn => {
@@ -10463,6 +10867,43 @@
         bindInput('btnFlowRandom', 'click', randomizeFlowPattern);
         bindInput('btnFlowRandomQuick', 'click', randomizeFlowPattern);
 
+        // Smart Creative Remix (Harmonic mutation of colors, materials, harmonics, turbulence, angles)
+        bindInput('btnFlowRemix', 'click', () => {
+            state.flowSeed = Math.floor(Math.random() * 900000) + 1000;
+            const paletteKeys = Object.keys(FLOW_COLOR_PALETTES);
+            state.flowColorPreset = paletteKeys[Math.floor(Math.random() * paletteKeys.length)];
+            const materials = ['auto', 'satin', 'chrome', 'glass', 'hologram', 'gold_leaf', 'cyber_neon'];
+            state.flowMaterial = materials[Math.floor(Math.random() * materials.length)];
+            const accents = ['auto', 'gold', 'silver', 'neon_cyan', 'hot_pink', 'emerald'];
+            state.flowAccentType = accents[Math.floor(Math.random() * accents.length)];
+            state.flowHarmonics = Math.round((0.8 + Math.random() * 2.2) * 10) / 10;
+            state.flowTurbulence = Math.floor(Math.random() * 65) + 15;
+            state.flowPinch = Math.floor(Math.random() * 60) + 30;
+            state.flowSparkles = Math.floor(Math.random() * 55) + 10;
+            state.flowRotation = Math.floor(Math.random() * 36) * 10;
+            syncUIFromState();
+            updateLiveUiLabels();
+            triggerRedraw();
+            if (typeof showToast === 'function') {
+                showToast('✨ Creative Flow Remixed!', `Theme: ${state.flowColorPreset.replace(/_/g, ' ')} • Material: ${state.flowMaterial}`);
+            }
+        });
+
+        // Cycle Color Palette sequentially through all 16 luxury palettes
+        bindInput('btnFlowCyclePalette', 'click', () => {
+            const paletteKeys = Object.keys(FLOW_COLOR_PALETTES);
+            let curIdx = paletteKeys.indexOf(state.flowColorPreset);
+            if (curIdx < 0) curIdx = 0;
+            const nextIdx = (curIdx + 1) % paletteKeys.length;
+            state.flowColorPreset = paletteKeys[nextIdx];
+            syncUIFromState();
+            updateLiveUiLabels();
+            triggerRedraw();
+            if (typeof showToast === 'function') {
+                showToast('🎨 Palette Cycled', `${paletteKeys[nextIdx].replace(/_/g, ' ').toUpperCase()}`);
+            }
+        });
+
         // Reset Settings
         bindInput('btnFlowReset', 'click', () => {
             const pDef = FLOW_PRESETS[state.flowStyle] || FLOW_PRESETS.flow_1;
@@ -10482,7 +10923,19 @@
             state.flowFlipV = false;
             state.flowColorPreset = 'default';
             state.flowBgColor = pDef.bg ? pDef.bg[0] : '#090a0f';
+            state.flowHarmonics = 1.0;
+            state.flowTurbulence = 35;
+            state.flowOffsetX = 0;
+            state.flowOffsetY = 0;
+            state.flowPinch = 50;
+            state.flowSparkles = 25;
+            state.flowMaterial = 'auto';
+            state.flowAccentType = 'auto';
+            state.flowAccentCustomColor = '#fde047';
+            state.flowBlendMode = 'screen';
+            state.flowOverlayOpacity = 85;
             syncUIFromState();
+            updateLiveUiLabels();
             triggerRedraw();
             if (typeof showToast === 'function') {
                 showToast('↺ Settings Reset', `${pDef.name} defaults restored`);
@@ -10533,6 +10986,18 @@
                     rotation: state.flowRotation,
                     flipH: state.flowFlipH,
                     flipV: state.flowFlipV,
+                    harmonics: state.flowHarmonics,
+                    turbulence: state.flowTurbulence,
+                    offsetX: state.flowOffsetX,
+                    offsetY: state.flowOffsetY,
+                    pinch: state.flowPinch,
+                    sparkles: state.flowSparkles,
+                    material: state.flowMaterial,
+                    accentType: state.flowAccentType,
+                    accentCustomColor: state.flowAccentCustomColor,
+                    targetMode: state.flowTargetMode,
+                    blendMode: state.flowBlendMode,
+                    overlayOpacity: state.flowOverlayOpacity,
                     seed: state.flowSeed
                 });
                 localStorage.setItem('ri_flow_custom_presets_v1', JSON.stringify(list));
@@ -10567,8 +11032,23 @@
                     state.flowGrain = item.grain ?? state.flowGrain;
                     state.flowScale = item.scale ?? state.flowScale;
                     state.flowRotation = item.rotation ?? state.flowRotation;
+                    state.flowFlipH = !!item.flipH;
+                    state.flowFlipV = !!item.flipV;
+                    state.flowHarmonics = item.harmonics ?? state.flowHarmonics;
+                    state.flowTurbulence = item.turbulence ?? state.flowTurbulence;
+                    state.flowOffsetX = item.offsetX ?? state.flowOffsetX;
+                    state.flowOffsetY = item.offsetY ?? state.flowOffsetY;
+                    state.flowPinch = item.pinch ?? state.flowPinch;
+                    state.flowSparkles = item.sparkles ?? state.flowSparkles;
+                    state.flowMaterial = item.material || state.flowMaterial;
+                    state.flowAccentType = item.accentType || state.flowAccentType;
+                    state.flowAccentCustomColor = item.accentCustomColor || state.flowAccentCustomColor;
+                    state.flowTargetMode = item.targetMode || state.flowTargetMode;
+                    state.flowBlendMode = item.blendMode || state.flowBlendMode;
+                    state.flowOverlayOpacity = item.overlayOpacity ?? state.flowOverlayOpacity;
                     state.flowSeed = item.seed ?? state.flowSeed;
                     syncUIFromState();
+                    updateLiveUiLabels();
                     triggerRedraw();
                     if (typeof showToast === 'function') {
                         showToast('Loaded Preset', `"${item.name}" applied successfully`);
@@ -10607,26 +11087,10 @@
 
                 // Render variation candidate
                 const vCtx = vCanvas.getContext('2d');
-                renderAbstract3DFlowPattern(vCtx, vCanvas.width, vCanvas.height, {
-                    style: state.flowStyle,
-                    colorPreset: state.flowColorPreset,
-                    bgColor: state.flowBgColor,
-                    direction: state.flowDirection,
-                    density: state.flowDensity,
-                    depth: state.flowDepth,
-                    depth3D: state.flow3DDepth,
-                    metallicShine: state.flowMetallicShine,
-                    glassTrans: state.flowGlassTrans,
-                    reflection: state.flowReflection,
-                    blur: state.flowBlur,
-                    glow: state.flowGlow,
-                    grain: state.flowGrain,
-                    scale: state.flowScale,
-                    rotation: state.flowRotation + (idx === 0 ? 0 : (idx * 15)),
-                    flipH: state.flowFlipH,
-                    flipV: state.flowFlipV,
-                    seed: candidateSeed
-                });
+                const vOpts = getFlowPatternOptions(state);
+                vOpts.seed = candidateSeed;
+                vOpts.rotation = (state.flowRotation + (idx === 0 ? 0 : (idx * 15))) % 360;
+                renderAbstract3DFlowPattern(vCtx, vCanvas.width, vCanvas.height, vOpts);
 
                 const btnApply = document.createElement('button');
                 btnApply.type = 'button';
@@ -10706,26 +11170,7 @@
             const expCtx = expCanvas.getContext('2d');
 
             const pDef = FLOW_PRESETS[state.flowStyle] || FLOW_PRESETS.flow_1;
-            renderAbstract3DFlowPattern(expCtx, dims.width, dims.height, {
-                style: state.flowStyle,
-                colorPreset: state.flowColorPreset,
-                bgColor: state.flowBgColor,
-                direction: state.flowDirection,
-                density: state.flowDensity,
-                depth: state.flowDepth,
-                depth3D: state.flow3DDepth,
-                metallicShine: state.flowMetallicShine,
-                glassTrans: state.flowGlassTrans,
-                reflection: state.flowReflection,
-                blur: state.flowBlur,
-                glow: state.flowGlow,
-                grain: state.flowGrain,
-                scale: state.flowScale,
-                rotation: state.flowRotation,
-                flipH: state.flowFlipH,
-                flipV: state.flowFlipV,
-                seed: state.flowSeed
-            });
+            renderAbstract3DFlowPattern(expCtx, dims.width, dims.height, getFlowPatternOptions(state));
 
             const mime = format === 'jpg' ? 'image/jpeg' : 'image/png';
             const ext = format === 'jpg' ? 'jpg' : 'png';
@@ -10781,26 +11226,10 @@
                     const bCtx = bCanvas.getContext('2d');
 
                     const vSeed = state.flowSeed + i * 277 + 43;
-                    renderAbstract3DFlowPattern(bCtx, dims.width, dims.height, {
-                        style: state.flowStyle,
-                        colorPreset: state.flowColorPreset,
-                        bgColor: state.flowBgColor,
-                        direction: state.flowDirection,
-                        density: state.flowDensity,
-                        depth: state.flowDepth,
-                        depth3D: state.flow3DDepth,
-                        metallicShine: state.flowMetallicShine,
-                        glassTrans: state.flowGlassTrans,
-                        reflection: state.flowReflection,
-                        blur: state.flowBlur,
-                        glow: state.flowGlow,
-                        grain: state.flowGrain,
-                        scale: state.flowScale,
-                        rotation: (state.flowRotation + i * 15) % 360,
-                        flipH: state.flowFlipH,
-                        flipV: state.flowFlipV,
-                        seed: vSeed
-                    });
+                    const bOpts = getFlowPatternOptions(state);
+                    bOpts.seed = vSeed;
+                    bOpts.rotation = (state.flowRotation + i * 15) % 360;
+                    renderAbstract3DFlowPattern(bCtx, dims.width, dims.height, bOpts);
 
                     const blob = await new Promise((res) => bCanvas.toBlob(res, 'image/jpeg', 0.94));
                     if (blob) {

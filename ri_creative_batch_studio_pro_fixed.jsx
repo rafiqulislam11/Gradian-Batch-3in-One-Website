@@ -72,10 +72,10 @@ app.bringToFront();
 
         var PS_VERSION = (typeof app !== "undefined" && app.version) ? String(app.version) : "9.0.2";
         var IS_CS2 = (PS_VERSION.indexOf("9.") === 0);
-        var DO_NOT_SAVE = (typeof SaveOptions !== "undefined" && DO_NOT_SAVE) ? DO_NOT_SAVE : 2;
-        var PLACE_TOP = (typeof ElementPlacement !== "undefined" && PLACE_TOP) ? PLACE_TOP : 1;
-        var DIALOG_NO = (typeof DialogModes !== "undefined" && DIALOG_NO) ? DIALOG_NO : 3;
-        var UNITS_PX = (typeof Units !== "undefined" && UNITS_PX) ? UNITS_PX : 1;
+        var DO_NOT_SAVE = (typeof SaveOptions !== "undefined" && typeof SaveOptions.DONOTSAVE !== "undefined") ? SaveOptions.DONOTSAVE : 2;
+        var PLACE_TOP = (typeof ElementPlacement !== "undefined" && typeof ElementPlacement.PLACEATBEGINNING !== "undefined") ? ElementPlacement.PLACEATBEGINNING : 1;
+        var DIALOG_NO = (typeof DialogModes !== "undefined" && typeof DialogModes.NO !== "undefined") ? DialogModes.NO : 3;
+        var UNITS_PX = (typeof Units !== "undefined" && typeof Units.PIXELS !== "undefined") ? Units.PIXELS : 1;
 
 
         var RESOLUTION_PRESETS = [
@@ -469,7 +469,7 @@ app.bringToFront();
             var validFiles = [];
             for (var i = 0; i < rawFiles.length; i++) {
                 var f = rawFiles[i];
-                if (f instanceof File && !f.hidden && SUPPORTED_EXTENSIONS.test(f.name)) {
+                if (f && !(f instanceof Folder) && typeof f.name === "string" && SUPPORTED_EXTENSIONS.test(f.name)) {
                     validFiles.push(f);
                 }
             }
@@ -557,25 +557,47 @@ app.bringToFront();
             } catch (lockErr) {}
         }
 
-        function convertToHighPrecisionRGB(doc) {
-            if (doc.mode !== DocumentMode.RGB) {
-                doc.changeMode(ChangeMode.RGB);
+        function toPx(val) {
+            if (val == null) return 0;
+            if (typeof val === "number") return val;
+            if (val.as) {
+                try { return val.as("px"); } catch (e) {}
             }
-            if (doc.bitsPerChannel !== BitsPerChannelType.SIXTEEN) {
+            if (typeof val.value === "number") return val.value;
+            return parseFloat(val) || 0;
+        }
+
+        function convertBitDepthSafe(doc, targetBits) {
+            try {
+                if (targetBits === 16 && doc.bitsPerChannel === BitsPerChannelType.SIXTEEN) return;
+                if (targetBits === 8 && doc.bitsPerChannel === BitsPerChannelType.EIGHT) return;
+                var idCnvM = charIDToTypeID("CnvM");
+                var desc = new ActionDescriptor();
+                var idDpth = charIDToTypeID("Dpth");
+                desc.putInteger(idDpth, targetBits);
+                executeAction(idCnvM, desc, DIALOG_NO);
+            } catch (eAM) {
                 try {
-                    doc.bitsPerChannel = BitsPerChannelType.SIXTEEN;
-                } catch (bitErr) {
-                    doc.bitsPerChannel = BitsPerChannelType.EIGHT;
-                }
+                    if (targetBits === 16) {
+                        doc.bitsPerChannel = BitsPerChannelType.SIXTEEN;
+                    } else {
+                        doc.bitsPerChannel = BitsPerChannelType.EIGHT;
+                    }
+                } catch (eDOM) {}
             }
         }
 
+        function convertToHighPrecisionRGB(doc) {
+            try {
+                if (doc.mode !== DocumentMode.RGB) {
+                    doc.changeMode(ChangeMode.RGB);
+                }
+            } catch (eMode) {}
+            convertBitDepthSafe(doc, 16);
+        }
+
         function finalizeTo8BitDithered(doc) {
-            if (doc.bitsPerChannel !== BitsPerChannelType.EIGHT) {
-                try {
-                    doc.bitsPerChannel = BitsPerChannelType.EIGHT;
-                } catch (e) {}
-            }
+            convertBitDepthSafe(doc, 8);
         }
 
         
@@ -647,8 +669,8 @@ app.bringToFront();
         }
 
         function resizeImageSmart(doc, targetW, targetH, mode) {
-            var origW = doc.width.as("px");
-            var origH = doc.height.as("px");
+            var origW = Math.round(toPx(doc.width));
+            var origH = Math.round(toPx(doc.height));
 
             if (origW === targetW && origH === targetH) {
                 return;
@@ -887,8 +909,8 @@ app.bringToFront();
         function apply3DGlassEffectPhotoshop(doc, cfg) {
             if (!cfg.glassEnable) return null;
 
-            var w = doc.width.as("px");
-            var h = doc.height.as("px");
+            var w = Math.round(toPx(doc.width));
+            var h = Math.round(toPx(doc.height));
             var style = cfg.glassStyle || "Frosted Glassmorphism (Floating 3D Slab)";
             if (style === "Random 3D Glass Style") {
                 var pool = [
@@ -1091,8 +1113,8 @@ app.bringToFront();
         // OPTICAL LIGHTING, HOLLYWOOD FLARE & STUDIO VIGNETTE ENGINE
         // ====================================================================
         function applyStudioOpticalLighting(doc, cfg) {
-            var w = doc.width.as("px");
-            var h = doc.height.as("px");
+            var w = Math.round(toPx(doc.width));
+            var h = Math.round(toPx(doc.height));
 
             if (cfg.vignetteEnable) {
                 try {
@@ -1615,7 +1637,13 @@ app.bringToFront();
 
                 resizeImageSmart(extraDoc, extraW, zoneH, "Fit/Crop (Fill)");
 
-                extraDoc.activeLayer.duplicate(mainDoc, PLACE_TOP);
+                try {
+                    extraDoc.activeLayer.duplicate(mainDoc);
+                } catch (dupErr1) {
+                    try {
+                        extraDoc.activeLayer.duplicate(mainDoc, PLACE_TOP);
+                    } catch (dupErr2) {}
+                }
                 extraDoc.close(DO_NOT_SAVE);
                 extraDoc = null;
 
@@ -1625,8 +1653,8 @@ app.bringToFront();
                 pastedLayer.name = layerTag;
 
                 var bounds = pastedLayer.bounds;
-                var curX = bounds[0].as("px");
-                var curY = bounds[1].as("px");
+                var curX = Math.round(toPx(bounds[0]));
+                var curY = Math.round(toPx(bounds[1]));
                 var targetX = 0;
                 if (zoneType === "LEFT") {
                     targetX = 0;
@@ -1641,8 +1669,8 @@ app.bringToFront();
                     try {
                         if (zoneType === "CENTER") {
                             var b = pastedLayer.bounds;
-                            var leftSeamX = b[0].as("px");
-                            var rightSeamX = b[2].as("px");
+                            var leftSeamX = Math.round(toPx(b[0]));
+                            var rightSeamX = Math.round(toPx(b[2]));
 
                             mainDoc.selection.select([[leftSeamX, 0], [leftSeamX + overlap, 0], [leftSeamX + overlap, cfg.height], [leftSeamX, cfg.height]]);
                             mainDoc.selection.feather(overlap * 0.7);
@@ -1654,7 +1682,7 @@ app.bringToFront();
                             mainDoc.selection.deselect();
                         } else if (zoneType === "RIGHT") {
                             var bRight = pastedLayer.bounds;
-                            var seamX = bRight[0].as("px");
+                            var seamX = Math.round(toPx(bRight[0]));
                             mainDoc.selection.select([[seamX, 0], [seamX + overlap, 0], [seamX + overlap, cfg.height], [seamX, cfg.height]]);
                             mainDoc.selection.feather(overlap * 0.7);
                             mainDoc.selection.clear();
@@ -1776,10 +1804,10 @@ app.bringToFront();
                 var slot = getNextAvailableOutputFile(folders.processed, cfg.filenamePrefix, seqCounter, cfg.exportFormat);
                 tempOutputFile = slot.file;
 
-                var actualDocW = Math.round(doc.width.as("px"));
-                var actualDocH = Math.round(doc.height.as("px"));
+                var actualDocW = Math.round(toPx(doc.width));
+                var actualDocH = Math.round(toPx(doc.height));
                 if (actualDocW !== cfg.width || actualDocH !== cfg.height) {
-                    doc.resizeImage(UnitValue(cfg.width, "px"), UnitValue(cfg.height, "px"), 300, ResampleMethod.BICUBICSMOOTHER);
+                    try { doc.resizeImage(UnitValue(cfg.width, "px"), UnitValue(cfg.height, "px"), 300, (typeof ResampleMethod !== "undefined" && ResampleMethod.BICUBICSMOOTHER) ? ResampleMethod.BICUBICSMOOTHER : ResampleMethod.BICUBIC); } catch (resErr) { doc.resizeImage(UnitValue(cfg.width, "px"), UnitValue(cfg.height, "px"), 300); }
                 }
 
                 exportDocumentMaster(doc, tempOutputFile, cfg);
@@ -1922,7 +1950,7 @@ app.bringToFront();
             win.alignChildren = ["fill", "top"];
             win.spacing = 5;
             win.margins = 8;
-            win.preferredSize = [545, 480];
+            win.preferredSize = [640, 520];
 
             // ====================================================================
             // HEADER BAR
@@ -1956,11 +1984,11 @@ app.bringToFront();
             srcRow.alignChildren = ["left", "center"];
             srcRow.spacing = 4;
             var btnBrowseSrc = srcRow.add("button", undefined, "Source Folder...");
-            btnBrowseSrc.preferredSize = [105, 21];
+            btnBrowseSrc.preferredSize = [105, 22];
             var txtSrcPath = srcRow.add("edittext", undefined, "", { readonly: true });
-            txtSrcPath.preferredSize = [325, 20];
+            txtSrcPath.preferredSize = [390, 20];
             var lblScannedInfo = srcRow.add("statictext", undefined, "Found: 0");
-            lblScannedInfo.preferredSize = [90, 18];
+            lblScannedInfo.preferredSize = [100, 18];
 
             // Row 2: Output Folder
             var outRow = pnlSetup.add("group");
@@ -1968,11 +1996,11 @@ app.bringToFront();
             outRow.alignChildren = ["left", "center"];
             outRow.spacing = 4;
             var btnBrowseOut = outRow.add("button", undefined, "Output Folder...");
-            btnBrowseOut.preferredSize = [105, 21];
+            btnBrowseOut.preferredSize = [105, 22];
             var txtOutPath = outRow.add("edittext", undefined, "", { readonly: true });
-            txtOutPath.preferredSize = [325, 20];
+            txtOutPath.preferredSize = [390, 20];
             var btnSelectSpecific = outRow.add("button", undefined, "Pick Files...");
-            btnSelectSpecific.preferredSize = [90, 21];
+            btnSelectSpecific.preferredSize = [100, 22];
             btnSelectSpecific.enabled = false;
 
             // Row 3: Mode, Presets & Dimensions
@@ -2207,13 +2235,13 @@ app.bringToFront();
             pnlProgress.margins = 5;
 
             var progressBar = pnlProgress.add("progressbar", undefined, 0, 100);
-            progressBar.preferredSize = [520, 12];
+            progressBar.preferredSize = [610, 14];
 
             var lblCurrentFile = pnlProgress.add("statictext", undefined, "Ready. Select Source & Output folders, then click START.");
-            lblCurrentFile.preferredSize = [520, 16];
+            lblCurrentFile.preferredSize = [610, 16];
 
             var lblStats = pnlProgress.add("statictext", undefined, "Success: 0  |  Failed: 0  |  Below Min MB: 0  |  Remaining: 0");
-            lblStats.preferredSize = [520, 16];
+            lblStats.preferredSize = [610, 16];
 
             // ====================================================================
             // ACTION BUTTON BAR
@@ -2223,34 +2251,34 @@ app.bringToFront();
             ctrlGrp.alignChildren = ["center", "center"];
             ctrlGrp.spacing = 4;
 
-            var btnStart = ctrlGrp.add("button", undefined, "START");
-            btnStart.preferredSize = [62, 26];
+            var btnStart = ctrlGrp.add("button", undefined, "▶ START BATCH");
+            btnStart.preferredSize = [120, 28];
 
             var btnPause = ctrlGrp.add("button", undefined, "PAUSE");
-            btnPause.preferredSize = [56, 26];
+            btnPause.preferredSize = [62, 28];
             btnPause.enabled = false;
 
             var btnResume = ctrlGrp.add("button", undefined, "RESUME");
-            btnResume.preferredSize = [60, 26];
+            btnResume.preferredSize = [68, 28];
             btnResume.enabled = false;
 
             var btnStop = ctrlGrp.add("button", undefined, "STOP");
-            btnStop.preferredSize = [52, 26];
+            btnStop.preferredSize = [56, 28];
             btnStop.enabled = false;
 
             var btnSkip = ctrlGrp.add("button", undefined, "SKIP");
-            btnSkip.preferredSize = [48, 26];
+            btnSkip.preferredSize = [52, 28];
             btnSkip.enabled = false;
 
             var btnRetry = ctrlGrp.add("button", undefined, "RETRY");
-            btnRetry.preferredSize = [54, 26];
+            btnRetry.preferredSize = [58, 28];
             btnRetry.enabled = false;
 
             var btnReset = ctrlGrp.add("button", undefined, "RESET");
-            btnReset.preferredSize = [54, 26];
+            btnReset.preferredSize = [58, 28];
 
             var btnClose = ctrlGrp.add("button", undefined, "CLOSE");
-            btnClose.preferredSize = [54, 26];
+            btnClose.preferredSize = [58, 28];
 
             var scannedFilesCache = [];
 
@@ -2414,6 +2442,9 @@ app.bringToFront();
                     scannedFilesCache = scanSourceFolder(chosen.fsName);
                     var tripletCount = Math.ceil(scannedFilesCache.length / 3);
                     lblScannedInfo.text = "Found: " + scannedFilesCache.length + " (" + tripletCount + " sets)";
+                    if (scannedFilesCache.length === 0) {
+                        alert("Notice: No supported images (JPG, PNG, TIF, PSD, BMP) found in:\n" + chosen.fsName);
+                    }
                 }
             };
 
@@ -2599,7 +2630,15 @@ app.bringToFront();
                         clearCheckpoint(folders.reports);
                     }
                     setControlsRunningState(false);
-                    updateStatsUI(0, batchState.stopRequested ? "Batch Stopped. Reports saved." : "Batch Completed! Success: " + batchState.successCount);
+                    var endStatusMsg = batchState.stopRequested ? "Batch Stopped. Reports saved." : ("Batch Completed! Success: " + batchState.successCount + " | Failed: " + batchState.failedCount);
+                    updateStatsUI(0, endStatusMsg);
+
+                    if (batchState.successCount > 0) {
+                        alert("Batch Processing Completed!\n\nSuccessfully Processed: " + batchState.successCount + " images\nFailed: " + batchState.failedCount + "\nOutput Directory:\n" + folders.processed.fsName);
+                    } else if (batchState.failedCount > 0 && !batchState.stopRequested) {
+                        var firstErrMsg = (batchState.failedDetails && batchState.failedDetails.length > 0) ? batchState.failedDetails[0] : "Check reports for error details.";
+                        alert("Batch processing ended, but 0 images were successfully saved.\nTotal Failed: " + batchState.failedCount + "\n\nFirst error:\n" + firstErrMsg);
+                    }
                 }
             }
 
@@ -2607,22 +2646,26 @@ app.bringToFront();
                 syncConfigFromUI();
                 if (config.processMode === "Selected Images") {
                     if (!config.selectedFiles || config.selectedFiles.length === 0) {
+                        alert("Please select images first.\nClick 'Pick Files...' button.");
                         lblCurrentFile.text = "Error: Please click 'Pick Files...' to select images.";
                         return;
                     }
                 } else {
-                    if (!config.sourcePath || !(new Folder(config.sourcePath)).exists) {
+                    if (!config.sourcePath || config.sourcePath === "" || !(new Folder(config.sourcePath)).exists) {
+                        alert("Please select a Source Folder first.\nClick 'Source Folder...' button.");
                         lblCurrentFile.text = "Error: Please select a valid Source Folder.";
                         return;
                     }
                 }
-                if (!config.outputPath || !(new Folder(config.outputPath)).exists) {
+                if (!config.outputPath || config.outputPath === "" || !(new Folder(config.outputPath)).exists) {
+                    alert("Please select an Output Folder first.\nClick 'Output Folder...' button.");
                     lblCurrentFile.text = "Error: Please select a valid Output Folder.";
                     return;
                 }
 
                 var built = buildProcessingQueue();
-                if (built.queue.length === 0) {
+                if (!built || !built.queue || built.queue.length === 0) {
+                    alert("No supported images (JPG, PNG, TIF, PSD, BMP) found in:\n" + config.sourcePath);
                     lblCurrentFile.text = "Error: No supported images found to process.";
                     return;
                 }

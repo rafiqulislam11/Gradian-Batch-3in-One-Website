@@ -2047,13 +2047,15 @@ app.bringToFront();
             var srcRow = tabSetup.add("group");
             var btnBrowseSrc = srcRow.add("button", undefined, "Source Folder...");
             btnBrowseSrc.preferredSize = [115, 23];
-            var txtSrcPath = srcRow.add("edittext", undefined, "", { readonly: true });
+            var txtSrcPath = srcRow.add("edittext", undefined, "");
+            try { txtSrcPath.readonly = true; } catch (eRo1) {}
             txtSrcPath.preferredSize = [385, 21];
 
             var outRow = tabSetup.add("group");
             var btnBrowseOut = outRow.add("button", undefined, "Output Folder...");
             btnBrowseOut.preferredSize = [115, 23];
-            var txtOutPath = outRow.add("edittext", undefined, "", { readonly: true });
+            var txtOutPath = outRow.add("edittext", undefined, "");
+            try { txtOutPath.readonly = true; } catch (eRo2) {}
             txtOutPath.preferredSize = [385, 21];
 
             var modeRow = tabSetup.add("group");
@@ -2338,7 +2340,7 @@ app.bringToFront();
             ddLiqStyle.selection = 0;
             ddLiqStyle.preferredSize = [200, 21];
 
-            tabPanel.selection = tabSetup;
+            selectTab(0);
 
             // --------------------------------------------------------------------
             // COMPACT PROGRESS & TELEMETRY BAR

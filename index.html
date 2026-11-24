@@ -8986,6 +8986,10 @@
         function render3DGlassBackground(ctx, width, height, styleKey, opts = {}) {
             ctx.save();
             ctx.clearRect(0, 0, width, height);
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
 
             const density = Math.max(4, Math.round((opts.density ?? 100) / 10));
             const scale = Math.max(0.4, (opts.scale ?? 100) / 100);
@@ -10076,6 +10080,8 @@
             targetCtx.save();
             // Pristine Canvas Initialization: Clear frame buffer completely
             targetCtx.clearRect(0, 0, width, height);
+            targetCtx.imageSmoothingEnabled = true;
+            targetCtx.imageSmoothingQuality = 'high';
             targetCtx.globalAlpha = 1.0;
             targetCtx.globalCompositeOperation = 'source-over';
 
@@ -10083,6 +10089,8 @@
             const baseBuffer = getCachedOffscreenCanvas('baseBuffer', width, height);
             const bCtx = baseBuffer.getContext('2d');
             bCtx.clearRect(0, 0, width, height);
+            bCtx.imageSmoothingEnabled = true;
+            bCtx.imageSmoothingQuality = 'high';
             renderTripletBase(bCtx, width, height, tripletImgs);
 
             // 25 3D Glass Background Styles (Full-Frame Background Mode)
@@ -16561,6 +16569,8 @@ false 3 colorimage
         async function exportHighResTargetFile(targetCanvas, targetCtx, mimeType, baseQuality, minMB, maxMB) {
             const w = targetCanvas.width;
             const h = targetCanvas.height;
+            targetCtx.imageSmoothingEnabled = true;
+            targetCtx.imageSmoothingQuality = 'high';
 
             // 4K Microstock Standard Compliance Rule:
             // Whatever input image is provided, if resolution is 4K or above (w >= 3840 or h >= 2160),

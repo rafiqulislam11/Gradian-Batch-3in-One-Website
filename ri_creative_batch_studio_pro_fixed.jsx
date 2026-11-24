@@ -807,16 +807,26 @@ app.bringToFront();
 
         function safeResizeImage(doc, targetW, targetH, dpi, resample) {
             var d = dpi || 300;
+            var r = resample;
+            if (!r) {
+                try {
+                    if (typeof ResampleMethod !== "undefined" && ResampleMethod.BICUBICSHARPER) {
+                        r = ResampleMethod.BICUBICSHARPER;
+                    } else if (typeof ResampleMethod !== "undefined" && ResampleMethod.BICUBIC) {
+                        r = ResampleMethod.BICUBIC;
+                    }
+                } catch (eR) {}
+            }
             try {
-                if (resample) {
-                    doc.resizeImage(new UnitValue(targetW, "px"), new UnitValue(targetH, "px"), d, resample);
+                if (r) {
+                    doc.resizeImage(new UnitValue(targetW, "px"), new UnitValue(targetH, "px"), d, r);
                 } else {
                     doc.resizeImage(new UnitValue(targetW, "px"), new UnitValue(targetH, "px"), d);
                 }
             } catch (e1) {
                 try {
-                    if (resample) {
-                        doc.resizeImage(targetW, targetH, d, resample);
+                    if (r) {
+                        doc.resizeImage(targetW, targetH, d, r);
                     } else {
                         doc.resizeImage(targetW, targetH, d);
                     }
@@ -964,8 +974,29 @@ app.bringToFront();
                         var angle = (a * 2 * Math.PI) / 24;
                         pts.push([Math.round(cx + rx * Math.cos(angle)), Math.round(cy + ry * Math.sin(angle))]);
                     }
-                    doc.selection.select(pts);
+                    safeSelectPolygon(doc, pts);
                 } catch (polyErr) {}
+            }
+        }
+
+                function safeSelectPolygon(doc, pts, feather) {
+            try {
+                if (!doc || !doc.selection || !pts || pts.length < 3) return false;
+                var f = (typeof feather === "number") ? feather : 0;
+                safeSelectPolygon(doc, pts, SelectionType.REPLACE, f, true);
+                return true;
+            } catch (e1) {
+                try {
+                    safeSelectPolygon(doc, pts, SelectionType.REPLACE, 0, true);
+                    return true;
+                } catch (e2) {
+                    try {
+                        safeSelectPolygon(doc, pts);
+                        return true;
+                    } catch (e3) {
+                        return false;
+                    }
+                }
             }
         }
 
@@ -1351,7 +1382,7 @@ app.bringToFront();
                     }
                     pts.push([w, h]);
                     pts.push([0, h]);
-                    doc.selection.select(pts);
+                    safeSelectPolygon(doc, pts);
 
                     // Ribbon Base Color
                     var ribCol = new SolidColor();
@@ -1381,7 +1412,7 @@ app.bringToFront();
                         for (var p = 0; p < pts.length; p++) {
                             shPts.push([pts[p][0], Math.min(h, pts[p][1] + shOffY)]);
                         }
-                        doc.selection.select(shPts);
+                        safeSelectPolygon(doc, shPts);
                         try { doc.selection.feather(Math.round(h * 0.02)); } catch (fSh) {}
                         doc.selection.fill(sBlack, ColorBlendMode.NORMAL, 55, false);
                         doc.selection.deselect();
@@ -1396,7 +1427,7 @@ app.bringToFront();
                         crestCol.rgb.red = pDef.accent[0];
                         crestCol.rgb.green = pDef.accent[1];
                         crestCol.rgb.blue = pDef.accent[2];
-                        doc.selection.select(pts);
+                        safeSelectPolygon(doc, pts);
                         safeStrokeSelection(doc, crestCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
                         doc.selection.deselect();
                         crestLayer.blendMode = BlendMode.SCREEN;
@@ -1478,7 +1509,7 @@ app.bringToFront();
                             wPts.push([curX, curY]);
                         }
                         wPts.push([w, h]); wPts.push([0, h]);
-                        doc.selection.select(wPts);
+                        safeSelectPolygon(doc, wPts);
                         doc.selection.fill(i % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 45, false);
                         safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
                         doc.selection.deselect();
@@ -1501,7 +1532,7 @@ app.bringToFront();
                         var pSh = doc.artLayers.add();
                         pSh.name = "Plate " + (p + 1) + " Shadow";
                         pSh.move(plateArt, ElementPlacement.PLACEAFTER);
-                        doc.selection.select([[px, py + Math.round(h * 0.02)], [px + pw, py + Math.round(h * 0.02)], [px + pw, py + ph + Math.round(h * 0.02)], [px, py + ph + Math.round(h * 0.02)]]);
+                        safeSelectPolygon(doc, [[px, py + Math.round(h * 0.02)], [px + pw, py + Math.round(h * 0.02)], [px + pw, py + ph + Math.round(h * 0.02)], [px, py + ph + Math.round(h * 0.02)]]);
                         try { doc.selection.feather(Math.round(w * 0.015)); } catch (fP) {}
                         doc.selection.fill(sBlack, ColorBlendMode.NORMAL, 55, false);
                         doc.selection.deselect();
@@ -1509,7 +1540,7 @@ app.bringToFront();
 
                         // Plate glass body
                         doc.activeLayer = plateArt;
-                        doc.selection.select([[px, py], [px + pw, py], [px + pw, py + ph], [px, py + ph]]);
+                        safeSelectPolygon(doc, [[px, py], [px + pw, py], [px + pw, py + ph], [px, py + ph]]);
                         doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 30, false);
                         safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                         doc.selection.deselect();
@@ -1585,17 +1616,17 @@ app.bringToFront();
                         cubeArt.name = "RI 3D Crystal Cube " + (c + 1);
 
                         // Top Facet (Brightest)
-                        doc.selection.select([[ccx, ccy - csz], [ccx + halfW, ccy - halfH], [ccx, ccy], [ccx - halfW, ccy - halfH]]);
+                        safeSelectPolygon(doc, [[ccx, ccy - csz], [ccx + halfW, ccy - halfH], [ccx, ccy], [ccx - halfW, ccy - halfH]]);
                         doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 65, false);
                         doc.selection.stroke(whiteCol, Math.max(2, Math.round(strokeW * 0.7)), StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
 
                         // Left Facet (Medium)
-                        doc.selection.select([[ccx - halfW, ccy - halfH], [ccx, ccy], [ccx, ccy + csz], [ccx - halfW, ccy + halfH]]);
+                        safeSelectPolygon(doc, [[ccx - halfW, ccy - halfH], [ccx, ccy], [ccx, ccy + csz], [ccx - halfW, ccy + halfH]]);
                         doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 55, false);
                         doc.selection.stroke(whiteCol, Math.max(2, Math.round(strokeW * 0.7)), StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
 
                         // Right Facet (Darker Shadow)
-                        doc.selection.select([[ccx, ccy], [ccx + halfW, ccy - halfH], [ccx + halfW, ccy + halfH], [ccx, ccy + csz]]);
+                        safeSelectPolygon(doc, [[ccx, ccy], [ccx + halfW, ccy - halfH], [ccx + halfW, ccy + halfH], [ccx, ccy + csz]]);
                         doc.selection.fill(violetCol, ColorBlendMode.NORMAL, 70, false);
                         doc.selection.stroke(whiteCol, Math.max(2, Math.round(strokeW * 0.7)), StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
                         doc.selection.deselect();
@@ -1610,7 +1641,7 @@ app.bringToFront();
                         var rbArt = doc.artLayers.add();
                         rbArt.name = "RI 3D Glass Ribbon " + (rb + 1);
                         var rY = Math.round(h * (0.2 + (rb * 0.18)));
-                        doc.selection.select([[0, rY], [w, rY + Math.round(h * 0.25)], [w, rY + Math.round(h * 0.38)], [0, rY + Math.round(h * 0.13)]]);
+                        safeSelectPolygon(doc, [[0, rY], [w, rY + Math.round(h * 0.25)], [w, rY + Math.round(h * 0.38)], [0, rY + Math.round(h * 0.13)]]);
                         doc.selection.fill(rb % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 40, false);
                         safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
                         doc.selection.deselect();
@@ -1637,7 +1668,7 @@ app.bringToFront();
                             var ang = (a * 60) * Math.PI / 180;
                             hPts.push([Math.round(hcx + Math.cos(ang) * hcr), Math.round(hcy + Math.sin(ang) * hcr)]);
                         }
-                        doc.selection.select(hPts);
+                        safeSelectPolygon(doc, hPts);
                         doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 45, false);
                         safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                         doc.selection.deselect();
@@ -1658,7 +1689,7 @@ app.bringToFront();
                             var ty = Math.round((tr + 1) * tileH);
                             var tDimW = Math.round(tileW * 0.85);
                             var tDimH = Math.round(tileH * 0.85);
-                            doc.selection.select([[tx, ty], [tx + tDimW, ty], [tx + tDimW, ty + tDimH], [tx, ty + tDimH]]);
+                            safeSelectPolygon(doc, [[tx, ty], [tx + tDimW, ty], [tx + tDimW, ty + tDimH], [tx, ty + tDimH]]);
                             doc.selection.fill((tr + tc) % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 35, false);
                             doc.selection.stroke(whiteCol, Math.max(2, Math.round(strokeW * 0.6)), StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
                             doc.selection.deselect();
@@ -1688,7 +1719,7 @@ app.bringToFront();
                         var stArt = doc.artLayers.add();
                         stArt.name = "RI Glass Stripe " + (st + 1);
                         var sOffset = Math.round(st * strW * 2.2);
-                        doc.selection.select([[sOffset, 0], [sOffset + strW, 0], [sOffset - h + strW, h], [sOffset - h, h]]);
+                        safeSelectPolygon(doc, [[sOffset, 0], [sOffset + strW, 0], [sOffset - h + strW, h], [sOffset - h, h]]);
                         doc.selection.fill(st % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 35, false);
                         safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                         doc.selection.deselect();
@@ -1704,7 +1735,7 @@ app.bringToFront();
                     var tTop = [Math.round(w * 0.5), Math.round(h * 0.2)];
                     var tLeft = [Math.round(w * 0.28), Math.round(h * 0.78)];
                     var tRight = [Math.round(w * 0.72), Math.round(h * 0.78)];
-                    doc.selection.select([tTop, tRight, tLeft]);
+                    safeSelectPolygon(doc, [tTop, tRight, tLeft]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 40, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
                     doc.selection.deselect();
@@ -1722,7 +1753,7 @@ app.bringToFront();
                             var curC = new SolidColor();
                             curC.rgb.red = rainbowColors[rc][0]; curC.rgb.green = rainbowColors[rc][1]; curC.rgb.blue = rainbowColors[rc][2];
                             var beamY = sY + (rc * bH);
-                            doc.selection.select([[Math.round(w * 0.5), beamY], [w, beamY - Math.round(h * 0.08)], [w, beamY + bH - Math.round(h * 0.08)], [Math.round(w * 0.5), beamY + bH]]);
+                            safeSelectPolygon(doc, [[Math.round(w * 0.5), beamY], [w, beamY - Math.round(h * 0.08)], [w, beamY + bH - Math.round(h * 0.08)], [Math.round(w * 0.5), beamY + bH]]);
                             try { doc.selection.feather(Math.round(bH * 0.4)); } catch (fB3) {}
                             doc.selection.fill(curC, ColorBlendMode.NORMAL, 65, false);
                         }
@@ -1776,7 +1807,7 @@ app.bringToFront();
                     // 10.17 3D Glass Curve: Sweeping Architectural Arch
                     var crvArt = doc.artLayers.add();
                     crvArt.name = "RI 3D Glass Curve Arch";
-                    doc.selection.select([[0, Math.round(h * 0.3)], [w, Math.round(h * 0.15)], [w, Math.round(h * 0.65)], [0, Math.round(h * 0.85)]]);
+                    safeSelectPolygon(doc, [[0, Math.round(h * 0.3)], [w, Math.round(h * 0.15)], [w, Math.round(h * 0.65)], [0, Math.round(h * 0.85)]]);
                     doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 45, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
@@ -1794,7 +1825,7 @@ app.bringToFront();
                     for (var m = 0; m < peaks.length; m++) {
                         var mArt = doc.artLayers.add();
                         mArt.name = "RI 3D Mountain Peak " + (m + 1);
-                        doc.selection.select(peaks[m]);
+                        safeSelectPolygon(doc, peaks[m]);
                         doc.selection.fill(m % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 50, false);
                         safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                         doc.selection.deselect();
@@ -1809,7 +1840,7 @@ app.bringToFront();
                         dmArt.name = "RI 3D Diamond Layer " + (dm + 1);
                         var dW = Math.round(w * (0.35 - (dm * 0.07)));
                         var dH = Math.round(h * (0.40 - (dm * 0.07)));
-                        doc.selection.select([[Math.round(w/2), Math.round(h/2) - dH], [Math.round(w/2) + dW, Math.round(h/2)], [Math.round(w/2), Math.round(h/2) + dH], [Math.round(w/2) - dW, Math.round(h/2)]]);
+                        safeSelectPolygon(doc, [[Math.round(w/2), Math.round(h/2) - dH], [Math.round(w/2) + dW, Math.round(h/2)], [Math.round(w/2), Math.round(h/2) + dH], [Math.round(w/2) - dW, Math.round(h/2)]]);
                         doc.selection.fill(dm % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 35, false);
                         safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                         doc.selection.deselect();
@@ -1895,7 +1926,7 @@ app.bringToFront();
                     // Top Facet (Brightest)
                     var topArt = doc.artLayers.add();
                     topArt.name = "RI 3D Cube Top Facet";
-                    doc.selection.select([[cx, cy - csz], [cx + halfW, cy - halfH], [cx, cy], [cx - halfW, cy - halfH]]);
+                    safeSelectPolygon(doc, [[cx, cy - csz], [cx + halfW, cy - halfH], [cx, cy], [cx - halfW, cy - halfH]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 65, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
                     doc.selection.deselect();
@@ -1904,7 +1935,7 @@ app.bringToFront();
                     // Left Facet (Medium)
                     var leftArt = doc.artLayers.add();
                     leftArt.name = "RI 3D Cube Left Facet";
-                    doc.selection.select([[cx - halfW, cy - halfH], [cx, cy], [cx, cy + csz], [cx - halfW, cy + halfH]]);
+                    safeSelectPolygon(doc, [[cx - halfW, cy - halfH], [cx, cy], [cx, cy + csz], [cx - halfW, cy + halfH]]);
                     doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 55, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
@@ -1913,7 +1944,7 @@ app.bringToFront();
                     // Right Facet (Darker Shadow)
                     var rightArt = doc.artLayers.add();
                     rightArt.name = "RI 3D Cube Right Facet";
-                    doc.selection.select([[cx, cy], [cx + halfW, cy - halfH], [cx + halfW, cy + halfH], [cx, cy + csz]]);
+                    safeSelectPolygon(doc, [[cx, cy], [cx + halfW, cy - halfH], [cx + halfW, cy + halfH], [cx, cy + csz]]);
                     doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 75, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
@@ -1962,7 +1993,7 @@ app.bringToFront();
 
                     var pillArt = doc.artLayers.add();
                     pillArt.name = "RI 3D Glass Capsule Pill";
-                    doc.selection.select([[pillX, pillY], [pillX + pillW, pillY], [pillX + pillW, pillY + pillH], [pillX, pillY + pillH]]);
+                    safeSelectPolygon(doc, [[pillX, pillY], [pillX + pillW, pillY], [pillX + pillW, pillY + pillH], [pillX, pillY + pillH]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 40, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
@@ -2000,7 +2031,7 @@ app.bringToFront();
                         var shH = Math.round(h * 0.16);
                         var shX = Math.round((w - shW) / 2);
                         var shY = Math.round(h * (0.28 + sh * 0.18));
-                        doc.selection.select([[shX, shY], [shX + shW, shY], [shX + shW, shY + shH], [shX, shY + shH]]);
+                        safeSelectPolygon(doc, [[shX, shY], [shX + shW, shY], [shX + shW, shY + shH], [shX, shY + shH]]);
                         doc.selection.fill(sh % 2 === 0 ? cyanCol : whiteCol, ColorBlendMode.NORMAL, 35, false);
                         safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                         doc.selection.deselect();
@@ -2014,7 +2045,7 @@ app.bringToFront();
                     var dH = Math.round(h * 0.28);
                     var dArt = doc.artLayers.add();
                     dArt.name = "RI 3D Diamond Crystal";
-                    doc.selection.select([[cx, cy - dH], [cx + dW, cy], [cx, cy + dH], [cx - dW, cy]]);
+                    safeSelectPolygon(doc, [[cx, cy - dH], [cx + dW, cy], [cx, cy + dH], [cx - dW, cy]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 45, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
                     doc.selection.deselect();
@@ -2028,7 +2059,7 @@ app.bringToFront();
                     var sqY = Math.round((h - sqDim) / 2);
                     var sqArt = doc.artLayers.add();
                     sqArt.name = "RI 3D Squircle Glass Card";
-                    doc.selection.select([[sqX, sqY], [sqX + sqDim, sqY], [sqX + sqDim, sqY + sqDim], [sqX, sqY + sqDim]]);
+                    safeSelectPolygon(doc, [[sqX, sqY], [sqX + sqDim, sqY], [sqX + sqDim, sqY + sqDim], [sqX, sqY + sqDim]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 35, false);
                     safeStrokeSelection(doc, whiteCol, strokeW + 2, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
@@ -2057,7 +2088,7 @@ app.bringToFront();
                     var cylY = Math.round((h - cylH) / 2);
                     var cylArt = doc.artLayers.add();
                     cylArt.name = "RI 3D Glass Cylinder";
-                    doc.selection.select([[cylX, cylY], [cylX + cylW, cylY], [cylX + cylW, cylY + cylH], [cylX, cylY + cylH]]);
+                    safeSelectPolygon(doc, [[cylX, cylY], [cylX + cylW, cylY], [cylX + cylW, cylY + cylH], [cylX, cylY + cylH]]);
                     doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 40, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
@@ -2072,10 +2103,10 @@ app.bringToFront();
                     var pyrLeft = [Math.round(cx - w * 0.22), Math.round(cy + h * 0.28)];
                     var pyrRight = [Math.round(cx + w * 0.22), Math.round(cy + h * 0.28)];
                     var pyrCenter = [cx, Math.round(cy + h * 0.15)];
-                    doc.selection.select([pyrTop, pyrCenter, pyrLeft]);
+                    safeSelectPolygon(doc, [pyrTop, pyrCenter, pyrLeft]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 55, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
-                    doc.selection.select([pyrTop, pyrRight, pyrCenter]);
+                    safeSelectPolygon(doc, [pyrTop, pyrRight, pyrCenter]);
                     doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 70, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
@@ -2086,7 +2117,7 @@ app.bringToFront();
                     // 11.13 Floating Glass Prism
                     var fPrismArt = doc.artLayers.add();
                     fPrismArt.name = "RI Floating Glass Prism";
-                    doc.selection.select([[cx, Math.round(cy - h * 0.25)], [Math.round(cx + w * 0.2), Math.round(cy + h * 0.25)], [Math.round(cx - w * 0.2), Math.round(cy + h * 0.25)]]);
+                    safeSelectPolygon(doc, [[cx, Math.round(cy - h * 0.25)], [Math.round(cx + w * 0.2), Math.round(cy + h * 0.25)], [Math.round(cx - w * 0.2), Math.round(cy + h * 0.25)]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 45, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
                     doc.selection.deselect();
@@ -2105,7 +2136,7 @@ app.bringToFront();
                         var sRadius = (st % 2 === 0) ? outerR : innerR;
                         starPts.push([Math.round(cx + Math.cos(sAngle) * sRadius), Math.round(cy + Math.sin(sAngle) * sRadius)]);
                     }
-                    doc.selection.select(starPts);
+                    safeSelectPolygon(doc, starPts);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 45, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
                     doc.selection.deselect();
@@ -2121,7 +2152,7 @@ app.bringToFront();
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 45, false);
                     makeEllipticalSelectionSafe(doc, cy - hRad, cx, cy + hRad, cx + Math.round(hRad * 1.6));
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 45, false);
-                    doc.selection.select([[cx - Math.round(hRad * 1.5), cy], [cx + Math.round(hRad * 1.5), cy], [cx, cy + Math.round(hRad * 1.8)]]);
+                    safeSelectPolygon(doc, [[cx - Math.round(hRad * 1.5), cy], [cx + Math.round(hRad * 1.5), cy], [cx, cy + Math.round(hRad * 1.8)]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 45, false);
                     doc.selection.deselect();
                     heartArt.blendMode = BlendMode.SCREEN;
@@ -2135,14 +2166,14 @@ app.bringToFront();
                     var fltY = Math.round((h - fltCardH) / 2);
                     var fltArt = doc.artLayers.add();
                     fltArt.name = "RI Fluted Glass Card";
-                    doc.selection.select([[fltX, fltY], [fltX + fltCardW, fltY], [fltX + fltCardW, fltY + fltCardH], [fltX, fltY + fltCardH]]);
+                    safeSelectPolygon(doc, [[fltX, fltY], [fltX + fltCardW, fltY], [fltX + fltCardW, fltY + fltCardH], [fltX, fltY + fltCardH]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 30, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     var numFlt = 16;
                     var fW = fltCardW / numFlt;
                     for (var fi = 0; fi < numFlt; fi++) {
                         var fx = Math.round(fltX + fi * fW);
-                        doc.selection.select([[fx, fltY], [fx + Math.max(2, Math.round(fW * 0.25)), fltY], [fx + Math.max(2, Math.round(fW * 0.25)), fltY + fltCardH], [fx, fltY + fltCardH]]);
+                        safeSelectPolygon(doc, [[fx, fltY], [fx + Math.max(2, Math.round(fW * 0.25)), fltY], [fx + Math.max(2, Math.round(fW * 0.25)), fltY + fltCardH], [fx, fltY + fltCardH]]);
                         doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 45, false);
                     }
                     doc.selection.deselect();
@@ -2161,7 +2192,7 @@ app.bringToFront();
                     slabSh.name = "RI 3D Glass Panel Shadow";
                     var shX = Math.round(w * 0.015);
                     var shY = Math.round(h * 0.02);
-                    doc.selection.select([[panX + shX, panY + shY], [panX + panW + shX, panY + shY], [panX + panW + shX, panY + panH + shY], [panX + shX, panY + panH + shY]]);
+                    safeSelectPolygon(doc, [[panX + shX, panY + shY], [panX + panW + shX, panY + shY], [panX + panW + shX, panY + panH + shY], [panX + shX, panY + panH + shY]]);
                     try { doc.selection.feather(Math.round(w * 0.018)); } catch (fSlab) {}
                     doc.selection.fill(sBlack, ColorBlendMode.NORMAL, 60, false);
                     doc.selection.deselect();
@@ -2170,14 +2201,14 @@ app.bringToFront();
                     // Glass Panel Body
                     var panArt = doc.artLayers.add();
                     panArt.name = "RI 3D Glass Panel Body";
-                    doc.selection.select([[panX, panY], [panX + panW, panY], [panX + panW, panY + panH], [panX, panY + panH]]);
+                    safeSelectPolygon(doc, [[panX, panY], [panX + panW, panY], [panX + panW, panY + panH], [panX, panY + panH]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 35, false);
                     safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
 
                     // Diagonal Light Sheen across top-left corner
                     var sheenW = Math.round(panW * 0.4);
                     var sheenH = Math.round(panH * 0.45);
-                    doc.selection.select([[panX, panY], [panX + sheenW, panY], [panX, panY + sheenH]]);
+                    safeSelectPolygon(doc, [[panX, panY], [panX + sheenW, panY], [panX, panY + sheenH]]);
                     try { doc.selection.feather(Math.round(w * 0.02)); } catch (fShn) {}
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 50, false);
                     doc.selection.deselect();
@@ -2380,7 +2411,7 @@ app.bringToFront();
                             rCol.rgb.green = rainbowColors[rb][1];
                             rCol.rgb.blue = rainbowColors[rb][2];
                             var curY = startY + (rb * bandH);
-                            doc.selection.select([[0, curY], [w, curY], [w, curY + bandH], [0, curY + bandH]]);
+                            safeSelectPolygon(doc, [[0, curY], [w, curY], [w, curY + bandH], [0, curY + bandH]]);
                             try { doc.selection.feather(Math.round(bandH * 0.5)); } catch (fRb) {}
                             doc.selection.fill(rCol, ColorBlendMode.NORMAL, 60, false);
                         }
@@ -2538,19 +2569,19 @@ app.bringToFront();
                             var slatH = h / numSlats;
                             for (var sl = 0; sl < numSlats; sl++) {
                                 var slY = Math.round(sl * slatH);
-                                doc.selection.select([[0, slY], [w, slY], [w, slY + Math.max(2, Math.round(slatH * 0.2))], [0, slY + Math.max(2, Math.round(slatH * 0.2))]]);
+                                safeSelectPolygon(doc, [[0, slY], [w, slY], [w, slY + Math.max(2, Math.round(slatH * 0.2))], [0, slY + Math.max(2, Math.round(slatH * 0.2))]]);
                                 doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 40, false);
                                 var trY = Math.round(slY + slatH * 0.7);
-                                doc.selection.select([[0, trY], [w, trY], [w, trY + Math.max(2, Math.round(slatH * 0.2))], [0, trY + Math.max(2, Math.round(slatH * 0.2))]]);
+                                safeSelectPolygon(doc, [[0, trY], [w, trY], [w, trY + Math.max(2, Math.round(slatH * 0.2))], [0, trY + Math.max(2, Math.round(slatH * 0.2))]]);
                                 doc.selection.fill(blackCol, ColorBlendMode.NORMAL, 30, false);
                             }
                         } else {
                             for (var fl = 0; fl < numFlutes; fl++) {
                                 var flX = Math.round(fl * fluteWidth);
-                                doc.selection.select([[flX, 0], [flX + Math.max(2, Math.round(fluteWidth * 0.2)), 0], [flX + Math.max(2, Math.round(fluteWidth * 0.2)), h], [flX, h]]);
+                                safeSelectPolygon(doc, [[flX, 0], [flX + Math.max(2, Math.round(fluteWidth * 0.2)), 0], [flX + Math.max(2, Math.round(fluteWidth * 0.2)), h], [flX, h]]);
                                 doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 40, false);
                                 var trX = Math.round(flX + fluteWidth * 0.7);
-                                doc.selection.select([[trX, 0], [trX + Math.max(2, Math.round(fluteWidth * 0.2)), 0], [trX + Math.max(2, Math.round(fluteWidth * 0.2)), h], [trX, h]]);
+                                safeSelectPolygon(doc, [[trX, 0], [trX + Math.max(2, Math.round(fluteWidth * 0.2)), 0], [trX + Math.max(2, Math.round(fluteWidth * 0.2)), h], [trX, h]]);
                                 doc.selection.fill(blackCol, ColorBlendMode.NORMAL, 30, false);
                             }
                         }
@@ -2577,7 +2608,7 @@ app.bringToFront();
                         sCol.rgb.red = 0; sCol.rgb.green = 0; sCol.rgb.blue = 0;
                         var shX = Math.round(w * 0.012);
                         var shY = Math.round(h * 0.02);
-                        doc.selection.select([[insetX + shX, insetY + shY], [w - insetX + shX, insetY + shY], [w - insetX + shX, h - insetY + shY], [insetX + shX, h - insetY + shY]]);
+                        safeSelectPolygon(doc, [[insetX + shX, insetY + shY], [w - insetX + shX, insetY + shY], [w - insetX + shX, h - insetY + shY], [insetX + shX, h - insetY + shY]]);
                         try { doc.selection.feather(Math.round(w * 0.018)); } catch (fSh2) {}
                         doc.selection.fill(sCol, ColorBlendMode.NORMAL, 65, false);
                         doc.selection.deselect();
@@ -2587,7 +2618,7 @@ app.bringToFront();
                     // B. Cut out the glass slab
                     doc.activeLayer = glassLayer;
                     safeTranslateLayer(glassLayer, Math.round(w * 0.004), Math.round(h * -0.004));
-                    doc.selection.select([[insetX, insetY], [w - insetX, insetY], [w - insetX, h - insetY], [insetX, h - insetY]]);
+                    safeSelectPolygon(doc, [[insetX, insetY], [w - insetX, insetY], [w - insetX, h - insetY], [insetX, h - insetY]]);
                     doc.selection.invert();
                     doc.selection.clear();
                     doc.selection.deselect();
@@ -2599,13 +2630,13 @@ app.bringToFront();
                             bevelLayer.name = "RI 3D Glass Bevel Rim [Specular]";
                             var whiteCol = new SolidColor();
                             whiteCol.rgb.red = 255; whiteCol.rgb.green = 255; whiteCol.rgb.blue = 255;
-                            doc.selection.select([[insetX, insetY], [w - insetX, insetY], [w - insetX, h - insetY], [insetX, h - insetY]]);
+                            safeSelectPolygon(doc, [[insetX, insetY], [w - insetX, insetY], [w - insetX, h - insetY], [insetX, h - insetY]]);
                             doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
 
                             // Diagonal Sheen across top-left corner
                             var sheenW = Math.round(panelW * 0.4);
                             var sheenH = Math.round(panelH * 0.45);
-                            doc.selection.select([[insetX, insetY], [insetX + sheenW, insetY], [insetX, insetY + sheenH]]);
+                            safeSelectPolygon(doc, [[insetX, insetY], [insetX + sheenW, insetY], [insetX, insetY + sheenH]]);
                             try { doc.selection.feather(Math.round(w * 0.02)); } catch (fShn) {}
                             doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 45, false);
                             doc.selection.deselect();
@@ -2616,14 +2647,14 @@ app.bringToFront();
 
                 } else if (scope === "Left & Right Ribbed Flutes" && !isSphere) {
                     var fluteW = Math.round(w * 0.22);
-                    doc.selection.select([[fluteW, 0], [w - fluteW, 0], [w - fluteW, h], [fluteW, h]]);
+                    safeSelectPolygon(doc, [[fluteW, 0], [w - fluteW, 0], [w - fluteW, h], [fluteW, h]]);
                     try { doc.selection.feather(35); } catch (eFlt) {}
                     doc.selection.clear();
                     doc.selection.deselect();
 
                 } else if (scope === "Outer Border Frame" && !isSphere) {
                     var borderMargin = Math.round(Math.min(w, h) * 0.12);
-                    doc.selection.select([[borderMargin, borderMargin], [w - borderMargin, borderMargin], [w - borderMargin, h - borderMargin], [borderMargin, h - borderMargin]]);
+                    safeSelectPolygon(doc, [[borderMargin, borderMargin], [w - borderMargin, borderMargin], [w - borderMargin, h - borderMargin], [borderMargin, h - borderMargin]]);
                     try { doc.selection.feather(30); } catch (eBrd) {}
                     doc.selection.clear();
                     doc.selection.deselect();
@@ -2633,7 +2664,7 @@ app.bringToFront();
                             frameRim.name = "RI Outer Frame Bevel Rim";
                             var whiteCol2 = new SolidColor();
                             whiteCol2.rgb.red = 255; whiteCol2.rgb.green = 255; whiteCol2.rgb.blue = 255;
-                            doc.selection.select([[borderMargin, borderMargin], [w - borderMargin, borderMargin], [w - borderMargin, h - borderMargin], [borderMargin, h - borderMargin]]);
+                            safeSelectPolygon(doc, [[borderMargin, borderMargin], [w - borderMargin, borderMargin], [w - borderMargin, h - borderMargin], [borderMargin, h - borderMargin]]);
                             doc.selection.stroke(whiteCol2, strokeW, StrokeLocation.CENTER, ColorBlendMode.NORMAL, 85);
                             doc.selection.deselect();
                             frameRim.blendMode = BlendMode.SCREEN;
@@ -2731,7 +2762,7 @@ app.bringToFront();
                     var flareY = Math.round(h * 0.42);
                     var streakH = Math.max(4, Math.round(h * 0.015));
 
-                    doc.selection.select([[0, flareY], [w, flareY], [w, flareY + streakH], [0, flareY + streakH]]);
+                    safeSelectPolygon(doc, [[0, flareY], [w, flareY], [w, flareY + streakH], [0, flareY + streakH]]);
                     doc.selection.fill(cyanGoldCol, ColorBlendMode.NORMAL, 100, false);
                     doc.selection.deselect();
 
@@ -2752,7 +2783,7 @@ app.bringToFront();
                     sunCol.rgb.blue = 220;
 
                     var sunH = Math.round(h * 0.35);
-                    doc.selection.select([[0, 0], [w, 0], [w, sunH], [0, sunH]]);
+                    safeSelectPolygon(doc, [[0, 0], [w, 0], [w, sunH], [0, sunH]]);
                     doc.selection.feather(Math.round(h * 0.15));
                     doc.selection.fill(sunCol, ColorBlendMode.NORMAL, 100, false);
                     doc.selection.deselect();
@@ -3294,18 +3325,18 @@ app.bringToFront();
                             var leftSeamX = Math.round(toPx(b[0]));
                             var rightSeamX = Math.round(toPx(b[2]));
 
-                            mainDoc.selection.select([[leftSeamX, 0], [leftSeamX + overlap, 0], [leftSeamX + overlap, cfg.height], [leftSeamX, cfg.height]]);
+                            safeSelectPolygon(mainDoc, [[leftSeamX, 0], [leftSeamX + overlap, 0], [leftSeamX + overlap, cfg.height], [leftSeamX, cfg.height]]);
                             try { mainDoc.selection.feather(overlap * 0.7); } catch (fErr1) {}
                             try { mainDoc.selection.clear(); } catch (cErr1) {}
 
-                            mainDoc.selection.select([[rightSeamX - overlap, 0], [rightSeamX, 0], [rightSeamX, cfg.height], [rightSeamX - overlap, cfg.height]]);
+                            safeSelectPolygon(mainDoc, [[rightSeamX - overlap, 0], [rightSeamX, 0], [rightSeamX, cfg.height], [rightSeamX - overlap, cfg.height]]);
                             try { mainDoc.selection.feather(overlap * 0.7); } catch (fErr2) {}
                             try { mainDoc.selection.clear(); } catch (cErr2) {}
                             mainDoc.selection.deselect();
                         } else if (zoneType === "RIGHT") {
                             var bRight = pastedLayer.bounds;
                             var seamX = Math.round(toPx(bRight[0]));
-                            mainDoc.selection.select([[seamX, 0], [seamX + overlap, 0], [seamX + overlap, cfg.height], [seamX, cfg.height]]);
+                            safeSelectPolygon(mainDoc, [[seamX, 0], [seamX + overlap, 0], [seamX + overlap, cfg.height], [seamX, cfg.height]]);
                             try { mainDoc.selection.feather(overlap * 0.7); } catch (fErr3) {}
                             try { mainDoc.selection.clear(); } catch (cErr3) {}
                             mainDoc.selection.deselect();

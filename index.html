@@ -2241,15 +2241,31 @@
                         </div>
                     </div>
 
+                    <!-- QUICK GLASS MATERIAL PRESETS -->
+                    <div class="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <label class="text-[9px] font-bold uppercase tracking-wider studio-heading">Quick Glass Material Presets:</label>
+                            <span class="text-[9px] font-mono text-sky-400">6 Pro Finishes</span>
+                        </div>
+                        <div class="grid grid-cols-3 sm:grid-cols-6 gap-1" id="gridGlassMaterials">
+                            <button type="button" data-glass-mat="crystal" class="studio-btn py-1 px-1 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="Clear Crystal (0 blur, 70% refract, sharp bevel)">💎 Crystal</button>
+                            <button type="button" data-glass-mat="frosted" class="studio-btn active py-1 px-1 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="Frosted Glass (25px blur, 40% refract, soft sheen)">🌫️ Frosted</button>
+                            <button type="button" data-glass-mat="liquid" class="studio-btn py-1 px-1 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="Liquid Glass (High 85% refraction, 65% dispersion)">💧 Liquid</button>
+                            <button type="button" data-glass-mat="prism" class="studio-btn py-1 px-1 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="Prism Rainbow (Chromatic dispersion &amp; glint)">🌈 Prism</button>
+                            <button type="button" data-glass-mat="acrylic" class="studio-btn py-1 px-1 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="Matte Acrylic (Soft 35px blur, low shine)">📱 Acrylic</button>
+                            <button type="button" data-glass-mat="smoky" class="studio-btn py-1 px-1 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="Smoky Tint (Dark tint, crisp chrome rim)">🌑 Smoky</button>
+                        </div>
+                    </div>
+
                     <!-- PLACEMENT & GEOMETRY -->
                     <div class="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="text-[9px] font-bold uppercase tracking-wider studio-heading flex items-center gap-1">
-                                <span>📐</span> Placement &amp; Scale
+                                <span>📐</span> Placement, Size &amp; Shape Customization
                             </span>
                             <div class="w-32">
                                 <select id="selGlassShapeScope" class="studio-input w-full border rounded px-1 py-0.5 text-[9px]">
-                                    <option value="center">Center (Default)</option>
+                                    <option value="center">Center Preset</option>
                                     <option value="full">Full Width</option>
                                     <option value="left">Left Floating</option>
                                     <option value="right">Right Floating</option>
@@ -2299,29 +2315,54 @@
                                 <input id="rngGlassShapeRotation" type="range" min="-180" max="180" value="0" class="studio-range w-full">
                             </div>
                         </div>
+
+                        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-black/5 dark:border-white/5">
+                            <div>
+                                <div class="flex items-center justify-between text-[8px] mb-0.5">
+                                    <span class="studio-label truncate">Corner Roundness:</span>
+                                    <span id="valGlassShapeRoundness" class="font-mono text-[8px] studio-accent-text">25%</span>
+                                </div>
+                                <input id="rngGlassShapeRoundness" type="range" min="0" max="100" value="25" class="studio-range w-full" title="Corner curvature: 0% = sharp 90° corners, 100% = full squircle / capsule">
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between text-[8px] mb-0.5">
+                                    <span class="studio-label truncate">3D Thickness / Depth:</span>
+                                    <span id="valGlassShapeDepth" class="font-mono text-[8px] studio-accent-text">50%</span>
+                                </div>
+                                <input id="rngGlassShapeDepth" type="range" min="0" max="100" value="50" class="studio-range w-full" title="3D glass extrusion thickness and depth displacement">
+                            </div>
+                        </div>
                     </div>
 
                     <!-- OPTICS & MATERIAL -->
                     <div class="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 space-y-2">
                         <div class="text-[9px] font-bold uppercase tracking-wider studio-heading flex items-center gap-1">
-                            <span>🔮</span> Optics, Frosted Blur &amp; Bevel
+                            <span>🔮</span> Optics, Frosted Blur, Bevel &amp; Lighting
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-3 gap-1.5">
                             <div>
-                                <div class="flex items-center justify-between text-[9px] mb-0.5">
-                                    <span class="studio-label">Frost Blur:</span>
-                                    <span id="valGlassShapeBlur" class="font-mono text-[9px] studio-accent-text">20 px</span>
+                                <div class="flex items-center justify-between text-[8px] mb-0.5">
+                                    <span class="studio-label truncate">Frost Blur:</span>
+                                    <span id="valGlassShapeBlur" class="font-mono text-[8px] studio-accent-text">20 px</span>
                                 </div>
                                 <input id="rngGlassShapeBlur" type="range" min="0" max="60" value="20" class="studio-range w-full">
                             </div>
                             <div>
-                                <div class="flex items-center justify-between text-[9px] mb-0.5">
-                                    <span class="studio-label">Refraction:</span>
-                                    <span id="valGlassShapeRefract" class="font-mono text-[9px] studio-accent-text">45%</span>
+                                <div class="flex items-center justify-between text-[8px] mb-0.5">
+                                    <span class="studio-label truncate">Refraction:</span>
+                                    <span id="valGlassShapeRefract" class="font-mono text-[8px] studio-accent-text">45%</span>
                                 </div>
                                 <input id="rngGlassShapeRefract" type="range" min="0" max="100" value="45" class="studio-range w-full">
                             </div>
+                            <div>
+                                <div class="flex items-center justify-between text-[8px] mb-0.5">
+                                    <span class="studio-label truncate">Body Opacity:</span>
+                                    <span id="valGlassShapeOpacity" class="font-mono text-[8px] studio-accent-text">90%</span>
+                                </div>
+                                <input id="rngGlassShapeOpacity" type="range" min="10" max="100" value="90" class="studio-range w-full" title="Glass body transparency">
+                            </div>
                         </div>
+
                         <div class="grid grid-cols-3 gap-1.5">
                             <div>
                                 <div class="flex items-center justify-between text-[8px] mb-0.5">
@@ -2343,6 +2384,23 @@
                                     <span id="valGlassShapeShadow" class="font-mono text-[8px] studio-accent-text">70%</span>
                                 </div>
                                 <input id="rngGlassShapeShadow" type="range" min="0" max="100" value="70" class="studio-range w-full">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-black/5 dark:border-white/5">
+                            <div>
+                                <div class="flex items-center justify-between text-[8px] mb-0.5">
+                                    <span class="studio-label truncate">Light Direction:</span>
+                                    <span id="valGlassShapeLightAngle" class="font-mono text-[8px] studio-accent-text">135°</span>
+                                </div>
+                                <input id="rngGlassShapeLightAngle" type="range" min="0" max="360" value="135" class="studio-range w-full" title="Specular light reflection angle">
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between text-[8px] mb-0.5">
+                                    <span class="studio-label truncate">Prism Dispersion:</span>
+                                    <span id="valGlassShapeDispersion" class="font-mono text-[8px] studio-accent-text">30%</span>
+                                </div>
+                                <input id="rngGlassShapeDispersion" type="range" min="0" max="100" value="30" class="studio-range w-full" title="Chromatic rainbow optical dispersion along glass edges">
                             </div>
                         </div>
                     </div>
@@ -4425,6 +4483,11 @@
             glassShapeScale: 65,
             glassShapeAspect: 100,
             glassShapeRotation: 0,
+            glassShapeRoundness: 25,
+            glassShapeDepth: 50,
+            glassShapeOpacity: 90,
+            glassShapeLightAngle: 135,
+            glassShapeDispersion: 30,
             glassShapeBlur: 20,
             glassShapeRefract: 45,
             glassShapeBevel: 4,
@@ -6857,7 +6920,7 @@ const GLASS_SHAPES_INFO = {
                 case 'classic':
                 case 'glow':
                 case 'neon': {
-                    const r = Math.min(hw, hh, opts.cornerRadius || Math.max(16, Math.min(w, h) * 0.08));
+                    const r = Math.min(hw, hh, opts.cornerRadius !== undefined ? opts.cornerRadius : Math.max(16, Math.min(w, h) * 0.08));
                     const x = cx - hw, y = cy - hh;
                     ctx.moveTo(x + r, y);
                     ctx.lineTo(x + w - r, y);
@@ -6874,32 +6937,32 @@ const GLASS_SHAPES_INFO = {
 
                 // 3D Glass Isometric Cube Outline
                 case 'cube': {
-                    const s = Math.min(hw, hh) * 0.92;
+                    const sx = hw * 0.92;
+                    const sy = hh * 0.92;
                     const cos30 = 0.866;
                     const sin30 = 0.5;
-                    const dx = s * cos30;
-                    const dy = s * sin30;
+                    const dx = sx * cos30;
+                    const dy = sy * sin30;
 
                     // Perimeter of isometric cube: top-vertex, right-top, right-bottom, bottom-vertex, left-bottom, left-top
-                    ctx.moveTo(cx, cy - s);
-                    ctx.lineTo(cx + dx, cy - s + dy);
+                    ctx.moveTo(cx, cy - sy);
+                    ctx.lineTo(cx + dx, cy - sy + dy);
                     ctx.lineTo(cx + dx, cy + dy);
-                    ctx.lineTo(cx, cy + s);
+                    ctx.lineTo(cx, cy + sy);
                     ctx.lineTo(cx - dx, cy + dy);
-                    ctx.lineTo(cx - dx, cy - s + dy);
+                    ctx.lineTo(cx - dx, cy - sy + dy);
                     ctx.closePath();
                     break;
                 }
 
                 case 'sphere': {
-                    const rad = Math.min(hw, hh);
-                    ctx.arc(cx, cy, rad, 0, Math.PI * 2);
+                    ctx.ellipse(cx, cy, Math.max(1, hw), Math.max(1, hh), 0, 0, Math.PI * 2);
                     ctx.closePath();
                     break;
                 }
 
                 case 'pill': {
-                    const r = Math.min(hh, hw);
+                    const r = Math.min(hh, hw * 0.5);
                     const x = cx - hw, y = cy - hh;
                     ctx.moveTo(x + r, y);
                     ctx.lineTo(x + w - r, y);
@@ -6957,7 +7020,7 @@ const GLASS_SHAPES_INFO = {
                     const ly = cy - hh * 0.85;
                     const lw = w * 0.85;
                     const lh = h * 0.85;
-                    const lr = Math.min(lw, lh) * 0.08;
+                    const lr = Math.min(lw / 2, lh / 2, opts.cornerRadius !== undefined ? opts.cornerRadius : (Math.min(lw, lh) * 0.08));
                     ctx.moveTo(lx + lr, ly);
                     ctx.lineTo(lx + lw - lr, ly);
                     ctx.quadraticCurveTo(lx + lw, ly, lx + lw, ly + lr);
@@ -6982,18 +7045,16 @@ const GLASS_SHAPES_INFO = {
                 }
 
                 case 'ribbon': {
-                    const r = Math.min(hw, hh) * 0.75;
-                    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                    ctx.ellipse(cx, cy, Math.max(1, hw * 0.75), Math.max(1, hh * 0.75), 0, 0, Math.PI * 2);
                     ctx.closePath();
                     break;
                 }
 
                 case 'hexagon': {
-                    const rad = Math.min(hw, hh);
                     for (let i = 0; i < 6; i++) {
                         const angle = (Math.PI / 3) * i - Math.PI / 6;
-                        const px = cx + rad * Math.cos(angle);
-                        const py = cy + rad * Math.sin(angle);
+                        const px = cx + hw * Math.cos(angle);
+                        const py = cy + hh * Math.sin(angle);
                         if (i === 0) ctx.moveTo(px, py);
                         else ctx.lineTo(px, py);
                     }
@@ -7002,7 +7063,7 @@ const GLASS_SHAPES_INFO = {
                 }
 
                 case 'app': {
-                    const r = Math.min(hw, hh) * 0.42;
+                    const r = Math.min(hw, hh, opts.cornerRadius !== undefined ? opts.cornerRadius : (Math.min(hw, hh) * 0.42));
                     const x = cx - hw, y = cy - hh;
                     ctx.moveTo(x + r, y);
                     ctx.lineTo(x + w - r, y);
@@ -7018,10 +7079,8 @@ const GLASS_SHAPES_INFO = {
                 }
 
                 case 'ring': {
-                    const rOuter = Math.min(hw, hh);
-                    const rInner = rOuter * 0.62;
-                    ctx.arc(cx, cy, rOuter, 0, Math.PI * 2, false);
-                    ctx.arc(cx, cy, rInner, 0, Math.PI * 2, true);
+                    ctx.ellipse(cx, cy, Math.max(1, hw), Math.max(1, hh), 0, 0, Math.PI * 2, false);
+                    ctx.ellipse(cx, cy, Math.max(1, hw * 0.62), Math.max(1, hh * 0.62), 0, 0, Math.PI * 2, true);
                     ctx.closePath();
                     break;
                 }
@@ -7081,7 +7140,7 @@ const GLASS_SHAPES_INFO = {
                 }
 
                 default: {
-                    const r = Math.min(hw, hh, 20);
+                    const r = Math.min(hw, hh, opts.cornerRadius !== undefined ? opts.cornerRadius : 20);
                     const x = cx - hw, y = cy - hh;
                     ctx.moveTo(x + r, y);
                     ctx.lineTo(x + w - r, y);
@@ -7106,73 +7165,94 @@ const GLASS_SHAPES_INFO = {
             const shapeId = opts.shape || 'frosted';
             const scope = opts.scope || 'center';
 
-            let cx = width * ((opts.x ?? 50) / 100);
-            let cy = height * ((opts.y ?? 50) / 100);
-            let scalePct = (opts.scale ?? 65) / 100;
-            let aspectPct = (opts.aspect ?? 100) / 100;
+            let cx = width * ((opts.x !== undefined ? opts.x : 50) / 100);
+            let cy = height * ((opts.y !== undefined ? opts.y : 50) / 100);
+            let scalePct = (opts.scale !== undefined ? opts.scale : 65) / 100;
+            let aspectPct = (opts.aspect !== undefined ? opts.aspect : 100) / 100;
 
-            if (scope === 'center') {
-                cx = width * 0.5;
-                cy = height * 0.5;
-            } else if (scope === 'full') {
-                cx = width * 0.5;
-                cy = height * 0.5;
-                scalePct = 0.92;
-                aspectPct = (height / width) * 100;
+            if (scope === 'full') {
+                scalePct = (opts.scale !== undefined ? opts.scale : 95) / 100;
+                aspectPct = (opts.aspect !== undefined ? opts.aspect : ((height / width) * 100)) / 100;
             } else if (scope === 'left') {
-                cx = width * 0.32;
-                cy = height * 0.5;
+                if (opts.x === undefined) cx = width * 0.32;
             } else if (scope === 'right') {
-                cx = width * 0.68;
-                cy = height * 0.5;
+                if (opts.x === undefined) cx = width * 0.68;
             } else if (scope === 'bottom') {
-                cx = width * 0.5;
-                cy = height * 0.72;
-                aspectPct = 40;
+                if (opts.y === undefined) cy = height * 0.72;
+                if (opts.aspect === undefined) aspectPct = 0.4;
             }
 
             const baseDim = Math.min(width, height) * scalePct;
-            let shapeW = baseDim * (aspectPct >= 100 ? (aspectPct / 100) : 1.0);
-            let shapeH = baseDim * (aspectPct < 100 ? (100 / Math.max(25, aspectPct)) : 1.0);
-            if (shapeId === 'sphere' || shapeId === 'cube' || shapeId === 'hexagon' || shapeId === 'ring') {
-                shapeW = baseDim;
-                shapeH = baseDim;
-            } else if (shapeId === 'pill') {
-                shapeW = baseDim * 1.5;
-                shapeH = baseDim * 0.65;
+            const aspectMult = Math.max(0.15, aspectPct);
+            let shapeW = baseDim * Math.sqrt(aspectMult);
+            let shapeH = baseDim / Math.sqrt(aspectMult);
+            if (shapeId === 'pill') {
+                shapeW *= 1.35;
+                shapeH *= 0.75;
             }
 
             const rotRad = ((opts.rotation ?? 0) * Math.PI) / 180;
             const blurPx = Math.max(0, opts.blur ?? 20);
             const refractPct = (opts.refract ?? 45) / 100;
-            const bevelPx = Math.max(1, opts.bevel ?? 5);
+            const bevelPx = Math.max(1, opts.bevel ?? 4);
             const shinePct = (opts.shine ?? 85) / 100;
             const shadowPct = (opts.shadow ?? 70) / 100;
+            const roundnessPct = (opts.roundness !== undefined ? opts.roundness : 25) / 100;
+            const depthPct = (opts.depth !== undefined ? opts.depth : 50) / 100;
+            const bodyOpacity = (opts.opacity !== undefined ? opts.opacity : 90) / 100;
+            const lightAngleDeg = opts.lightAngle !== undefined ? opts.lightAngle : 135;
+            const lightAngleRad = (lightAngleDeg * Math.PI) / 180;
+            const dispersionPct = (opts.dispersion !== undefined ? opts.dispersion : 30) / 100;
             const neonPct = (opts.neon ?? (shapeId === 'neon' ? 85 : 0)) / 100;
             const neonColor = opts.neonColor || '#00e5ff';
             const tintColor = opts.tint || '#ffffff';
             const tintOpacity = (opts.tintOpacity ?? 15) / 100;
 
+            const calcCornerRadius = Math.min(shapeW, shapeH) * 0.5 * roundnessPct;
+            const shapeOpts = { cornerRadius: calcCornerRadius };
+
+            // Directional light vector for specular highlights and prism refraction
+            const lx = Math.cos(lightAngleRad) * shapeW * 0.5;
+            const ly = Math.sin(lightAngleRad) * shapeH * 0.5;
+
             targetCtx.save();
 
             // ========================================================================
-            // 1. 3D AMBIENT OCCLUSION & GROUND CONTACT SHADOW
+            // 1. 3D AMBIENT OCCLUSION & VOLUMETRIC CONTACT SHADOW
             // ========================================================================
             if (shadowPct > 0.05) {
                 targetCtx.save();
                 targetCtx.translate(cx, cy);
                 if (rotRad !== 0) targetCtx.rotate(rotRad);
 
-                const shOffset = Math.max(8, baseDim * 0.05);
-                const shBlur = Math.max(16, baseDim * 0.1);
+                const shOffset = Math.max(8, baseDim * 0.05 * (0.4 + depthPct * 1.2));
+                const shBlur = Math.max(16, baseDim * 0.1 * (0.4 + depthPct * 1.2));
                 targetCtx.shadowColor = 'rgba(5, 12, 35, ' + (0.65 * shadowPct) + ')';
                 targetCtx.shadowBlur = shBlur;
                 targetCtx.shadowOffsetX = shOffset * 0.5;
                 targetCtx.shadowOffsetY = shOffset;
 
-                buildGlassShapePath(targetCtx, shapeId, 0, 0, shapeW, shapeH, { cornerRadius: Math.min(shapeW, shapeH) * 0.1 });
+                buildGlassShapePath(targetCtx, shapeId, 0, 0, shapeW, shapeH, shapeOpts);
                 targetCtx.fillStyle = 'rgba(0, 0, 0, 0.45)';
                 targetCtx.fill('evenodd');
+                targetCtx.restore();
+            }
+
+            // 3D Extrusion thickness (behind the main body when depth is high)
+            if (depthPct > 0.15) {
+                targetCtx.save();
+                targetCtx.translate(cx, cy);
+                if (rotRad !== 0) targetCtx.rotate(rotRad);
+                const extrudeY = Math.max(2, baseDim * 0.04 * depthPct);
+                buildGlassShapePath(targetCtx, shapeId, 0, extrudeY, shapeW, shapeH, shapeOpts);
+                const extrudeGrad = targetCtx.createLinearGradient(0, 0, 0, extrudeY);
+                extrudeGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.2 * shinePct) + ')');
+                extrudeGrad.addColorStop(1, 'rgba(10, 20, 45, ' + (0.4 * depthPct) + ')');
+                targetCtx.fillStyle = extrudeGrad;
+                targetCtx.fill('evenodd');
+                targetCtx.lineWidth = Math.max(1, bevelPx * 0.5);
+                targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                targetCtx.stroke();
                 targetCtx.restore();
             }
 
@@ -7200,11 +7280,12 @@ const GLASS_SHAPES_INFO = {
             targetCtx.translate(cx, cy);
             if (rotRad !== 0) targetCtx.rotate(rotRad);
 
-            buildGlassShapePath(targetCtx, shapeId, 0, 0, shapeW, shapeH, { cornerRadius: Math.min(shapeW, shapeH) * 0.1 });
+            buildGlassShapePath(targetCtx, shapeId, 0, 0, shapeW, shapeH, shapeOpts);
             targetCtx.clip('evenodd');
 
             // Draw Refracted / Blurred Canvas Base
             targetCtx.save();
+            targetCtx.globalAlpha = bodyOpacity;
             const refractZoom = 1.0 + refractPct * 0.18;
             targetCtx.scale(refractZoom, refractZoom);
             const drawSrc = blurredCanvas || sampleCanvas;
@@ -7545,13 +7626,28 @@ const GLASS_SHAPES_INFO = {
                 targetCtx.globalAlpha = 1.0;
             }
 
-            const shineGrad = targetCtx.createLinearGradient(-shapeW / 2, -shapeH / 2, shapeW / 2, shapeH / 2);
+            const shineGrad = targetCtx.createLinearGradient(-lx, -ly, lx, ly);
             shineGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.65 * shinePct) + ')');
             shineGrad.addColorStop(0.35, 'rgba(255, 255, 255, 0.08)');
             shineGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.08)');
             shineGrad.addColorStop(1, 'rgba(255, 255, 255, ' + (0.45 * shinePct) + ')');
             targetCtx.fillStyle = shineGrad;
             targetCtx.fill('evenodd');
+
+            // Chromatic Rainbow Dispersion along inner refracted edge
+            if (dispersionPct > 0.05) {
+                targetCtx.save();
+                const dispGrad = targetCtx.createLinearGradient(-lx, -ly, lx, ly);
+                dispGrad.addColorStop(0, 'rgba(255, 60, 60, ' + (0.4 * dispersionPct) + ')');
+                dispGrad.addColorStop(0.25, 'rgba(255, 220, 50, ' + (0.35 * dispersionPct) + ')');
+                dispGrad.addColorStop(0.5, 'rgba(50, 255, 120, ' + (0.3 * dispersionPct) + ')');
+                dispGrad.addColorStop(0.75, 'rgba(50, 180, 255, ' + (0.4 * dispersionPct) + ')');
+                dispGrad.addColorStop(1, 'rgba(200, 60, 255, ' + (0.45 * dispersionPct) + ')');
+                targetCtx.lineWidth = Math.max(1.5, bevelPx * 0.75);
+                targetCtx.strokeStyle = dispGrad;
+                targetCtx.stroke();
+                targetCtx.restore();
+            }
 
             targetCtx.restore(); // end clip
 
@@ -7562,8 +7658,8 @@ const GLASS_SHAPES_INFO = {
             targetCtx.translate(cx, cy);
             if (rotRad !== 0) targetCtx.rotate(rotRad);
 
-            buildGlassShapePath(targetCtx, shapeId, 0, 0, shapeW, shapeH, { cornerRadius: Math.min(shapeW, shapeH) * 0.1 });
-            const rimGrad = targetCtx.createLinearGradient(-shapeW / 2, -shapeH / 2, shapeW / 2, shapeH / 2);
+            buildGlassShapePath(targetCtx, shapeId, 0, 0, shapeW, shapeH, shapeOpts);
+            const rimGrad = targetCtx.createLinearGradient(-lx, -ly, lx, ly);
             rimGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.95 * shinePct) + ')');
             rimGrad.addColorStop(0.35, 'rgba(255, 255, 255, 0.35)');
             rimGrad.addColorStop(0.7, 'rgba(120, 200, 255, 0.28)');
@@ -7571,6 +7667,20 @@ const GLASS_SHAPES_INFO = {
             targetCtx.lineWidth = bevelPx;
             targetCtx.strokeStyle = rimGrad;
             targetCtx.stroke();
+
+            // Outer Rainbow Dispersion Ring if dispersion is high
+            if (dispersionPct > 0.15) {
+                targetCtx.save();
+                const outDispGrad = targetCtx.createLinearGradient(lx, ly, -lx, -ly);
+                outDispGrad.addColorStop(0, 'rgba(255, 80, 80, ' + (0.3 * dispersionPct) + ')');
+                outDispGrad.addColorStop(0.3, 'rgba(255, 230, 80, ' + (0.25 * dispersionPct) + ')');
+                outDispGrad.addColorStop(0.6, 'rgba(80, 220, 255, ' + (0.3 * dispersionPct) + ')');
+                outDispGrad.addColorStop(1, 'rgba(210, 80, 255, ' + (0.35 * dispersionPct) + ')');
+                targetCtx.lineWidth = Math.max(1, bevelPx * 0.5);
+                targetCtx.strokeStyle = outDispGrad;
+                targetCtx.stroke();
+                targetCtx.restore();
+            }
 
             // ========================================================================
             // 5. NEON GLOWING RIM BORDER (IF ENABLED OR NEON GLASS)
@@ -7595,8 +7705,8 @@ const GLASS_SHAPES_INFO = {
             // ========================================================================
             if (shinePct > 0.4 && shapeId !== 'sphere') {
                 targetCtx.save();
-                const glintX = -shapeW * 0.38;
-                const glintY = -shapeH * 0.38;
+                const glintX = -lx * 0.75;
+                const glintY = -ly * 0.75;
                 const glintR = Math.max(4, bevelPx * 2);
                 const glintGrad = targetCtx.createRadialGradient(glintX, glintY, 0, glintX, glintY, glintR);
                 glintGrad.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
@@ -11266,6 +11376,11 @@ const GLASS_SHAPES_INFO = {
                     scale: state.glassShapeScale ?? 65,
                     aspect: state.glassShapeAspect ?? 100,
                     rotation: state.glassShapeRotation ?? 0,
+                    roundness: state.glassShapeRoundness ?? 25,
+                    depth: state.glassShapeDepth ?? 50,
+                    opacity: state.glassShapeOpacity ?? 90,
+                    lightAngle: state.glassShapeLightAngle ?? 135,
+                    dispersion: state.glassShapeDispersion ?? 30,
                     blur: state.glassShapeBlur ?? 20,
                     refract: state.glassShapeRefract ?? 45,
                     bevel: state.glassShapeBevel ?? 4,
@@ -11428,6 +11543,11 @@ const GLASS_SHAPES_INFO = {
             setTxt('valGlassShapeScale', (state.glassShapeScale ?? 65) + '%');
             setTxt('valGlassShapeAspect', (state.glassShapeAspect ?? 100) + '%');
             setTxt('valGlassShapeRotation', (state.glassShapeRotation ?? 0) + '°');
+            setTxt('valGlassShapeRoundness', (state.glassShapeRoundness ?? 25) + '%');
+            setTxt('valGlassShapeDepth', (state.glassShapeDepth ?? 50) + '%');
+            setTxt('valGlassShapeOpacity', (state.glassShapeOpacity ?? 90) + '%');
+            setTxt('valGlassShapeLightAngle', (state.glassShapeLightAngle ?? 135) + '°');
+            setTxt('valGlassShapeDispersion', (state.glassShapeDispersion ?? 30) + '%');
             setTxt('valGlassShapeBlur', (state.glassShapeBlur ?? 20) + ' px');
             setTxt('valGlassShapeRefract', (state.glassShapeRefract ?? 45) + '%');
             setTxt('valGlassShapeBevel', (state.glassShapeBevel ?? 4) + ' px');
@@ -11686,6 +11806,11 @@ const GLASS_SHAPES_INFO = {
             setVal('rngGlassShapeScale', state.glassShapeScale ?? 65);
             setVal('rngGlassShapeAspect', state.glassShapeAspect ?? 100);
             setVal('rngGlassShapeRotation', state.glassShapeRotation ?? 0);
+            setVal('rngGlassShapeRoundness', state.glassShapeRoundness ?? 25);
+            setVal('rngGlassShapeDepth', state.glassShapeDepth ?? 50);
+            setVal('rngGlassShapeOpacity', state.glassShapeOpacity ?? 90);
+            setVal('rngGlassShapeLightAngle', state.glassShapeLightAngle ?? 135);
+            setVal('rngGlassShapeDispersion', state.glassShapeDispersion ?? 30);
             setVal('rngGlassShapeBlur', state.glassShapeBlur ?? 20);
             setVal('rngGlassShapeRefract', state.glassShapeRefract ?? 45);
             setVal('rngGlassShapeBevel', state.glassShapeBevel ?? 4);
@@ -11699,6 +11824,18 @@ const GLASS_SHAPES_INFO = {
                 const isActive = !!state.glassShapeEnable && btn.getAttribute('data-glass-shape') === state.glassShapeType;
                 btn.classList.toggle('active', isActive);
                 btn.classList.toggle('border-accent-main', isActive);
+            });
+            document.querySelectorAll('[data-glass-mat]').forEach(btn => {
+                const mat = btn.getAttribute('data-glass-mat');
+                let isMatch = false;
+                if (mat === 'crystal' && state.glassShapeRefract >= 70 && state.glassShapeBlur <= 6) isMatch = true;
+                else if (mat === 'frosted' && state.glassShapeBlur >= 30) isMatch = true;
+                else if (mat === 'liquid' && state.glassShapeRefract >= 85) isMatch = true;
+                else if (mat === 'prism' && state.glassShapeDispersion >= 75) isMatch = true;
+                else if (mat === 'acrylic' && state.glassShapeOpacity <= 80 && state.glassShapeBlur >= 10) isMatch = true;
+                else if (mat === 'smoky' && state.glassShapeTint === '#1e293b') isMatch = true;
+                btn.classList.toggle('active', isMatch);
+                btn.classList.toggle('border-sky-400', isMatch);
             });
             document.querySelectorAll('[data-flow-preset]').forEach(card => {
                 const isActive = card.getAttribute('data-flow-preset') === state.flowStyle;
@@ -13382,13 +13519,44 @@ const GLASS_SHAPES_INFO = {
 
         bindInput('selGlassShapeScope', 'change', (e) => {
             state.glassShapeScope = e.target.value;
+            if (e.target.value === 'center') {
+                state.glassShapeX = 50;
+                state.glassShapeY = 50;
+            } else if (e.target.value === 'full') {
+                state.glassShapeX = 50;
+                state.glassShapeY = 50;
+                state.glassShapeScale = 95;
+            } else if (e.target.value === 'left') {
+                state.glassShapeX = 32;
+                state.glassShapeY = 50;
+            } else if (e.target.value === 'right') {
+                state.glassShapeX = 68;
+                state.glassShapeY = 50;
+            } else if (e.target.value === 'bottom') {
+                state.glassShapeX = 50;
+                state.glassShapeY = 72;
+                state.glassShapeAspect = 40;
+            }
+            syncUIFromState();
             triggerRedraw();
         });
 
-        bindInput('rngGlassShapeX', 'input', (e) => { state.glassShapeX = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngGlassShapeX', 'input', (e) => {
+            state.glassShapeX = parseInt(e.target.value, 10);
+            state.glassShapeScope = 'custom';
+            const sel = document.getElementById('selGlassShapeScope');
+            if (sel) sel.value = 'custom';
+            triggerRedraw(true);
+        });
         bindInput('rngGlassShapeX', 'change', () => pushHistory());
 
-        bindInput('rngGlassShapeY', 'input', (e) => { state.glassShapeY = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngGlassShapeY', 'input', (e) => {
+            state.glassShapeY = parseInt(e.target.value, 10);
+            state.glassShapeScope = 'custom';
+            const sel = document.getElementById('selGlassShapeScope');
+            if (sel) sel.value = 'custom';
+            triggerRedraw(true);
+        });
         bindInput('rngGlassShapeY', 'change', () => pushHistory());
 
         bindInput('rngGlassShapeScale', 'input', (e) => { state.glassShapeScale = parseInt(e.target.value, 10); triggerRedraw(true); });
@@ -13399,6 +13567,21 @@ const GLASS_SHAPES_INFO = {
 
         bindInput('rngGlassShapeRotation', 'input', (e) => { state.glassShapeRotation = parseInt(e.target.value, 10); triggerRedraw(true); });
         bindInput('rngGlassShapeRotation', 'change', () => pushHistory());
+
+        bindInput('rngGlassShapeRoundness', 'input', (e) => { state.glassShapeRoundness = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngGlassShapeRoundness', 'change', () => pushHistory());
+
+        bindInput('rngGlassShapeDepth', 'input', (e) => { state.glassShapeDepth = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngGlassShapeDepth', 'change', () => pushHistory());
+
+        bindInput('rngGlassShapeOpacity', 'input', (e) => { state.glassShapeOpacity = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngGlassShapeOpacity', 'change', () => pushHistory());
+
+        bindInput('rngGlassShapeLightAngle', 'input', (e) => { state.glassShapeLightAngle = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngGlassShapeLightAngle', 'change', () => pushHistory());
+
+        bindInput('rngGlassShapeDispersion', 'input', (e) => { state.glassShapeDispersion = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngGlassShapeDispersion', 'change', () => pushHistory());
 
         bindInput('rngGlassShapeBlur', 'input', (e) => { state.glassShapeBlur = parseInt(e.target.value, 10); triggerRedraw(true); });
         bindInput('rngGlassShapeBlur', 'change', () => pushHistory());
@@ -13423,6 +13606,87 @@ const GLASS_SHAPES_INFO = {
 
         bindInput('rngGlassShapeTintOpacity', 'input', (e) => { state.glassShapeTintOpacity = parseInt(e.target.value, 10); triggerRedraw(true); });
         bindInput('rngGlassShapeTintOpacity', 'change', () => pushHistory());
+
+        // Quick Glass Material Finishes (Presets)
+        document.querySelectorAll('[data-glass-mat]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mat = btn.getAttribute('data-glass-mat');
+                state.glassShapeEnable = true;
+                switch (mat) {
+                    case 'crystal':
+                        state.glassShapeBlur = 4;
+                        state.glassShapeRefract = 75;
+                        state.glassShapeBevel = 6;
+                        state.glassShapeShine = 95;
+                        state.glassShapeOpacity = 92;
+                        state.glassShapeDispersion = 55;
+                        state.glassShapeDepth = 65;
+                        state.glassShapeTint = '#ffffff';
+                        state.glassShapeTintOpacity = 10;
+                        break;
+                    case 'frosted':
+                        state.glassShapeBlur = 35;
+                        state.glassShapeRefract = 35;
+                        state.glassShapeBevel = 4;
+                        state.glassShapeShine = 70;
+                        state.glassShapeOpacity = 85;
+                        state.glassShapeDispersion = 15;
+                        state.glassShapeDepth = 45;
+                        state.glassShapeTint = '#ffffff';
+                        state.glassShapeTintOpacity = 22;
+                        break;
+                    case 'liquid':
+                        state.glassShapeBlur = 8;
+                        state.glassShapeRefract = 90;
+                        state.glassShapeBevel = 7;
+                        state.glassShapeShine = 92;
+                        state.glassShapeOpacity = 95;
+                        state.glassShapeDispersion = 40;
+                        state.glassShapeDepth = 70;
+                        state.glassShapeTint = '#38bdf8';
+                        state.glassShapeTintOpacity = 18;
+                        break;
+                    case 'prism':
+                        state.glassShapeBlur = 6;
+                        state.glassShapeRefract = 65;
+                        state.glassShapeBevel = 5;
+                        state.glassShapeShine = 98;
+                        state.glassShapeOpacity = 90;
+                        state.glassShapeDispersion = 85;
+                        state.glassShapeDepth = 60;
+                        state.glassShapeTint = '#f472b6';
+                        state.glassShapeTintOpacity = 15;
+                        break;
+                    case 'acrylic':
+                        state.glassShapeBlur = 12;
+                        state.glassShapeRefract = 45;
+                        state.glassShapeBevel = 5;
+                        state.glassShapeShine = 80;
+                        state.glassShapeOpacity = 75;
+                        state.glassShapeDispersion = 20;
+                        state.glassShapeDepth = 40;
+                        state.glassShapeTint = '#a78bfa';
+                        state.glassShapeTintOpacity = 20;
+                        break;
+                    case 'smoky':
+                        state.glassShapeBlur = 22;
+                        state.glassShapeRefract = 50;
+                        state.glassShapeBevel = 4;
+                        state.glassShapeShine = 65;
+                        state.glassShapeOpacity = 60;
+                        state.glassShapeDispersion = 10;
+                        state.glassShapeDepth = 50;
+                        state.glassShapeTint = '#1e293b';
+                        state.glassShapeTintOpacity = 45;
+                        break;
+                }
+                syncUIFromState();
+                triggerRedraw();
+                if (typeof showToast === 'function') {
+                    showToast('Glass Material Applied', `${mat.toUpperCase()} finish active`);
+                }
+            });
+        });
 
         bindInput('btnGlassShapeRandom', 'click', () => {
             const shapeKeys = Object.keys(GLASS_SHAPES_INFO);
@@ -13452,6 +13716,11 @@ const GLASS_SHAPES_INFO = {
             state.glassShapeScale = 65;
             state.glassShapeAspect = 100;
             state.glassShapeRotation = 0;
+            state.glassShapeRoundness = 25;
+            state.glassShapeDepth = 50;
+            state.glassShapeOpacity = 90;
+            state.glassShapeLightAngle = 135;
+            state.glassShapeDispersion = 30;
             state.glassShapeBlur = 20;
             state.glassShapeRefract = 45;
             state.glassShapeBevel = 4;

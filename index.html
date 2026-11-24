@@ -1899,8 +1899,9 @@
                         <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">✨ 20 Shapes</span>
                         <button id="btnGlassShapeRandom" type="button" class="studio-btn px-2 py-0.5 rounded border text-[10px] font-semibold transition" title="Pick Random Glass Shape">🎲 Random</button>
                         <button id="btnGlassShapeReset" type="button" class="studio-btn px-2 py-0.5 rounded border text-[10px] font-semibold transition" title="Reset Glass Shape Controls">↺ Reset</button>
+                        <button id="btnGlassShapeClear" type="button" class="studio-btn px-2 py-0.5 rounded border text-[10px] font-semibold text-rose-400 hover:border-rose-500 transition" title="Clear / Hide Glass Shape Overlay">✕ Off</button>
                         <label class="studio-check flex items-center gap-1 text-[11px] cursor-pointer">
-                            <input id="chkGlassShapeEnable" type="checkbox" checked>
+                            <input id="chkGlassShapeEnable" type="checkbox">
                             <span>Enable</span>
                         </label>
                     </div>
@@ -1916,10 +1917,10 @@
                     <div class="space-y-1.5">
                         <div class="flex items-center justify-between">
                             <label class="text-[9px] font-bold uppercase tracking-wider studio-subtext">Choose Glass Shape (20 Styles):</label>
-                            <span id="lblActiveGlassShape" class="text-[9px] font-bold text-accent-main">1. Frosted Glass</span>
+                            <span id="lblActiveGlassShape" class="text-[9px] font-medium text-slate-400">None (Off)</span>
                         </div>
                         <div class="grid grid-cols-5 gap-1" id="gridGlassShapes">
-                            <button type="button" data-glass-shape="frosted" class="studio-btn active py-1 px-1 rounded-lg border text-[9px] font-semibold flex flex-col items-center justify-center gap-0.5 transition hover:border-accent-main" title="Frosted Glass (Rounded slab with blur)">
+                            <button type="button" data-glass-shape="frosted" class="studio-btn py-1 px-1 rounded-lg border text-[9px] font-semibold flex flex-col items-center justify-center gap-0.5 transition hover:border-accent-main" title="Frosted Glass (Rounded slab with blur)">
                                 <span class="text-xs">🌫️</span>
                                 <span class="truncate w-full text-center text-[8px]">Frosted</span>
                             </button>
@@ -2157,7 +2158,7 @@
                     <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
                         <button id="btnShuffleGlass" type="button" class="studio-btn px-2 py-0.5 rounded border text-[10px] font-semibold transition" title="Randomize Glass Parameters">🎲 Shuffle</button>
                         <label class="studio-check flex items-center gap-1 text-[11px] cursor-pointer">
-                            <input id="chkFracGlassEnable" type="checkbox" checked>
+                            <input id="chkFracGlassEnable" type="checkbox">
                             <span>Enable</span>
                         </label>
                     </div>
@@ -3650,7 +3651,7 @@
             { id: "gradient", name: "2. Advanced Gradient", visible: true, opacity: 35, blend: "soft-light" },
             { id: "liquify", name: "3. Multi-Axis Liquify", visible: true, opacity: 100, blend: "source-over" },
             { id: "fractal", name: "4. Fractal Pro Engine", visible: true, opacity: 55, blend: "overlay" },
-            { id: "glass", name: "5. 3D Glass Engine", visible: true, opacity: 100, blend: "source-over" },
+            { id: "glass", name: "5. 3D Glass Engine", visible: false, opacity: 100, blend: "source-over" },
             { id: "geometric", name: "6. Geometric Pattern", visible: false, opacity: 28, blend: "overlay" },
             { id: "lighting", name: "7. Optical Lighting", visible: false, opacity: 100, blend: "screen" },
             { id: "texture", name: "8. Surface Texture & Overlay", visible: true, opacity: 100, blend: "overlay" }
@@ -3862,7 +3863,7 @@
             flowCustomH: 2160,
             flowSavedPresets: [],
             // 20 Glass Effect Background Styles – Apply on Your Image
-            glassShapeEnable: true,
+            glassShapeEnable: false,
             glassShapeType: 'frosted',
             glassShapeScope: 'center',
             glassShapeX: 50,
@@ -3879,7 +3880,7 @@
             glassShapeNeonColor: '#00e5ff',
             glassShapeTint: '#ffffff',
             glassShapeTintOpacity: 15,
-            fracGlassEnable: true,
+            fracGlassEnable: false,
             fracGlassStyle: "glass1",
             glassDir: "auto",
             glassGroove: "medium",
@@ -6933,8 +6934,22 @@
                     lighting: state.glassLighting,
                     dispersion: state.glassDispersion
                 });
-                bCtx.clearRect(0, 0, width, height);
-                bCtx.drawImage(bgGlassCanvas, 0, 0);
+                const hasImgs = tripletImgs && tripletImgs.length > 0 && tripletImgs[0];
+                if (!state.tripletCleanBase || !hasImgs) {
+                    bCtx.clearRect(0, 0, width, height);
+                    bCtx.drawImage(bgGlassCanvas, 0, 0);
+                } else {
+                    const compCanvas = document.createElement('canvas');
+                    compCanvas.width = width;
+                    compCanvas.height = height;
+                    const cCtx = compCanvas.getContext('2d');
+                    cCtx.drawImage(bgGlassCanvas, 0, 0);
+                    cCtx.globalAlpha = 0.95;
+                    cCtx.drawImage(baseBuffer, 0, 0);
+                    bCtx.clearRect(0, 0, width, height);
+                    bCtx.drawImage(compCanvas, 0, 0);
+                    disposeCanvas(compCanvas);
+                }
             }
 
             // Abstract 3D Metallic & Glass Flow Patterns (Full-Frame Background Mode)
@@ -9505,7 +9520,17 @@
                 flowModeBgBtn.classList.toggle('active', state.flowTargetMode === 'background');
                 flowModeOvBtn.classList.toggle('active', state.flowTargetMode === 'overlay');
             }
-            setChk('chkGlassShapeEnable', state.glassShapeEnable);
+            setChk('chkGlassShapeEnable', !!state.glassShapeEnable);
+            const lblShape = document.getElementById('lblActiveGlassShape');
+            if (lblShape) {
+                if (state.glassShapeEnable && state.glassShapeType && GLASS_SHAPES_INFO[state.glassShapeType]) {
+                    lblShape.textContent = GLASS_SHAPES_INFO[state.glassShapeType].name;
+                    lblShape.className = 'text-[9px] font-bold text-accent-main';
+                } else {
+                    lblShape.textContent = 'None (Off)';
+                    lblShape.className = 'text-[9px] font-medium text-slate-400';
+                }
+            }
             setVal('selGlassShapeScope', state.glassShapeScope || 'center');
             setVal('rngGlassShapeX', state.glassShapeX ?? 50);
             setVal('rngGlassShapeY', state.glassShapeY ?? 50);
@@ -9522,7 +9547,7 @@
             setVal('colGlassShapeTint', state.glassShapeTint || '#ffffff');
             setVal('rngGlassShapeTintOpacity', state.glassShapeTintOpacity ?? 15);
             document.querySelectorAll('[data-glass-shape]').forEach(btn => {
-                const isActive = btn.getAttribute('data-glass-shape') === (state.glassShapeType || 'frosted');
+                const isActive = !!state.glassShapeEnable && btn.getAttribute('data-glass-shape') === state.glassShapeType;
                 btn.classList.toggle('active', isActive);
                 btn.classList.toggle('border-accent-main', isActive);
             });
@@ -10664,28 +10689,48 @@
         // ============================================================================
         bindInput('chkGlassShapeEnable', 'change', (e) => {
             state.glassShapeEnable = e.target.checked;
+            syncUIFromState();
             triggerRedraw();
+        });
+
+        bindInput('btnGlassShapeClear', 'click', () => {
+            state.glassShapeEnable = false;
+            syncUIFromState();
+            triggerRedraw();
+            if (typeof showToast === 'function') {
+                showToast('Glass Shape Removed', 'Glass overlay turned off');
+            }
         });
 
         // 20 Shapes Visual Grid Selection
         document.querySelectorAll('[data-glass-shape]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const shapeId = btn.getAttribute('data-glass-shape');
-                state.glassShapeType = shapeId;
-                state.glassShapeEnable = true;
-                const info = GLASS_SHAPES_INFO[shapeId];
-                if (info) {
-                    state.glassShapeBlur = info.defaultBlur ?? 20;
-                    state.glassShapeRefract = info.defaultRefract ?? 45;
-                    state.glassShapeBevel = info.defaultBevel ?? 4;
-                    if (typeof info.defaultNeon === 'number') {
-                        state.glassShapeNeon = info.defaultNeon;
+                if (state.glassShapeEnable && state.glassShapeType === shapeId) {
+                    // Clicking the active shape again turns it off cleanly
+                    state.glassShapeEnable = false;
+                } else {
+                    state.glassShapeType = shapeId;
+                    state.glassShapeEnable = true;
+                    const info = GLASS_SHAPES_INFO[shapeId];
+                    if (info) {
+                        state.glassShapeBlur = info.defaultBlur ?? 20;
+                        state.glassShapeRefract = info.defaultRefract ?? 45;
+                        state.glassShapeBevel = info.defaultBevel ?? 4;
+                        if (typeof info.defaultNeon === 'number') {
+                            state.glassShapeNeon = info.defaultNeon;
+                        }
                     }
                 }
                 syncUIFromState();
                 triggerRedraw();
                 if (typeof showToast === 'function') {
-                    showToast('3D Glass Shape Selected', `${info ? info.name : shapeId} activated on image`);
+                    if (state.glassShapeEnable) {
+                        const info = GLASS_SHAPES_INFO[shapeId];
+                        showToast('3D Glass Shape Selected', `${info ? info.name : shapeId} activated on image`);
+                    } else {
+                        showToast('Glass Shape Removed', 'Glass overlay turned off');
+                    }
                 }
             });
         });
@@ -10754,6 +10799,8 @@
         });
 
         bindInput('btnGlassShapeReset', 'click', () => {
+            state.glassShapeEnable = false;
+            state.glassShapeType = 'frosted';
             state.glassShapeScope = 'center';
             state.glassShapeX = 50;
             state.glassShapeY = 50;

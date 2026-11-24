@@ -561,6 +561,9 @@
             <button id="btnHeaderOpenAiStudio" type="button" class="studio-btn px-2 sm:px-2.5 py-1.5 sm:py-1 rounded-lg border text-[11px] sm:text-xs font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 transition shrink-0 flex items-center gap-1" title="Open AI Creative Background Generator (DALL-E 3 / FLUX.1 / SDXL)">
                 <span>🤖</span><span class="hidden 2xl:inline">AI Studio</span><span class="hidden xl:inline 2xl:hidden">AI</span>
             </button>
+            <button id="btnMasterPolish" type="button" class="studio-btn px-2 sm:px-2.5 py-1.5 sm:py-1 rounded-lg border text-[11px] sm:text-xs font-semibold transition shrink-0 bg-gradient-to-r from-amber-500/10 to-purple-500/10 hover:from-amber-500/20 hover:to-purple-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30 flex items-center gap-1 shadow-sm" title="Apply 1-Click Studio Master Polish (Microstock Certified Auto-Enhance)">
+                <span>✨</span><span class="hidden 2xl:inline">Master Polish</span><span class="hidden xl:inline 2xl:hidden">Polish</span>
+            </button>
             <button id="btnRandomize" type="button" class="studio-btn px-2 sm:px-2.5 py-1.5 sm:py-1 rounded-lg border text-[11px] sm:text-xs font-medium transition shrink-0" title="Randomize Seed">
                 <span class="sm:hidden">🎲</span><span class="hidden 2xl:inline">Randomize </span><span class="hidden xl:inline 2xl:inline">Seed</span>
             </button>
@@ -2973,6 +2976,9 @@
             gradeContrast: 104,
             gradeTemp: 0,
             gradeTint: 0,
+            clarity: 0,
+            vibrance: 0,
+            studioVignette: 0,
             curves: {
                 master: [25, 50, 75],
                 r: [25, 50, 75],
@@ -4780,6 +4786,21 @@
                         targetCtx.fillStyle = lin;
                         targetCtx.fillRect(0, 0, width, height);
                     }
+
+                    // High-Precision Sub-Pixel Blue-Noise Anti-Banding Pass
+                    if (state.gradDither > 0) {
+                        applyPhotoshopAddNoise(targetCtx, width, height, {
+                            amount: Math.max(2, Math.round((state.gradDither / 100) * 16)),
+                            type: 'fine',
+                            density: 100,
+                            scale: 80,
+                            contrast: -15,
+                            monochromatic: true,
+                            blendMode: 'direct',
+                            opacity: 100,
+                            seed: 1337 + ((state.seed * 500) | 0)
+                        });
+                    }
                     targetCtx.restore();
                 }
 
@@ -6396,45 +6417,107 @@
                     targetCtx.restore();
                 }
 
-                // Engine 7: Lighting & Optical Effects Engine
+                // Engine 7: Professional Optical Lighting & Flare Effects Engine
                 if (layer.id === 'lighting' && state.lightEnable) {
                     targetCtx.save();
                     targetCtx.globalCompositeOperation = 'screen';
 
                     if (state.lightFlare > 0) {
-                        const fAlpha = (state.lightFlare / 100) * layerAlpha * 0.55;
+                        const fAlpha = (state.lightFlare / 100) * layerAlpha * 0.65;
                         const fy = height * (0.45 + state.offsetY * 0.4);
+                        const fx = width * (0.5 + state.offsetX * 0.35);
+
+                        // 1. Broad Anamorphic Streak with Subtle Chromatic Aberration
                         const flareGrad = targetCtx.createLinearGradient(0, fy, width, fy);
-                        flareGrad.addColorStop(0, 'rgba(120, 200, 255, 0)');
-                        flareGrad.addColorStop(0.35, `rgba(180, 225, 255, ${fAlpha * 0.6})`);
-                        flareGrad.addColorStop(0.5, `rgba(255, 250, 240, ${fAlpha})`);
-                        flareGrad.addColorStop(0.65, `rgba(220, 180, 255, ${fAlpha * 0.6})`);
-                        flareGrad.addColorStop(1, 'rgba(120, 200, 255, 0)');
+                        flareGrad.addColorStop(0, 'rgba(56, 189, 248, 0)');
+                        flareGrad.addColorStop(0.25, `rgba(96, 165, 250, ${fAlpha * 0.35})`);
+                        flareGrad.addColorStop(0.45, `rgba(216, 180, 254, ${fAlpha * 0.75})`);
+                        flareGrad.addColorStop(0.5, `rgba(255, 255, 255, ${fAlpha * 1.15})`);
+                        flareGrad.addColorStop(0.55, `rgba(216, 180, 254, ${fAlpha * 0.75})`);
+                        flareGrad.addColorStop(0.75, `rgba(96, 165, 250, ${fAlpha * 0.35})`);
+                        flareGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
                         targetCtx.fillStyle = flareGrad;
-                        targetCtx.fillRect(0, fy - height * 0.04, width, height * 0.08);
+                        targetCtx.fillRect(0, fy - height * 0.05, width, height * 0.10);
+
+                        // 2. Razor-Thin Specular Core Anamorphic Line
+                        const coreGrad = targetCtx.createLinearGradient(0, fy, width, fy);
+                        coreGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+                        coreGrad.addColorStop(0.35, `rgba(220, 245, 255, ${fAlpha * 0.85})`);
+                        coreGrad.addColorStop(0.5, `rgba(255, 255, 255, ${fAlpha * 1.35})`);
+                        coreGrad.addColorStop(0.65, `rgba(220, 245, 255, ${fAlpha * 0.85})`);
+                        coreGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                        targetCtx.fillStyle = coreGrad;
+                        targetCtx.fillRect(0, fy - 1.5, width, 3.0);
+
+                        // 3. Central Starburst & Optical Core Burst
+                        const coreR = Math.min(width, height) * 0.12;
+                        const coreBurst = targetCtx.createRadialGradient(fx, fy, 0, fx, fy, coreR);
+                        coreBurst.addColorStop(0, `rgba(255, 255, 255, ${fAlpha * 1.25})`);
+                        coreBurst.addColorStop(0.25, `rgba(255, 235, 190, ${fAlpha * 0.65})`);
+                        coreBurst.addColorStop(0.6, `rgba(147, 197, 253, ${fAlpha * 0.28})`);
+                        coreBurst.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                        targetCtx.fillStyle = coreBurst;
+                        targetCtx.beginPath();
+                        targetCtx.arc(fx, fy, coreR, 0, Math.PI * 2);
+                        targetCtx.fill();
+
+                        // 4. Hexagonal Aperture Lens Ghost along Optical Axis
+                        const ghostSteps = [-0.4, -0.2, 0.25, 0.6];
+                        ghostSteps.forEach((gStep, gIdx) => {
+                            const gx = fx + (width * 0.5 - fx) * gStep;
+                            const gy = fy + (height * 0.5 - fy) * gStep;
+                            const gr = coreR * (0.18 + gIdx * 0.08);
+                            const gHex = targetCtx.createRadialGradient(gx, gy, gr * 0.3, gx, gy, gr);
+                            gHex.addColorStop(0, `rgba(168, 85, 247, ${fAlpha * 0.25})`);
+                            gHex.addColorStop(0.7, `rgba(56, 189, 248, ${fAlpha * 0.18})`);
+                            gHex.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                            targetCtx.fillStyle = gHex;
+                            targetCtx.beginPath();
+                            targetCtx.arc(gx, gy, gr, 0, Math.PI * 2);
+                            targetCtx.fill();
+                        });
                     }
 
                     if (state.lightBokeh > 0) {
-                        const bAlpha = (state.lightBokeh / 100) * layerAlpha * 0.35;
-                        for (let b = 0; b < 14; b++) {
-                            const bx = ((Math.sin(b * 19.3 + state.seed) * 0.5 + 0.5) * 0.85 + 0.075) * width;
-                            const by = ((Math.cos(b * 27.1 + state.seed) * 0.5 + 0.5) * 0.85 + 0.075) * height;
-                            const br = (0.03 + (b % 4) * 0.018) * Math.min(width, height);
-                            const bGrad = targetCtx.createRadialGradient(bx, by, br * 0.1, bx, by, br);
-                            bGrad.addColorStop(0, `rgba(255, 245, 230, ${bAlpha})`);
-                            bGrad.addColorStop(0.75, `rgba(210, 235, 255, ${bAlpha * 0.5})`);
+                        const bAlpha = (state.lightBokeh / 100) * layerAlpha * 0.42;
+                        const minDim = Math.min(width, height);
+                        for (let b = 0; b < 16; b++) {
+                            const bx = ((Math.sin(b * 19.3 + state.seed) * 0.5 + 0.5) * 0.88 + 0.06) * width;
+                            const by = ((Math.cos(b * 27.1 + state.seed) * 0.5 + 0.5) * 0.88 + 0.06) * height;
+                            const br = (0.025 + (b % 5) * 0.016) * minDim;
+
+                            targetCtx.save();
+                            targetCtx.translate(bx, by);
+                            targetCtx.rotate(b * 0.45 + state.seed);
+
+                            const bGrad = targetCtx.createRadialGradient(0, 0, br * 0.2, 0, 0, br);
+                            bGrad.addColorStop(0, `rgba(255, 248, 235, ${bAlpha * 0.35})`);
+                            bGrad.addColorStop(0.65, `rgba(215, 235, 255, ${bAlpha * 0.55})`);
+                            bGrad.addColorStop(0.88, `rgba(255, 255, 255, ${bAlpha * 0.85})`);
                             bGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
                             targetCtx.fillStyle = bGrad;
+
+                            // 7-Blade Polygonal Aperture Bokeh Diaphragm
+                            const blades = 7;
                             targetCtx.beginPath();
-                            targetCtx.arc(bx, by, br, 0, Math.PI * 2);
+                            for (let bl = 0; bl < blades; bl++) {
+                                const ang = (bl / blades) * Math.PI * 2;
+                                const px = Math.cos(ang) * br;
+                                const py = Math.sin(ang) * br;
+                                if (bl === 0) targetCtx.moveTo(px, py);
+                                else targetCtx.lineTo(px, py);
+                            }
+                            targetCtx.closePath();
                             targetCtx.fill();
+                            targetCtx.restore();
                         }
                     }
 
                     if (state.lightGlow > 0) {
-                        const gAlpha = (state.lightGlow / 100) * layerAlpha * 0.45;
-                        const glow = targetCtx.createRadialGradient(width * 0.5, height * 0.5, width * 0.05, width * 0.5, height * 0.5, width * 0.65);
+                        const gAlpha = (state.lightGlow / 100) * layerAlpha * 0.52;
+                        const glow = targetCtx.createRadialGradient(width * 0.5, height * 0.5, width * 0.05, width * 0.5, height * 0.5, width * 0.68);
                         glow.addColorStop(0, `rgba(${c3[0]},${c3[1]},${c3[2]},${gAlpha})`);
+                        glow.addColorStop(0.5, `rgba(${c1[0]},${c1[1]},${c1[2]},${gAlpha * 0.35})`);
                         glow.addColorStop(1, 'rgba(0,0,0,0)');
                         targetCtx.fillStyle = glow;
                         targetCtx.fillRect(0, 0, width, height);
@@ -6442,9 +6525,14 @@
 
                     if (state.lightVignette > 0) {
                         targetCtx.globalCompositeOperation = 'multiply';
-                        const vAlpha = (state.lightVignette / 100) * layerAlpha * 0.72;
-                        const vig = targetCtx.createRadialGradient(width * 0.5, height * 0.5, width * 0.28, width * 0.5, height * 0.5, width * 0.75);
+                        const vAlpha = (state.lightVignette / 100) * layerAlpha * 0.75;
+                        const vig = targetCtx.createRadialGradient(
+                            width * 0.5, height * 0.5, Math.min(width, height) * 0.32,
+                            width * 0.5, height * 0.5, Math.hypot(width, height) * 0.52
+                        );
                         vig.addColorStop(0, 'rgba(255,255,255,1)');
+                        vig.addColorStop(0.6, `rgba(240,240,245,${1 - vAlpha * 0.18})`);
+                        vig.addColorStop(0.85, `rgba(160,170,185,${1 - vAlpha * 0.55})`);
                         vig.addColorStop(1, `rgba(${Math.round(255 * (1 - vAlpha))},${Math.round(255 * (1 - vAlpha))},${Math.round(255 * (1 - vAlpha))},1)`);
                         targetCtx.fillStyle = vig;
                         targetCtx.fillRect(0, 0, width, height);
@@ -6540,9 +6628,10 @@
                 disposeCanvas(maskLayer);
             }
 
-            // Professional Color Grading, RGB Tone Curves & HSL Pass
+            // Professional Color Grading, RGB Tone Curves, Clarity & HSL Pass
             const hasGrading = state.gradeHue !== 0 || state.gradeSat !== 100 || state.gradeLum !== 100 ||
                                state.gradeContrast !== 100 || state.gradeTemp !== 0 || state.gradeTint !== 0 ||
+                               (state.clarity && state.clarity > 0) || (state.vibrance && state.vibrance > 0) || (state.studioVignette && state.studioVignette > 0) ||
                                state.curves.master[1] !== 50 || state.curves.r[1] !== 50 || state.curves.g[1] !== 50 || state.curves.b[1] !== 50;
 
             if (hasGrading) {
@@ -6582,6 +6671,51 @@
                         gCtx.fillRect(0, 0, width, height);
                     }
                     gCtx.globalCompositeOperation = 'source-over';
+                }
+
+                // Professional Clarity & Micro-Contrast Enhancement
+                const clarityLevel = (state.clarity !== undefined ? state.clarity : 0) / 100;
+                if (clarityLevel > 0) {
+                    const cW = Math.round(width * 0.5);
+                    const cH = Math.round(height * 0.5);
+                    const cBuf = document.createElement('canvas');
+                    cBuf.width = cW; cBuf.height = cH;
+                    const cCtx = cBuf.getContext('2d');
+                    cCtx.drawImage(gradeBuf, 0, 0, cW, cH);
+
+                    gCtx.save();
+                    gCtx.globalAlpha = clarityLevel * 0.35;
+                    gCtx.globalCompositeOperation = 'overlay';
+                    gCtx.drawImage(cBuf, 0, 0, width, height);
+                    gCtx.restore();
+                    disposeCanvas(cBuf);
+                }
+
+                // Professional Smart Vibrance Boost
+                const vibranceLevel = (state.vibrance !== undefined ? state.vibrance : 0) / 100;
+                if (vibranceLevel > 0) {
+                    gCtx.save();
+                    gCtx.globalAlpha = vibranceLevel * 0.28;
+                    gCtx.globalCompositeOperation = 'soft-light';
+                    gCtx.drawImage(gradeBuf, 0, 0);
+                    gCtx.restore();
+                }
+
+                // Professional Studio Vignette Falloff
+                const vigLevel = (state.studioVignette !== undefined ? state.studioVignette : 0) / 100;
+                if (vigLevel > 0) {
+                    gCtx.save();
+                    gCtx.globalCompositeOperation = 'multiply';
+                    const vGrad = gCtx.createRadialGradient(
+                        width * 0.5, height * 0.5, width * 0.30,
+                        width * 0.5, height * 0.5, width * 0.72
+                    );
+                    vGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+                    vGrad.addColorStop(0.65, `rgba(220, 220, 225, ${1 - vigLevel * 0.25})`);
+                    vGrad.addColorStop(1, `rgba(18, 22, 35, ${1 - vigLevel * 0.65})`);
+                    gCtx.fillStyle = vGrad;
+                    gCtx.fillRect(0, 0, width, height);
+                    gCtx.restore();
                 }
 
                 targetCtx.drawImage(gradeBuf, 0, 0);
@@ -8124,6 +8258,34 @@
         bindInput('inpOutWidth', 'change', updateDimensionLabels);
         bindInput('inpOutHeight', 'change', updateDimensionLabels);
         bindInput('selExportFormat', 'change', updateDimensionLabels);
+
+        bindInput('btnMasterPolish', 'click', () => {
+            // Apply 1-Click Studio Master Polish (Microstock Certified Auto-Enhance)
+            state.gradDither = 75;
+            state.noiseEnable = true;
+            state.textureType = 'filmgrain';
+            state.noise = 16;
+            state.noiseDensity = 85;
+            state.noiseScale = 90;
+            state.noiseContrast = 5;
+            state.noiseMono = true;
+            state.noiseBlendMode = 'soft-light';
+            const noiseLayer = state.layers ? state.layers.find(l => l.id === 'texture') : null;
+            if (noiseLayer) noiseLayer.visible = true;
+
+            state.gradeSat = 108;
+            state.gradeLum = 100;
+            state.gradeContrast = 106;
+            state.clarity = 25;
+            state.vibrance = 18;
+            state.studioVignette = 15;
+
+            syncUIFromState();
+            renderLayerStackUI();
+            triggerRedraw();
+            pushHistory();
+            showToast('✨ Master Polish Applied', 'Anti-banding smooth dither, micro-contrast & Kodak Portra 35mm grain balanced.');
+        });
 
         bindInput('btnRandomize', 'click', () => {
             const keys = Object.keys(PRESETS);

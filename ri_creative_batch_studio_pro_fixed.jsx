@@ -117,21 +117,152 @@ app.bringToFront();
         ];
 
         var GLASS_STYLE_PRESETS = [
-            "Frosted Glassmorphism (Floating 3D Slab)",
-            "Fluted & Reeded Glass (Vertical Ribs)",
-            "3D Convex Glass Sphere (Crystal Lens)",
-            "Rainbow Prism (Chromatic Dispersion)",
-            "Liquid Wave Glass (Molten Fluid Refraction)",
-            "Beveled Glass Tiles (Facet Prisms)",
-            "Photoshop Frosted Glass Filter",
-            "Photoshop Tiny Lens Glass Filter",
-            "Photoshop Blocks Glass Filter",
-            "Emerald Tinted Glass",
-            "Sapphire Blue Glass",
-            "Amber Gold Glass",
-            "Rose Quartz Glass",
-            "Neon Glow Glass",
-            "Random 3D Glass Style"
+            "Random 3D Glass Style",
+            // 1. Frosted Glass Effects (10 Styles)
+            "1.1 Soft Frosted Glass",
+            "1.2 Heavy Frosted Glass",
+            "1.3 Crystal Frost Glass",
+            "1.4 Milky Frost Glass",
+            "1.5 Matte Frost Glass",
+            "1.6 Satin Frost Glass",
+            "1.7 Hazy Frost Glass",
+            "1.8 Diffused Frost Glass",
+            "1.9 Translucent Frost Glass",
+            "1.10 Gradient Frost Glass",
+            // 2. Ribbed & Textured Glass (10 Styles)
+            "2.1 Vertical Ribbed Glass",
+            "2.2 Horizontal Ribbed Glass",
+            "2.3 Fine Fluted Glass",
+            "2.4 Deep Fluted Glass",
+            "2.5 Micro Reeded Glass",
+            "2.6 Wavy Texture Glass",
+            "2.7 Rippled Glass",
+            "2.8 Hammered Glass",
+            "2.9 Seeded Glass",
+            "2.10 Diamond Texture Glass",
+            // 3. Optical & Prism Glass (10 Styles)
+            "3.1 Rainbow Prism",
+            "3.2 Crystal Refraction",
+            "3.3 Light Dispersion",
+            "3.4 Chromatic Refraction",
+            "3.5 Spectral Glass",
+            "3.6 Optical Distortion",
+            "3.7 Double Prism",
+            "3.8 Micro Prism",
+            "3.9 Iridescent Glass",
+            "3.10 Dichroic Glass",
+            // 4. Liquid Glass Effects (10 Styles)
+            "4.1 Liquid Glass",
+            "4.2 Melted Glass",
+            "4.3 Flowing Glass",
+            "4.4 Glass Wave",
+            "4.5 Glass Blob",
+            "4.6 Glass Bubble",
+            "4.7 Liquid Crystal",
+            "4.8 Glass Ripple",
+            "4.9 Fluid Glass",
+            "4.10 Organic Glass",
+            // 5. 3D Glass Shapes (10 Styles)
+            "5.1 Glass Sphere (3D Ball)",
+            "5.2 Glass Orb",
+            "5.3 Glass Ring",
+            "5.4 Glass Cube",
+            "5.5 Glass Cylinder",
+            "5.6 Glass Ribbon",
+            "5.7 Glass Torus",
+            "5.8 Glass Pyramid",
+            "5.9 Glass Pebble",
+            "5.10 Glass Sculptures",
+            // 6. Light & Glow Glass (10 Styles)
+            "6.1 Luminous Glass",
+            "6.2 Neon Glass",
+            "6.3 Aurora Glass",
+            "6.4 Soft Glow Glass",
+            "6.5 Halo Glass",
+            "6.6 Light Beam Glass",
+            "6.7 Radiant Glass",
+            "6.8 Backlit Glass",
+            "6.9 Edge Glow Glass",
+            "6.10 Ambient Glow Glass",
+            // 7. Modern Abstract Glass (10 Styles)
+            "7.1 Transparent Glass Overlay",
+            "7.2 Layered Glass",
+            "7.3 Floating Glass (Glassmorphism)",
+            "7.4 Glass Panel",
+            "7.5 Glass Sheet",
+            "7.6 Glass Fragment",
+            "7.7 Glass Shard",
+            "7.8 Glass Mosaic",
+            "7.9 Glass Mesh",
+            "7.10 Abstract Glass Flow",
+            // 8. Premium Color Glass (10 Styles)
+            "8.1 Rose Gold Glass",
+            "8.2 Champagne Glass",
+            "8.3 Emerald Glass",
+            "8.4 Sapphire Glass",
+            "8.5 Amethyst Glass",
+            "8.6 Ruby Glass",
+            "8.7 Amber Glass",
+            "8.8 Ocean Blue Glass",
+            "8.9 Aurora Gradient Glass",
+            "8.10 Rainbow Gradient Glass",
+            // Classic Studio Glass (01–56)
+            "01. Micro Square Lens Array",
+            "02. Diagonal Cross-Wave Interference",
+            "03. Flowing Organic S-Curve Fluted",
+            "04. Cross-Grid Crystal",
+            "05. Horizontal Venetian Louver",
+            "06. Concentric Fresnel Lens",
+            "07. Diamond Facet Prism",
+            "08. Hexagonal Honeycomb",
+            "09. Twisted Vortex Glass",
+            "10. Architectural Louver",
+            "11. Classic Reeded Glass",
+            "12. Cathedral Glass",
+            "13. Fine Fluted Glass",
+            "14. Deep Grooved Glass",
+            "15. Soft Ribbed Glass",
+            "16. Sharp Ribbed Glass",
+            "17. Parallel Ribbed Glass",
+            "18. Asymmetric Ribbed Glass",
+            "19. Zigzag Ribbed Glass",
+            "20. Chevron Ribbed Glass",
+            "21. Diamond Ribbed Glass",
+            "22. Geometric Ribbed Glass",
+            "23. Wave Fluted Glass",
+            "24. Ripple Ribbed Glass",
+            "25. 3D Ribbed Glass",
+            "26. Crystal Ribbed Glass",
+            "27. Prism Ribbed Glass",
+            "28. Gradient Ribbed Glass",
+            "29. Iridescent Ribbed Glass",
+            "30. Metallic Ribbed Glass",
+            "31. Liquid Ribbed Glass",
+            "32. Bubble Ribbed Glass",
+            "33. Layered Ribbed Glass",
+            "34. Vertical Gradient Fluted",
+            "35. Double Wave Ribbed",
+            "36. Twisted Ribbed Glass",
+            "37. Sculptural Ribbed Glass",
+            "38. Organic Ribbed Glass",
+            "39. Radial Ribbed Glass",
+            "40. Micro Wave Ribbed Glass",
+            "41. Hexagonal Micro-Lens Array (HD)",
+            "42. Liquid Mercury Ripple Glass (HD)",
+            "43. Diamond Pyramid Facet Grid (HD)",
+            "44. Concentric Fresnel Ripple Glass (HD)",
+            "45. Vortex Spiral Twist Glass (HD)",
+            "46. Cathedral Pebbled Bubble Glass (HD)",
+            "47. Woven Herringbone Basket Glass (HD)",
+            "48. Cellular Voronoi Crystal Glass (HD)",
+            "49. Op-Art Sine Interference Glass (HD)",
+            "50. Kaleidoscope Starburst Prism (HD)",
+            "51. 3D Frosted Glass Pills & Discs (Pro)",
+            "52. 3D Rainbow Prism Bars (Pro)",
+            "53. 3D Liquid Glass Droplets (Pro)",
+            "54. 3D Luminous Ribbed Glass (Pro)",
+            "55. 3D Holographic Glass Spheres (Pro)",
+            "56. 3D Stacked Layered Glass Panes (Pro)"
         ];
 
         var DEFAULT_CONFIG = {
@@ -171,7 +302,7 @@ app.bringToFront();
             noiseFilmGrainOverlay: true,
             // 3D Glass Effect Studio Engine
             glassEnable: false,
-            glassStyle: "Frosted Glassmorphism (Floating 3D Slab)",
+            glassStyle: "Random 3D Glass Style",
             glassScope: "Center 3D Floating Panel", // Center 3D Floating Panel, Full Composition, Left & Right Ribbed Flutes, Outer Border Frame
             glassOpacity: 75,
             glassFrostBlur: 25,
@@ -1058,19 +1189,8 @@ app.bringToFront();
             var h = Math.round(toPx(doc.height));
             var style = cfg.glassStyle || "Frosted Glassmorphism (Floating 3D Slab)";
             if (style === "Random 3D Glass Style") {
-                var pool = [
-                    "Frosted Glassmorphism (Floating 3D Slab)",
-                    "Fluted & Reeded Glass (Vertical Ribs)",
-                    "3D Convex Glass Sphere (Crystal Lens)",
-                    "Rainbow Prism (Chromatic Dispersion)",
-                    "Liquid Wave Glass (Molten Fluid Refraction)",
-                    "Beveled Glass Tiles (Facet Prisms)",
-                    "Photoshop Frosted Glass Filter",
-                    "Emerald Tinted Glass",
-                    "Sapphire Blue Glass",
-                    "Amber Gold Glass"
-                ];
-                style = pool[Math.floor(Math.random() * pool.length)];
+                var pickIdx = Math.floor(Math.random() * (GLASS_STYLE_PRESETS.length - 1)) + 1;
+                style = GLASS_STYLE_PRESETS[pickIdx];
             }
 
             var opacity = Math.max(20, Math.min(100, cfg.glassOpacity || 75));
@@ -1081,7 +1201,7 @@ app.bringToFront();
             var strokeW = Math.max(4, Math.round(w * 0.0035));
 
             try {
-                // Ensure active layer can be duplicated and translated
+                // Ensure active layer is unlocked
                 if (doc.activeLayer && doc.activeLayer.isBackgroundLayer) {
                     try { doc.activeLayer.name = "Layer 0"; } catch (eBg) {}
                 }
@@ -1091,49 +1211,30 @@ app.bringToFront();
                 glassLayer.name = "RI 3D Glass [" + style + "]";
                 doc.activeLayer = glassLayer;
 
-                var isSphere = (style.indexOf("Sphere") !== -1 || style.indexOf("Lens") !== -1);
-                var isFluted = (style.indexOf("Fluted") !== -1 || style.indexOf("Reeded") !== -1);
-                var isRainbow = (style.indexOf("Rainbow") !== -1 || style.indexOf("Prism") !== -1);
-                var isLiquid = (style.indexOf("Liquid") !== -1 || style.indexOf("Wave") !== -1);
-                var isBeveled = (style.indexOf("Beveled") !== -1 || style.indexOf("Facet") !== -1);
+                // Category Detection
+                var isCategory1Frosted = (style.indexOf("1.") === 0 || style.indexOf("Frost") !== -1 || style.indexOf("Matte") !== -1 || style.indexOf("Satin") !== -1 || style.indexOf("Hazy") !== -1 || style.indexOf("Diffused") !== -1 || style.indexOf("Translucent") !== -1 || style.indexOf("51.") === 0);
+                var isCategory3Prism = (style.indexOf("3.") === 0 || style.indexOf("Prism") !== -1 || style.indexOf("Spectral") !== -1 || style.indexOf("Dispersion") !== -1 || style.indexOf("Refraction") !== -1 || style.indexOf("Iridescent") !== -1 || style.indexOf("Dichroic") !== -1 || style.indexOf("52.") === 0);
+                var isCategory4Liquid = (style.indexOf("4.") === 0 || style.indexOf("Liquid") !== -1 || style.indexOf("Melted") !== -1 || style.indexOf("Flowing") !== -1 || style.indexOf("Wave") !== -1 || style.indexOf("Blob") !== -1 || style.indexOf("Bubble") !== -1 || style.indexOf("Droplet") !== -1 || style.indexOf("Fluid") !== -1 || style.indexOf("53.") === 0);
+                var isCategory5Shapes = (style.indexOf("5.") === 0 || style.indexOf("Sphere") !== -1 || style.indexOf("Orb") !== -1 || style.indexOf("Ring") !== -1 || style.indexOf("Cube") !== -1 || style.indexOf("Cylinder") !== -1 || style.indexOf("Pyramid") !== -1 || style.indexOf("Torus") !== -1 || style.indexOf("Pebble") !== -1 || style.indexOf("55.") === 0);
+                var isCategory6Glow = (style.indexOf("6.") === 0 || style.indexOf("Luminous") !== -1 || style.indexOf("Neon") !== -1 || style.indexOf("Aurora") !== -1 || style.indexOf("Glow") !== -1 || style.indexOf("Halo") !== -1 || style.indexOf("Beam") !== -1 || style.indexOf("Radiant") !== -1 || style.indexOf("Backlit") !== -1 || style.indexOf("54.") === 0);
+                var isCategory7Abstract = (style.indexOf("7.") === 0 || style.indexOf("Fragment") !== -1 || style.indexOf("Shard") !== -1 || style.indexOf("Mosaic") !== -1 || style.indexOf("Mesh") !== -1 || style.indexOf("Sheet") !== -1 || style.indexOf("Overlay") !== -1 || style.indexOf("56.") === 0);
+                var isCategory8Color = (style.indexOf("8.") === 0 || style.indexOf("Rose Gold") !== -1 || style.indexOf("Champagne") !== -1 || style.indexOf("Emerald") !== -1 || style.indexOf("Sapphire") !== -1 || style.indexOf("Amethyst") !== -1 || style.indexOf("Ruby") !== -1 || style.indexOf("Amber") !== -1 || style.indexOf("Ocean Blue") !== -1);
+                var isSphere = (style.indexOf("Sphere") !== -1 || style.indexOf("Orb") !== -1 || style.indexOf("5.1") === 0 || style.indexOf("5.2") === 0 || style.indexOf("55.") === 0);
 
-                if (isFluted) {
-                    // Architectural Fluted / Reeded Cylindrical Ribs
-                    glassLayer.applyMotionBlur(90, Math.round(distortion * 1.8));
-                    try {
-                        glassLayer.applyZigZag(Math.round(distortion * 0.3), 12, ZigZagType.AROUNDCENTER);
-                    } catch (eZ1) {}
-                    glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.3));
+                if (isCategory1Frosted) {
+                    // Category 1: Frosted Glass Effects (10 Styles + 51.)
+                    var fBlur = frostBlur;
+                    if (style.indexOf("Soft") !== -1) fBlur = Math.round(frostBlur * 0.7);
+                    else if (style.indexOf("Heavy") !== -1) fBlur = Math.round(frostBlur * 1.8);
+                    else if (style.indexOf("Crystal") !== -1) fBlur = Math.round(frostBlur * 0.9);
+                    else if (style.indexOf("Milky") !== -1) fBlur = Math.round(frostBlur * 1.3);
+
+                    glassLayer.applyGaussianBlur(Math.max(2, fBlur));
+                    applyAddNoiseFilter(doc, 4, "Gaussian", true);
                     glassLayer.opacity = opacity;
 
-                    // Generate authentic vertical cylindrical optical rib lines
-                    try {
-                        var ribLayer = doc.artLayers.add();
-                        ribLayer.name = "RI Fluted Cylindrical Specular Ribs";
-                        var numFlutes = 28;
-                        var fluteWidth = w / numFlutes;
-                        var whiteCol = new SolidColor();
-                        whiteCol.rgb.red = 255; whiteCol.rgb.green = 255; whiteCol.rgb.blue = 255;
-                        var blackCol = new SolidColor();
-                        blackCol.rgb.red = 0; blackCol.rgb.green = 0; blackCol.rgb.blue = 0;
-
-                        for (var fl = 0; fl < numFlutes; fl++) {
-                            var flX = Math.round(fl * fluteWidth);
-                            // Highlight specular crest
-                            doc.selection.select([[flX, 0], [flX + Math.max(2, Math.round(fluteWidth * 0.2)), 0], [flX + Math.max(2, Math.round(fluteWidth * 0.2)), h], [flX, h]]);
-                            doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 40, false);
-                            // Shadow trough
-                            var trX = Math.round(flX + fluteWidth * 0.7);
-                            doc.selection.select([[trX, 0], [trX + Math.max(2, Math.round(fluteWidth * 0.2)), 0], [trX + Math.max(2, Math.round(fluteWidth * 0.2)), h], [trX, h]]);
-                            doc.selection.fill(blackCol, ColorBlendMode.NORMAL, 30, false);
-                        }
-                        doc.selection.deselect();
-                        ribLayer.blendMode = BlendMode.OVERLAY;
-                        ribLayer.opacity = 70;
-                    } catch (fluteErr) {}
-
                 } else if (isSphere) {
-                    // 3D Convex Glass Crystal Sphere
+                    // Category 5: 3D Convex Glass Crystal Sphere / Orb
                     var radius = Math.round(Math.min(w, h) * 0.32);
                     var cx = Math.round(w / 2);
                     var cy = Math.round(h / 2);
@@ -1187,14 +1288,14 @@ app.bringToFront();
                         } catch (glareErr) {}
                     }
 
-                } else if (isRainbow) {
-                    // Optical Rainbow Prism with Spectral Dispersion Bands
+                } else if (isCategory3Prism) {
+                    // Category 3: Optical & Prism Glass (Rainbow Dispersion & Spectral Refraction)
                     glassLayer.applyMotionBlur(0, Math.round(distortion * 1.8));
                     glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.35));
                     glassLayer.blendMode = BlendMode.SCREEN;
                     glassLayer.opacity = Math.round(opacity * 0.85);
 
-                    // Add authentic 7-color chromatic dispersion bands
+                    // Add authentic 7-color chromatic dispersion spectrum bands
                     try {
                         var prismLayer = doc.artLayers.add();
                         prismLayer.name = "RI Chromatic Dispersion [Rainbow Spectrum]";
@@ -1208,7 +1309,7 @@ app.bringToFront();
                             [175, 55, 255]   // Violet
                         ];
                         var bandH = Math.round(h / (rainbowColors.length * 2));
-                        var startY = Math.round(h * 0.25);
+                        var startY = Math.round(h * 0.22);
                         for (var rb = 0; rb < rainbowColors.length; rb++) {
                             var rCol = new SolidColor();
                             rCol.rgb.red = rainbowColors[rb][0];
@@ -1221,11 +1322,11 @@ app.bringToFront();
                         }
                         doc.selection.deselect();
                         prismLayer.blendMode = BlendMode.COLORBLEND;
-                        prismLayer.opacity = 45;
+                        prismLayer.opacity = 50;
                     } catch (prismErr) {}
 
-                } else if (isLiquid) {
-                    // Liquid Wave Glass (Molten Fluid Refraction)
+                } else if (isCategory4Liquid) {
+                    // Category 4: Liquid Glass Effects (Molten Fluid, Waves & Droplets)
                     try {
                         glassLayer.applyTwirl(Math.round((distortion * 0.9) + 40));
                         glassLayer.applyZigZag(Math.round(distortion * 0.6), 6, ZigZagType.AROUNDCENTER);
@@ -1233,37 +1334,86 @@ app.bringToFront();
                     glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.4));
                     glassLayer.opacity = opacity;
 
-                } else if (isBeveled) {
-                    // Beveled Glass Facets
+                } else if (isCategory6Glow) {
+                    // Category 6: Light & Glow Glass (Neon, Luminous & Backlit)
+                    glassLayer.applyGaussianBlur(Math.max(2, frostBlur * 0.8));
+                    glassLayer.opacity = opacity;
+                    try {
+                        var glowLayer = doc.artLayers.add();
+                        glowLayer.name = "RI 3D Luminous Specular Glow";
+                        var glowCol = new SolidColor();
+                        if (style.indexOf("Neon") !== -1) { glowCol.rgb.red = 30; glowCol.rgb.green = 220; glowCol.rgb.blue = 255; }
+                        else if (style.indexOf("Aurora") !== -1) { glowCol.rgb.red = 140; glowCol.rgb.green = 255; glowCol.rgb.blue = 170; }
+                        else { glowCol.rgb.red = 255; glowCol.rgb.green = 235; glowCol.rgb.blue = 190; }
+
+                        doc.selection.selectAll();
+                        doc.selection.stroke(glowCol, Math.max(12, Math.round(w * 0.008)), StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
+                        doc.selection.deselect();
+                        glowLayer.blendMode = BlendMode.SCREEN;
+                        glowLayer.opacity = 80;
+                    } catch (glwErr) {}
+
+                } else if (isCategory7Abstract) {
+                    // Category 7: Modern Abstract Glass (Fragments, Mesh & Mosaic)
                     try {
                         glassLayer.applyZigZag(Math.round(distortion * 0.7), 8, ZigZagType.PONDRIPPLES);
-                    } catch (eBv) {}
+                    } catch (eAbs) {}
                     glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.45));
                     glassLayer.opacity = opacity;
 
                 } else {
-                    // Modern Frosted Glassmorphism & Native Filter
-                    var filterApplied = false;
-                    try {
-                        var idGls = charIDToTypeID("Gls ");
-                        var desc = new ActionDescriptor();
-                        desc.putInteger(charIDToTypeID("Dstr"), Math.min(20, Math.max(1, Math.round(distortion / 4))));
-                        desc.putInteger(charIDToTypeID("Smth"), Math.min(15, Math.max(1, Math.round(frostBlur / 2.5))));
-                        var txtrID = charIDToTypeID("Frst");
-                        if (style.indexOf("Tiny Lens") !== -1) txtrID = charIDToTypeID("Lnsq");
-                        else if (style.indexOf("Blocks") !== -1) txtrID = charIDToTypeID("Blck");
-                        desc.putEnumerated(charIDToTypeID("Txtr"), charIDToTypeID("TxtT"), txtrID);
-                        desc.putUnitDouble(charIDToTypeID("Scl "), charIDToTypeID("#Prc"), 100);
-                        desc.putBoolean(charIDToTypeID("Invr"), false);
-                        executeAction(idGls, desc, DIALOG_NO);
-                        filterApplied = true;
-                    } catch (glsErr) {}
+                    // Category 2: Ribbed, Fluted & Textured Glass (Vertical, Horizontal, Wavy & Cross-Grid)
+                    var isHoriz = (style.indexOf("Horizontal") !== -1 || style.indexOf("Venetian") !== -1 || style.indexOf("05.") !== -1 || style.indexOf("10.") !== -1);
+                    var isWavy = (style.indexOf("Wavy") !== -1 || style.indexOf("Ripple") !== -1 || style.indexOf("S-Curve") !== -1 || style.indexOf("Chevron") !== -1 || style.indexOf("Zigzag") !== -1 || style.indexOf("02.") !== -1 || style.indexOf("03.") !== -1 || style.indexOf("19.") !== -1 || style.indexOf("20.") !== -1 || style.indexOf("23.") !== -1 || style.indexOf("24.") !== -1 || style.indexOf("35.") !== -1);
 
-                    if (!filterApplied) {
-                        glassLayer.applyGaussianBlur(frostBlur);
-                        applyAddNoiseFilter(doc, 4, "Gaussian", true);
+                    if (isHoriz) {
+                        glassLayer.applyMotionBlur(0, Math.round(distortion * 1.6));
+                    } else if (isWavy) {
+                        glassLayer.applyMotionBlur(90, Math.round(distortion * 1.5));
+                        try { glassLayer.applyZigZag(Math.round(distortion * 0.4), 8, ZigZagType.AROUNDCENTER); } catch (eZg) {}
+                    } else {
+                        glassLayer.applyMotionBlur(90, Math.round(distortion * 1.8));
                     }
+
+                    glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.3));
                     glassLayer.opacity = opacity;
+
+                    // Generate authentic optical cylindrical rib lines
+                    try {
+                        var ribLayer = doc.artLayers.add();
+                        ribLayer.name = "RI Optical Specular Flutes & Ribs";
+                        var numFlutes = 28;
+                        var fluteWidth = w / numFlutes;
+                        var whiteCol = new SolidColor();
+                        whiteCol.rgb.red = 255; whiteCol.rgb.green = 255; whiteCol.rgb.blue = 255;
+                        var blackCol = new SolidColor();
+                        blackCol.rgb.red = 0; blackCol.rgb.green = 0; blackCol.rgb.blue = 0;
+
+                        if (isHoriz) {
+                            var numSlats = 20;
+                            var slatH = h / numSlats;
+                            for (var sl = 0; sl < numSlats; sl++) {
+                                var slY = Math.round(sl * slatH);
+                                doc.selection.select([[0, slY], [w, slY], [w, slY + Math.max(2, Math.round(slatH * 0.2))], [0, slY + Math.max(2, Math.round(slatH * 0.2))]]);
+                                doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 40, false);
+                                var trY = Math.round(slY + slatH * 0.7);
+                                doc.selection.select([[0, trY], [w, trY], [w, trY + Math.max(2, Math.round(slatH * 0.2))], [0, trY + Math.max(2, Math.round(slatH * 0.2))]]);
+                                doc.selection.fill(blackCol, ColorBlendMode.NORMAL, 30, false);
+                            }
+                        } else {
+                            for (var fl = 0; fl < numFlutes; fl++) {
+                                var flX = Math.round(fl * fluteWidth);
+                                doc.selection.select([[flX, 0], [flX + Math.max(2, Math.round(fluteWidth * 0.2)), 0], [flX + Math.max(2, Math.round(fluteWidth * 0.2)), h], [flX, h]]);
+                                doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 40, false);
+                                var trX = Math.round(flX + fluteWidth * 0.7);
+                                doc.selection.select([[trX, 0], [trX + Math.max(2, Math.round(fluteWidth * 0.2)), 0], [trX + Math.max(2, Math.round(fluteWidth * 0.2)), h], [trX, h]]);
+                                doc.selection.fill(blackCol, ColorBlendMode.NORMAL, 30, false);
+                            }
+                        }
+                        doc.selection.deselect();
+                        ribLayer.blendMode = BlendMode.OVERLAY;
+                        ribLayer.opacity = 70;
+                    } catch (fluteErr) {}
                 }
 
                 // 2. Apply Scope: Center 3D Floating Panel, Outer Border, or Left/Right Flutes
@@ -1291,7 +1441,6 @@ app.bringToFront();
 
                     // B. Cut out the glass slab
                     doc.activeLayer = glassLayer;
-                    // Slightly translate for refractive displacement
                     safeTranslateLayer(glassLayer, Math.round(w * 0.004), Math.round(h * -0.004));
                     doc.selection.select([[insetX, insetY], [w - insetX, insetY], [w - insetX, h - insetY], [insetX, h - insetY]]);
                     doc.selection.invert();
@@ -1348,33 +1497,42 @@ app.bringToFront();
                     }
                 }
 
-                // 3. Apply Professional Glass Tint Color Layer
-                if (tintColor !== "Clear Transparent" || style.indexOf("Tint") !== -1 || style.indexOf("Emerald") !== -1 || style.indexOf("Sapphire") !== -1 || style.indexOf("Amber") !== -1 || style.indexOf("Rose") !== -1 || style.indexOf("Neon") !== -1) {
+                // 3. Apply Professional Glass Tint Color Layer (Category 8 or Dropdown Tint)
+                var activeTint = tintColor;
+                if (activeTint === "Clear Transparent") {
+                    if (style.indexOf("Rose Gold") !== -1 || style.indexOf("8.1") !== -1) activeTint = "Rose Gold";
+                    else if (style.indexOf("Champagne") !== -1 || style.indexOf("8.2") !== -1) activeTint = "Champagne Gold";
+                    else if (style.indexOf("Emerald") !== -1 || style.indexOf("8.3") !== -1) activeTint = "Emerald Green";
+                    else if (style.indexOf("Sapphire") !== -1 || style.indexOf("8.4") !== -1) activeTint = "Sapphire Blue";
+                    else if (style.indexOf("Amethyst") !== -1 || style.indexOf("8.5") !== -1) activeTint = "Amethyst Violet";
+                    else if (style.indexOf("Ruby") !== -1 || style.indexOf("8.6") !== -1) activeTint = "Ruby Red";
+                    else if (style.indexOf("Amber") !== -1 || style.indexOf("8.7") !== -1) activeTint = "Amber Gold";
+                    else if (style.indexOf("Ocean Blue") !== -1 || style.indexOf("8.8") !== -1) activeTint = "Ocean Blue";
+                }
+
+                if (activeTint !== "Clear Transparent") {
                     try {
                         var tintLayer = doc.artLayers.add();
-                        tintLayer.name = "RI 3D Glass Tint [" + tintColor + "]";
+                        tintLayer.name = "RI 3D Glass Tint [" + activeTint + "]";
                         var tintCol = new SolidColor();
 
-                        if (tintColor.indexOf("Emerald") !== -1 || style.indexOf("Emerald") !== -1) {
-                            tintCol.rgb.red = 24; tintCol.rgb.green = 185; tintCol.rgb.blue = 142;
-                        } else if (tintColor.indexOf("Sapphire") !== -1 || style.indexOf("Sapphire") !== -1) {
-                            tintCol.rgb.red = 28; tintCol.rgb.green = 112; tintCol.rgb.blue = 224;
-                        } else if (tintColor.indexOf("Amber") !== -1 || style.indexOf("Amber") !== -1) {
-                            tintCol.rgb.red = 236; tintCol.rgb.green = 162; tintCol.rgb.blue = 44;
-                        } else if (tintColor.indexOf("Rose") !== -1 || style.indexOf("Rose") !== -1) {
-                            tintCol.rgb.red = 232; tintCol.rgb.green = 124; tintCol.rgb.blue = 168;
-                        } else if (tintColor.indexOf("Neon") !== -1 || style.indexOf("Neon") !== -1) {
-                            tintCol.rgb.red = 148; tintCol.rgb.green = 62; tintCol.rgb.blue = 248;
-                        } else {
-                            tintCol.rgb.red = 180; tintCol.rgb.green = 210; tintCol.rgb.blue = 235;
-                        }
+                        if (activeTint.indexOf("Rose Gold") !== -1) { tintCol.rgb.red = 235; tintCol.rgb.green = 145; tintCol.rgb.blue = 155; }
+                        else if (activeTint.indexOf("Champagne") !== -1) { tintCol.rgb.red = 245; tintCol.rgb.green = 215; tintCol.rgb.blue = 160; }
+                        else if (activeTint.indexOf("Emerald") !== -1) { tintCol.rgb.red = 24; tintCol.rgb.green = 185; tintCol.rgb.blue = 142; }
+                        else if (activeTint.indexOf("Sapphire") !== -1) { tintCol.rgb.red = 28; tintCol.rgb.green = 112; tintCol.rgb.blue = 224; }
+                        else if (activeTint.indexOf("Amethyst") !== -1) { tintCol.rgb.red = 155; tintCol.rgb.green = 60; tintCol.rgb.blue = 220; }
+                        else if (activeTint.indexOf("Ruby") !== -1) { tintCol.rgb.red = 225; tintCol.rgb.green = 35; tintCol.rgb.blue = 65; }
+                        else if (activeTint.indexOf("Amber") !== -1) { tintCol.rgb.red = 240; tintCol.rgb.green = 160; tintCol.rgb.blue = 40; }
+                        else if (activeTint.indexOf("Ocean Blue") !== -1) { tintCol.rgb.red = 20; tintCol.rgb.green = 160; tintCol.rgb.blue = 230; }
+                        else if (activeTint.indexOf("Cyberpunk") !== -1 || activeTint.indexOf("Neon") !== -1) { tintCol.rgb.red = 155; tintCol.rgb.green = 50; tintCol.rgb.blue = 255; }
+                        else { tintCol.rgb.red = 180; tintCol.rgb.green = 210; tintCol.rgb.blue = 235; }
 
                         doc.selection.selectAll();
                         doc.selection.fill(tintCol, ColorBlendMode.NORMAL, 100, false);
                         doc.selection.deselect();
 
                         tintLayer.blendMode = BlendMode.COLORBLEND;
-                        tintLayer.opacity = 30;
+                        tintLayer.opacity = 32;
                     } catch (tintErr) {}
                 }
 
@@ -2555,15 +2713,14 @@ app.bringToFront();
             var chkGlassBevel = glassRow3.add("checkbox", undefined, "3D Bevel & Specular Rim");
             chkGlassBevel.value = DEFAULT_CONFIG.glassBevelRim;
 
-            var glassInfoPanel = tabGlass.add("panel", undefined, "3D Glass Characteristics");
+            var glassInfoPanel = tabGlass.add("panel", undefined, "3D Glass Engine (136 Studio Presets)");
             glassInfoPanel.orientation = "column";
             glassInfoPanel.alignChildren = ["fill", "top"];
             glassInfoPanel.spacing = 2;
             glassInfoPanel.margins = 6;
-            glassInfoPanel.add("statictext", undefined, "• Frosted Glassmorphism: Smooth Gaussian depth blur + micro-surface noise.");
-            glassInfoPanel.add("statictext", undefined, "• Fluted / Reeded Glass: Cylindrical vertical optical lenses with wave refraction.");
-            glassInfoPanel.add("statictext", undefined, "• 3D Convex Sphere: Spherical optical distortion + specular glare reflection.");
-            glassInfoPanel.add("statictext", undefined, "• Rainbow Prism: Chromatic horizontal aberration dispersion effect.");
+            glassInfoPanel.add("statictext", undefined, "• 136 Glass Styles: 8 Pro Categories (Frosted, Ribbed, Prism, Liquid, 3D Shapes, Glow, Abstract, Color) + 56 Classics.");
+            glassInfoPanel.add("statictext", undefined, "• 3D Floating Slab: Layered glass with real drop shadow, bevel rim & diagonal reflection sheen.");
+            glassInfoPanel.add("statictext", undefined, "• Authentic Optics: Cylindrical flutes, 3D crystal spheres, chromatic dispersion & liquid refractions.");
 
             // --------------------------------------------------------------------
             // TAB 4: CREATIVE GRADIENT, LIGHTING & LIQUIFY
@@ -2775,7 +2932,7 @@ app.bringToFront();
 
                 // 3D Glass Studio Sync
                 config.glassEnable = chkGlassEnable.value;
-                config.glassStyle = ddGlassStyle.selection ? ddGlassStyle.selection.text : "Frosted Glassmorphism (Floating 3D Slab)";
+                config.glassStyle = ddGlassStyle.selection ? ddGlassStyle.selection.text : "Random 3D Glass Style";
                 config.glassScope = ddGlassScope.selection ? ddGlassScope.selection.text : "Center 3D Floating Panel";
                 config.glassTintColor = ddGlassTint.selection ? ddGlassTint.selection.text : "Clear Transparent";
                 config.glassOpacity = parseIntSafe(inpGlassOpacity.text, 75, 10, 100);

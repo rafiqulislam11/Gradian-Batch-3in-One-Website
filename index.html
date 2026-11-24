@@ -14699,6 +14699,51 @@
         bindInput('btnFlowDownloadJpg', 'click', () => exportFlowImage('jpg'));
         bindInput('btnFlowDownload4K', 'click', () => exportFlowImage('png', { width: 3840, height: 2160 }));
 
+        bindInput('btnFlowDownloadSvg', 'click', () => {
+            const dims = getFlowExportDimensions();
+            const expCanvas = document.createElement('canvas');
+            expCanvas.width = dims.width;
+            expCanvas.height = dims.height;
+            const expCtx = expCanvas.getContext('2d');
+            const pDef = FLOW_PRESETS[state.flowStyle] || FLOW_PRESETS.flow_1;
+            renderAbstract3DFlowPattern(expCtx, dims.width, dims.height, getFlowPatternOptions(state));
+            const safeName = pDef.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+            const svgBlob = generateVectorSvgBlob(dims.width, dims.height, expCanvas);
+            disposeCanvas(expCanvas);
+            triggerActualBlobDownload(svgBlob, `RI_3DFlow_${safeName}_${dims.width}x${dims.height}_${Date.now()}.svg`);
+            showToast('📐 Flow SVG Exported', `${dims.width}×${dims.height} SVG vector downloaded.`);
+        });
+
+        bindInput('btnFlowDownloadEps', 'click', () => {
+            const dims = getFlowExportDimensions();
+            const expCanvas = document.createElement('canvas');
+            expCanvas.width = dims.width;
+            expCanvas.height = dims.height;
+            const expCtx = expCanvas.getContext('2d');
+            const pDef = FLOW_PRESETS[state.flowStyle] || FLOW_PRESETS.flow_1;
+            renderAbstract3DFlowPattern(expCtx, dims.width, dims.height, getFlowPatternOptions(state));
+            const safeName = pDef.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+            const epsBlob = generateEPS10Blob(dims.width, dims.height, expCanvas, state.exportDpi || 300);
+            disposeCanvas(expCanvas);
+            triggerActualBlobDownload(epsBlob, `RI_3DFlow_${safeName}_${dims.width}x${dims.height}_${Date.now()}.eps`);
+            showToast('📦 Flow EPS 10 Exported', `${dims.width}×${dims.height} Microstock EPS downloaded.`);
+        });
+
+        bindInput('btnFlowDownloadPsd', 'click', () => {
+            const dims = getFlowExportDimensions();
+            const expCanvas = document.createElement('canvas');
+            expCanvas.width = dims.width;
+            expCanvas.height = dims.height;
+            const expCtx = expCanvas.getContext('2d');
+            const pDef = FLOW_PRESETS[state.flowStyle] || FLOW_PRESETS.flow_1;
+            renderAbstract3DFlowPattern(expCtx, dims.width, dims.height, getFlowPatternOptions(state));
+            const safeName = pDef.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+            const psdBlob = generateLayeredPsdBlob(dims.width, dims.height, expCanvas, state.exportDpi || 300);
+            disposeCanvas(expCanvas);
+            triggerActualBlobDownload(psdBlob, `RI_3DFlow_${safeName}_${dims.width}x${dims.height}_${Date.now()}.psd`);
+            showToast('🎨 Flow PSD Exported', `${dims.width}×${dims.height} Adobe Photoshop PSD downloaded.`);
+        });
+
         // Bulk Variations ZIP Generator
         bindInput('btnFlowBulkGenerate', 'click', async () => {
             if (typeof JSZip === 'undefined') {
@@ -15921,14 +15966,35 @@ ${glassSvg}
         // MICROSTOCK VECTOR EPS 10 EXPORTER (SHUTTERSTOCK, FREEPIK, ADOBE STOCK STANDARD)
         // ============================================================================
         function generateEPS10Blob(width, height, targetCanvas, dpi = 300) {
+            // Microstock Compliance Gate: EPS 10 file size on Shutterstock/Freepik/Adobe Stock must be strictly <= 25 MB.
+            // ASCIIHex EPS uses 6 bytes per pixel. Max pixels for safe ~15 MB EPS is 2.5 Megapixels.
+            const maxEpsPixels = 2500000;
+            let sampleW = width;
+            let sampleH = height;
+            if (sampleW * sampleH > maxEpsPixels) {
+                const ratio = Math.sqrt(maxEpsPixels / (sampleW * sampleH));
+                sampleW = Math.round(sampleW * ratio);
+                sampleH = Math.round(sampleH * ratio);
+            }
+
             let offCanvas = targetCanvas;
             let needDispose = false;
             if (!offCanvas) {
                 offCanvas = document.createElement('canvas');
-                offCanvas.width = width;
-                offCanvas.height = height;
+                offCanvas.width = sampleW;
+                offCanvas.height = sampleH;
                 const oCtx = offCanvas.getContext('2d');
-                renderScene(oCtx, width, height, previewTripletImages, true);
+                renderScene(oCtx, sampleW, sampleH, previewTripletImages, true);
+                needDispose = true;
+            } else if (offCanvas.width !== sampleW || offCanvas.height !== sampleH) {
+                const scaledCanvas = document.createElement('canvas');
+                scaledCanvas.width = sampleW;
+                scaledCanvas.height = sampleH;
+                const sCtx = scaledCanvas.getContext('2d');
+                sCtx.imageSmoothingEnabled = true;
+                sCtx.imageSmoothingQuality = 'high';
+                sCtx.drawImage(offCanvas, 0, 0, sampleW, sampleH);
+                offCanvas = scaledCanvas;
                 needDispose = true;
             }
 
@@ -15954,8 +16020,8 @@ ${glassSvg}
 gsave
 0 0 translate
 ${ptWidth} ${ptHeight} scale
-${width} ${height} 8
-[${width} 0 0 -${height} 0 ${height}]
+${sampleW} ${sampleH} 8
+[${sampleW} 0 0 -${sampleH} 0 ${sampleH}]
 currentfile /ASCIIHexDecode filter
 false 3 colorimage
 `;
@@ -15963,9 +16029,9 @@ false 3 colorimage
             const trailerStr = '\n>\ngrestore\nshowpage\n%%Trailer\n%%EOF\n';
 
             const ctx = offCanvas.getContext('2d');
-            const imgData = ctx.getImageData(0, 0, width, height);
+            const imgData = ctx.getImageData(0, 0, sampleW, sampleH);
             const rgba = imgData.data;
-            const numPixels = width * height;
+            const numPixels = sampleW * sampleH;
 
             const hexLookup = [];
             const chars = '0123456789ABCDEF';
@@ -18126,8 +18192,18 @@ false 3 colorimage
             });
             bindInput('liqBtnResetMeshPins', 'click', () => {
                 if (LiquifyStudioPro.engine) {
-                    LiquifyStudioPro.initMeshPins(LiquifyStudioPro.engine.width, LiquifyStudioPro.engine.height, LiquifyStudioPro.meshDensity);
+                    LiquifyStudioPro.initMeshPins(LiquifyStudioPro.engine.width, LiquifyStudioPro.engine.height, LiquifyStudioPro.meshDensity || 8);
                     LiquifyStudioPro.render();
+                }
+            });
+            bindInput('liqBtnSubdivideMesh', 'click', () => {
+                if (LiquifyStudioPro.engine) {
+                    const currentDensity = LiquifyStudioPro.meshDensity || 8;
+                    const newDensity = Math.min(32, Math.round(currentDensity * 1.5));
+                    LiquifyStudioPro.meshDensity = newDensity;
+                    LiquifyStudioPro.initMeshPins(LiquifyStudioPro.engine.width, LiquifyStudioPro.engine.height, newDensity);
+                    LiquifyStudioPro.render();
+                    showToast('Mesh Subdivided', `Mesh density increased to ${newDensity}×${newDensity}.`);
                 }
             });
 

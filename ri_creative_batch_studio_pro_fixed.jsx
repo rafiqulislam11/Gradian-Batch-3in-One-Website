@@ -1,8 +1,8 @@
 /**
  * ============================================================================
  * RI CREATIVE — BATCH BACKGROUND PROCESSING STUDIO PRO
- * Version: 2.7.0 (Universal CS2 - CC 2026 Ultra High Quality Edition)
- * Target: Adobe Photoshop CS2 (9.0), CS3, CS4, CS5, CS6, CC 2014 - CC 2026 (Windows & macOS)
+ * Version: 2.8.0 (Adobe Photoshop CS2 v9.0.2 Dedicated & Universal Edition)
+ * Target: Adobe Photoshop CS2 (9.0 / 9.0.2), CS3, CS4, CS5, CS6, CC 2014 - CC 2026 (Windows & macOS)
  * Developed by: RI Creative Studio & AI Engineering Team
  * ============================================================================
  */
@@ -66,9 +66,17 @@ app.bringToFront();
         // 1. GLOBAL CONSTANTS & DEFAULT CONFIGURATION
         // ========================================================================
         var SCRIPT_TITLE = "RI CREATIVE — BATCH BACKGROUND STUDIO PRO";
-        var SCRIPT_VERSION = "2.7.0";
+        var SCRIPT_VERSION = "2.8.0";
         var MAX_ALLOWED_BATCH = 1000;
         var SUPPORTED_EXTENSIONS = /\.(jpg|jpeg|png|tif|tiff|psd|bmp|webp)$/i;
+
+        var PS_VERSION = (typeof app !== "undefined" && app.version) ? String(app.version) : "9.0.2";
+        var IS_CS2 = (PS_VERSION.indexOf("9.") === 0);
+        var DO_NOT_SAVE = (typeof SaveOptions !== "undefined" && DO_NOT_SAVE) ? DO_NOT_SAVE : 2;
+        var PLACE_TOP = (typeof ElementPlacement !== "undefined" && PLACE_TOP) ? PLACE_TOP : 1;
+        var DIALOG_NO = (typeof DialogModes !== "undefined" && DIALOG_NO) ? DIALOG_NO : 3;
+        var UNITS_PX = (typeof Units !== "undefined" && UNITS_PX) ? UNITS_PX : 1;
+
 
         var RESOLUTION_PRESETS = [
             { label: "4000 × 2000 (Standard Stock 2:1)", width: 4000, height: 2000 },
@@ -415,6 +423,43 @@ app.bringToFront();
             throw new Error("Exceeded maximum sequential filename limit.");
         }
 
+        
+        function openFileDialogSafe(promptText, multiSelect) {
+            var picked = null;
+            var isWin = ($.os.indexOf("Windows") !== -1);
+            if (isWin) {
+                try {
+                    picked = File.openDialog(promptText, "*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.psd;*.bmp", multiSelect);
+                } catch (e1) {
+                    try {
+                        picked = File.openDialog(promptText, "Images:*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.psd;*.bmp", multiSelect);
+                    } catch (e2) {
+                        try {
+                            picked = File.openDialog(promptText, "*.*", multiSelect);
+                        } catch (e3) {
+                            picked = File.openDialog(promptText);
+                        }
+                    }
+                }
+            } else {
+                try {
+                    picked = File.openDialog(promptText, function (f) {
+                        return (f instanceof Folder) || SUPPORTED_EXTENSIONS.test(f.name);
+                    }, multiSelect);
+                } catch (eMac) {
+                    try {
+                        picked = File.openDialog(promptText, "*", multiSelect);
+                    } catch (eMac2) {
+                        picked = File.openDialog(promptText);
+                    }
+                }
+            }
+            if (picked && !(picked instanceof Array)) {
+                picked = [picked];
+            }
+            return picked;
+        }
+
         function scanSourceFolder(folderPath) {
             var folder = new Folder(folderPath);
             if (!folder.exists) {
@@ -552,7 +597,7 @@ app.bringToFront();
                 descElps.putUnitDouble(charIDToTypeID("Rght"), charIDToTypeID("#Pxl"), right);
                 desc.putObject(idT, charIDToTypeID("Elps"), descElps);
                 desc.putBoolean(charIDToTypeID("AntA"), true);
-                executeAction(idsetd, desc, DialogModes.NO);
+                executeAction(idsetd, desc, DIALOG_NO);
             } catch (e) {
                 try {
                     var cx = (left + right) / 2;
@@ -596,7 +641,7 @@ app.bringToFront();
                     var idImgS = charIDToTypeID("ImgS");
                     var desc = new ActionDescriptor();
                     desc.putUnitDouble(charIDToTypeID("Rslt"), charIDToTypeID("#Rsl"), 300);
-                    executeAction(idImgS, desc, DialogModes.NO);
+                    executeAction(idImgS, desc, DIALOG_NO);
                 } catch (amErr) {}
             }
         }
@@ -650,7 +695,7 @@ app.bringToFront();
             } catch (e) {
                 try {
                     var idAvrg = charIDToTypeID("Avrg");
-                    executeAction(idAvrg, undefined, DialogModes.NO);
+                    executeAction(idAvrg, undefined, DIALOG_NO);
                 } catch (e2) {}
             }
         }
@@ -672,7 +717,7 @@ app.bringToFront();
                 var idBxBl = stringIDToTypeID("boxBlur");
                 var desc = new ActionDescriptor();
                 desc.putUnitDouble(charIDToTypeID("Rds "), charIDToTypeID("#Pxl"), radius);
-                executeAction(idBxBl, desc, DialogModes.NO);
+                executeAction(idBxBl, desc, DIALOG_NO);
             } catch (e) {
                 doc.activeLayer.applyGaussianBlur(radius);
             }
@@ -690,7 +735,7 @@ app.bringToFront();
                 var desc = new ActionDescriptor();
                 desc.putInteger(charIDToTypeID("Rds "), Math.round(radius));
                 desc.putInteger(charIDToTypeID("SpcT"), Math.round(specularThreshold || 250));
-                executeAction(idlensBlur, desc, DialogModes.NO);
+                executeAction(idlensBlur, desc, DIALOG_NO);
             } catch (e) {
                 doc.activeLayer.applyGaussianBlur(radius);
             }
@@ -709,7 +754,7 @@ app.bringToFront();
                 desc.putInteger(charIDToTypeID("Amnt"), Math.min(100, Math.max(1, Math.round(amount))));
                 desc.putEnumerated(charIDToTypeID("Mthd"), charIDToTypeID("Mthd"), (method === "Zoom") ? charIDToTypeID("Zm  ") : charIDToTypeID("Spn "));
                 desc.putEnumerated(charIDToTypeID("Qlty"), charIDToTypeID("Qlty"), (quality === "Draft") ? charIDToTypeID("Drft") : charIDToTypeID("Best"));
-                executeAction(idRdlB, desc, DialogModes.NO);
+                executeAction(idRdlB, desc, DIALOG_NO);
             } catch (e) {}
         }
 
@@ -718,7 +763,7 @@ app.bringToFront();
                 var idshapeBlur = stringIDToTypeID("shapeBlur");
                 var desc = new ActionDescriptor();
                 desc.putUnitDouble(charIDToTypeID("Rds "), charIDToTypeID("#Pxl"), radius);
-                executeAction(idshapeBlur, desc, DialogModes.NO);
+                executeAction(idshapeBlur, desc, DIALOG_NO);
             } catch (e) {
                 doc.activeLayer.applyGaussianBlur(radius);
             }
@@ -738,7 +783,7 @@ app.bringToFront();
                 var desc = new ActionDescriptor();
                 desc.putUnitDouble(charIDToTypeID("Rds "), charIDToTypeID("#Pxl"), radius);
                 desc.putInteger(charIDToTypeID("Thsh"), Math.round(threshold));
-                executeAction(idsurfaceBlur, desc, DialogModes.NO);
+                executeAction(idsurfaceBlur, desc, DIALOG_NO);
             } catch (e) {
                 doc.activeLayer.applyGaussianBlur(radius);
             }
@@ -797,7 +842,7 @@ app.bringToFront();
                     desc.putEnumerated(charIDToTypeID("Dstr"), charIDToTypeID("Dstr"), (distributionStr === "Gaussian") ? charIDToTypeID("Gsn ") : charIDToTypeID("Unfr"));
                     desc.putUnitDouble(charIDToTypeID("Nose"), charIDToTypeID("#Prc"), amount);
                     desc.putBoolean(charIDToTypeID("Mnch"), monochromatic);
-                    executeAction(idAdNs, desc, DialogModes.NO);
+                    executeAction(idAdNs, desc, DIALOG_NO);
                 } catch (e2) {}
             }
         }
@@ -983,7 +1028,7 @@ app.bringToFront();
                         desc.putEnumerated(charIDToTypeID("Txtr"), charIDToTypeID("TxtT"), txtrID);
 
                         desc.putUnitDouble(charIDToTypeID("Scl "), charIDToTypeID("#Prc"), 100);
-                        executeAction(idGls, desc, DialogModes.NO);
+                        executeAction(idGls, desc, DIALOG_NO);
                     } catch (glsErr) {
                         glassLayer.applyGaussianBlur(frostBlur);
                     }
@@ -1360,7 +1405,7 @@ app.bringToFront();
             descContentLayer.putObject(charIDToTypeID("Type"), stringIDToTypeID("gradientLayer"), descGradFill);
             descMain.putObject(charIDToTypeID("Usng"), stringIDToTypeID("contentLayer"), descContentLayer);
 
-            executeAction(idMk, descMain, DialogModes.NO);
+            executeAction(idMk, descMain, DIALOG_NO);
 
             var layer = doc.activeLayer;
             layer.name = layerName;
@@ -1438,7 +1483,7 @@ app.bringToFront();
                 descTo.putUnitDouble(charIDToTypeID("Vrtc"), charIDToTypeID("#Pxl"), cfg.height);
                 descG.putObject(charIDToTypeID("T   "), charIDToTypeID("Pnt "), descTo);
                 descG.putEnumerated(charIDToTypeID("Type"), charIDToTypeID("GrdT"), mapGradientTypeToID(params.type));
-                executeAction(idGrdn, descG, DialogModes.NO);
+                executeAction(idGrdn, descG, DIALOG_NO);
 
                 rasterLayer.opacity = cfg.gradientOpacity;
                 rasterLayer.blendMode = mapBlendModeToEnum(cfg.gradientBlendMode);
@@ -1520,7 +1565,7 @@ app.bringToFront();
                     desc.putPath(charIDToTypeID("In  "), outFile);
                     desc.putBoolean(charIDToTypeID("Cpy "), true);
                     desc.putBoolean(charIDToTypeID("LwCs"), true);
-                    executeAction(idsave, desc, DialogModes.NO);
+                    executeAction(idsave, desc, DIALOG_NO);
                 }
             }
         }
@@ -1570,8 +1615,8 @@ app.bringToFront();
 
                 resizeImageSmart(extraDoc, extraW, zoneH, "Fit/Crop (Fill)");
 
-                extraDoc.activeLayer.duplicate(mainDoc, ElementPlacement.PLACEATBEGINNING);
-                extraDoc.close(SaveOptions.DONOTSAVECHANGES);
+                extraDoc.activeLayer.duplicate(mainDoc, PLACE_TOP);
+                extraDoc.close(DO_NOT_SAVE);
                 extraDoc = null;
 
                 app.activeDocument = mainDoc;
@@ -1621,7 +1666,7 @@ app.bringToFront();
                 }
             } catch (err) {
                 if (extraDoc !== null) {
-                    try { extraDoc.close(SaveOptions.DONOTSAVECHANGES); } catch (e2) {}
+                    try { extraDoc.close(DO_NOT_SAVE); } catch (e2) {}
                 }
             }
         }
@@ -1756,7 +1801,7 @@ app.bringToFront();
                     qcResult = verifyExportedFile(tempOutputFile, cfg.width, cfg.height, minRequiredBytes);
                 }
 
-                doc.close(SaveOptions.DONOTSAVECHANGES);
+                doc.close(DO_NOT_SAVE);
                 doc = null;
 
                 if (!qcResult.valid) {
@@ -1790,7 +1835,7 @@ app.bringToFront();
 
             } catch (err) {
                 if (doc !== null) {
-                    try { doc.close(SaveOptions.DONOTSAVECHANGES); } catch (closeErr) {}
+                    try { doc.close(DO_NOT_SAVE); } catch (closeErr) {}
                 }
                 if (tempOutputFile !== null && tempOutputFile.exists) {
                     try { tempOutputFile.remove(); } catch (rmErr) {}
@@ -1818,6 +1863,7 @@ app.bringToFront();
                 "====================================================================",
                 "Start Time           : " + (batchState.startTime || "N/A"),
                 "End Time             : " + endTime,
+                "Photoshop Version    : " + PS_VERSION + (IS_CS2 ? " (Photoshop CS2 9.0.2 Mode)" : ""),
                 "Source Folder        : " + config.sourcePath,
                 "Output Folder        : " + folders.root.fsName,
                 "--------------------------------------------------------------------",
@@ -1886,7 +1932,7 @@ app.bringToFront();
                 titleText.graphics.font = ScriptUI.newFont("Arial", "BOLD", 12);
             } catch (fontErr) {}
 
-            var badgeText = headerGrp.add("statictext", undefined, "💎 3D GLASS & UNIVERSAL CS2-CC2026 ENGINE");
+            var badgeText = headerGrp.add("statictext", undefined, IS_CS2 ? "💎 3D GLASS & PHOTOSHOP 9.0.2 VERIFIED" : "💎 3D GLASS & UNIVERSAL CS2-CC2026 ENGINE");
             try {
                 badgeText.graphics.font = ScriptUI.newFont("Arial", "REGULAR", 10);
             } catch (fontErr2) {}
@@ -2443,15 +2489,7 @@ app.bringToFront();
             };
 
             btnSelectSpecific.onClick = function () {
-                var filterPattern = ($.os.indexOf("Windows") !== -1) ?
-                    "Supported Images:*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.psd;*.bmp,All Files:*.*" :
-                    function (f) { return (f instanceof Folder) || SUPPORTED_EXTENSIONS.test(f.name); };
-                var picked = null;
-                try {
-                    picked = File.openDialog("Select Images to Process", filterPattern, true);
-                } catch (dialogErr) {
-                    picked = File.openDialog("Select Images to Process", "*.*", true);
-                }
+                var picked = openFileDialogSafe("Select Images to Process", true);
                 if (picked && picked.length > 0) {
                     config.selectedFiles = picked;
                     lblScannedInfo.text = "Picked: " + picked.length + " files";
@@ -2550,8 +2588,8 @@ app.bringToFront();
 
                 var prevDialogs = app.displayDialogs;
                 var prevRulerUnits = app.preferences.rulerUnits;
-                app.displayDialogs = DialogModes.NO;
-                app.preferences.rulerUnits = Units.PIXELS;
+                app.displayDialogs = DIALOG_NO;
+                app.preferences.rulerUnits = UNITS_PX;
 
                 setControlsRunningState(true);
                 var seqCounter = 1;
@@ -2566,7 +2604,7 @@ app.bringToFront();
                             if (win && typeof win.update === "function") {
                                 try { win.update(); } catch (uErr) {}
                             }
-                            $.sleep(120);
+                            if (typeof $ !== "undefined" && typeof $.sleep === "function") { $.sleep(120); }
                         }
 
                         if (batchState.stopRequested) {

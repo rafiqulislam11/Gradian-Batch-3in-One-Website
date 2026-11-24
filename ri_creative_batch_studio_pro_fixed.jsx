@@ -969,6 +969,33 @@ app.bringToFront();
             }
         }
 
+        function safeStrokeSelection(doc, color, strokeW, location, blendMode, opacity) {
+            try {
+                if (!doc.selection) return false;
+                doc.selection.stroke(
+                    color,
+                    strokeW,
+                    location || StrokeLocation.INSIDE,
+                    blendMode || ColorBlendMode.NORMAL,
+                    opacity !== undefined ? opacity : 100
+                );
+                return true;
+            } catch (eStrk1) {
+                try {
+                    doc.selection.stroke(
+                        color,
+                        Math.max(1, Math.round(strokeW * 0.7)),
+                        StrokeLocation.CENTER,
+                        blendMode || ColorBlendMode.NORMAL,
+                        opacity !== undefined ? opacity : 100
+                    );
+                    return true;
+                } catch (eStrk2) {
+                    return false;
+                }
+            }
+        }
+
         function purgePhotoshopCachesSafe() {
             try {
                 if (typeof PurgeTarget !== "undefined") {
@@ -1370,7 +1397,7 @@ app.bringToFront();
                         crestCol.rgb.green = pDef.accent[1];
                         crestCol.rgb.blue = pDef.accent[2];
                         doc.selection.select(pts);
-                        doc.selection.stroke(crestCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
+                        safeStrokeSelection(doc, crestCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
                         doc.selection.deselect();
                         crestLayer.blendMode = BlendMode.SCREEN;
                         crestLayer.opacity = 85;
@@ -1453,7 +1480,7 @@ app.bringToFront();
                         wPts.push([w, h]); wPts.push([0, h]);
                         doc.selection.select(wPts);
                         doc.selection.fill(i % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 45, false);
-                        doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
+                        safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
                         doc.selection.deselect();
                         waveArt.applyGaussianBlur(Math.max(2, frostBlur * 0.3));
                         waveArt.blendMode = BlendMode.SCREEN;
@@ -1484,7 +1511,7 @@ app.bringToFront();
                         doc.activeLayer = plateArt;
                         doc.selection.select([[px, py], [px + pw, py], [px + pw, py + ph], [px, py + ph]]);
                         doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 30, false);
-                        doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                        safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                         doc.selection.deselect();
                         plateArt.applyGaussianBlur(Math.max(2, frostBlur * 0.25));
                         plateArt.blendMode = BlendMode.SCREEN;
@@ -1522,7 +1549,7 @@ app.bringToFront();
                         bArt.name = "RI 3D Bubble " + (b + 1);
                         makeEllipticalSelectionSafe(doc, by - br, bx - br, by + br, bx + br);
                         doc.selection.fill(b % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 35, false);
-                        doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                        safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                         doc.selection.deselect();
                         try { bArt.applySpherize(100, SpherizeMode.NORMAL); } catch (eSph) {}
 
@@ -1585,7 +1612,7 @@ app.bringToFront();
                         var rY = Math.round(h * (0.2 + (rb * 0.18)));
                         doc.selection.select([[0, rY], [w, rY + Math.round(h * 0.25)], [w, rY + Math.round(h * 0.38)], [0, rY + Math.round(h * 0.13)]]);
                         doc.selection.fill(rb % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 40, false);
-                        doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
+                        safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
                         doc.selection.deselect();
                         try { rbArt.applyTwirl(Math.round(55 * (rb % 2 === 0 ? 1 : -1))); } catch (eTw) {}
                         rbArt.blendMode = BlendMode.SCREEN;
@@ -1612,7 +1639,7 @@ app.bringToFront();
                         }
                         doc.selection.select(hPts);
                         doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 45, false);
-                        doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                        safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                         doc.selection.deselect();
                         hexArt.blendMode = BlendMode.SCREEN;
                         hexArt.opacity = opacity;
@@ -1663,7 +1690,7 @@ app.bringToFront();
                         var sOffset = Math.round(st * strW * 2.2);
                         doc.selection.select([[sOffset, 0], [sOffset + strW, 0], [sOffset - h + strW, h], [sOffset - h, h]]);
                         doc.selection.fill(st % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 35, false);
-                        doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                        safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                         doc.selection.deselect();
                         stArt.applyGaussianBlur(Math.max(2, frostBlur * 0.25));
                         stArt.blendMode = BlendMode.SCREEN;
@@ -1679,7 +1706,7 @@ app.bringToFront();
                     var tRight = [Math.round(w * 0.72), Math.round(h * 0.78)];
                     doc.selection.select([tTop, tRight, tLeft]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 40, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
                     doc.selection.deselect();
                     prismArt.blendMode = BlendMode.SCREEN;
                     prismArt.opacity = opacity;
@@ -1735,13 +1762,13 @@ app.bringToFront();
                     var ringArt1 = doc.artLayers.add();
                     ringArt1.name = "RI 3D Glass Ring Outer";
                     makeEllipticalSelectionSafe(doc, Math.round(h/2) - rRad1, Math.round(w/2) - rRad1, Math.round(h/2) + rRad1, Math.round(w/2) + rRad1);
-                    doc.selection.stroke(whiteCol, strokeW + 3, StrokeLocation.CENTER, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, whiteCol, strokeW + 3, StrokeLocation.CENTER, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
                     ringArt1.blendMode = BlendMode.SCREEN;
                     var ringArt2 = doc.artLayers.add();
                     ringArt2.name = "RI 3D Glass Ring Inner";
                     makeEllipticalSelectionSafe(doc, Math.round(h/2) - rRad2, Math.round(w/2) - rRad2, Math.round(h/2) + rRad2, Math.round(w/2) + rRad2);
-                    doc.selection.stroke(cyanCol, strokeW + 2, StrokeLocation.CENTER, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, cyanCol, strokeW + 2, StrokeLocation.CENTER, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
                     ringArt2.blendMode = BlendMode.SCREEN;
 
@@ -1751,7 +1778,7 @@ app.bringToFront();
                     crvArt.name = "RI 3D Glass Curve Arch";
                     doc.selection.select([[0, Math.round(h * 0.3)], [w, Math.round(h * 0.15)], [w, Math.round(h * 0.65)], [0, Math.round(h * 0.85)]]);
                     doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 45, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
                     try { crvArt.applyTwirl(-45); } catch (eCrv) {}
                     crvArt.blendMode = BlendMode.SCREEN;
@@ -1769,7 +1796,7 @@ app.bringToFront();
                         mArt.name = "RI 3D Mountain Peak " + (m + 1);
                         doc.selection.select(peaks[m]);
                         doc.selection.fill(m % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 50, false);
-                        doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                        safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                         doc.selection.deselect();
                         mArt.blendMode = BlendMode.SCREEN;
                         mArt.opacity = opacity;
@@ -1784,7 +1811,7 @@ app.bringToFront();
                         var dH = Math.round(h * (0.40 - (dm * 0.07)));
                         doc.selection.select([[Math.round(w/2), Math.round(h/2) - dH], [Math.round(w/2) + dW, Math.round(h/2)], [Math.round(w/2), Math.round(h/2) + dH], [Math.round(w/2) - dW, Math.round(h/2)]]);
                         doc.selection.fill(dm % 2 === 0 ? cyanCol : violetCol, ColorBlendMode.NORMAL, 35, false);
-                        doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                        safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                         doc.selection.deselect();
                         dmArt.blendMode = BlendMode.SCREEN;
                         dmArt.opacity = opacity;
@@ -1813,7 +1840,22 @@ app.bringToFront();
 
                 return "3D Glass Background [" + style + "]";
             } catch (errBg) {
-                return null;
+                try {
+                    var fbArt = doc.artLayers.add();
+                    fbArt.name = "RI 3D Glass Studio Wave Fallback";
+                    doc.selection.selectAll();
+                    var fbCol = new SolidColor();
+                    fbCol.rgb.red = 14; fbCol.rgb.green = 65; fbCol.rgb.blue = 148;
+                    doc.selection.fill(fbCol, ColorBlendMode.NORMAL, 85, false);
+                    doc.selection.deselect();
+                    try { fbArt.applyTwirl(60); } catch (eF1) {}
+                    try { fbArt.applyZigZag(Math.round(distortion * 0.5), 5, ZigZagType.AROUNDCENTER); } catch (eF2) {}
+                    fbArt.blendMode = BlendMode.SCREEN;
+                    fbArt.opacity = opacity;
+                    return "3D Glass Background [Wave Fallback - " + style + "]";
+                } catch (eFb) {
+                    return "3D Glass Background [Studio Base]";
+                }
             }
         }
 
@@ -1855,7 +1897,7 @@ app.bringToFront();
                     topArt.name = "RI 3D Cube Top Facet";
                     doc.selection.select([[cx, cy - csz], [cx + halfW, cy - halfH], [cx, cy], [cx - halfW, cy - halfH]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 65, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
                     doc.selection.deselect();
                     topArt.blendMode = BlendMode.SCREEN;
 
@@ -1864,7 +1906,7 @@ app.bringToFront();
                     leftArt.name = "RI 3D Cube Left Facet";
                     doc.selection.select([[cx - halfW, cy - halfH], [cx, cy], [cx, cy + csz], [cx - halfW, cy + halfH]]);
                     doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 55, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
                     leftArt.blendMode = BlendMode.SCREEN;
 
@@ -1873,7 +1915,7 @@ app.bringToFront();
                     rightArt.name = "RI 3D Cube Right Facet";
                     doc.selection.select([[cx, cy], [cx + halfW, cy - halfH], [cx + halfW, cy + halfH], [cx, cy + csz]]);
                     doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 75, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
                     rightArt.blendMode = BlendMode.SCREEN;
 
@@ -1895,7 +1937,7 @@ app.bringToFront();
                     sphArt.name = "RI 3D Crystal Sphere Body";
                     makeEllipticalSelectionSafe(doc, cy - r, cx - r, cy + r, cx + r);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 35, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
                     try { sphArt.applySpherize(100, SpherizeMode.NORMAL); } catch (eSp2) {}
                     sphArt.applyGaussianBlur(Math.max(1, frostBlur * 0.2));
@@ -1922,7 +1964,7 @@ app.bringToFront();
                     pillArt.name = "RI 3D Glass Capsule Pill";
                     doc.selection.select([[pillX, pillY], [pillX + pillW, pillY], [pillX + pillW, pillY + pillH], [pillX, pillY + pillH]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 40, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
                     try { pillArt.applySpherize(60, SpherizeMode.HORIZONTALONLY); } catch (ePl) {}
                     pillArt.blendMode = BlendMode.SCREEN;
@@ -1935,7 +1977,7 @@ app.bringToFront();
                     sOrb.name = "RI Saturn Sphere Orb";
                     makeEllipticalSelectionSafe(doc, cy - sRad, cx - sRad, cy + sRad, cx + sRad);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 40, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
                     try { sOrb.applySpherize(100, SpherizeMode.NORMAL); } catch (eSt) {}
                     sOrb.blendMode = BlendMode.SCREEN;
@@ -1945,7 +1987,7 @@ app.bringToFront();
                     var rW = Math.round(sRad * 2.2);
                     var rH = Math.round(sRad * 0.6);
                     makeEllipticalSelectionSafe(doc, cy - rH, cx - rW, cy + rH, cx + rW);
-                    doc.selection.stroke(whiteCol, strokeW + 2, StrokeLocation.CENTER, ColorBlendMode.NORMAL, 95);
+                    safeStrokeSelection(doc, whiteCol, strokeW + 2, StrokeLocation.CENTER, ColorBlendMode.NORMAL, 95);
                     doc.selection.deselect();
                     ringArt.blendMode = BlendMode.SCREEN;
 
@@ -1960,7 +2002,7 @@ app.bringToFront();
                         var shY = Math.round(h * (0.28 + sh * 0.18));
                         doc.selection.select([[shX, shY], [shX + shW, shY], [shX + shW, shY + shH], [shX, shY + shH]]);
                         doc.selection.fill(sh % 2 === 0 ? cyanCol : whiteCol, ColorBlendMode.NORMAL, 35, false);
-                        doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                        safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                         doc.selection.deselect();
                         shArt.applyGaussianBlur(Math.max(2, frostBlur * 0.25));
                         shArt.blendMode = BlendMode.SCREEN;
@@ -1974,7 +2016,7 @@ app.bringToFront();
                     dArt.name = "RI 3D Diamond Crystal";
                     doc.selection.select([[cx, cy - dH], [cx + dW, cy], [cx, cy + dH], [cx - dW, cy]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 45, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
                     doc.selection.deselect();
                     dArt.blendMode = BlendMode.SCREEN;
                     dArt.opacity = opacity;
@@ -1988,7 +2030,7 @@ app.bringToFront();
                     sqArt.name = "RI 3D Squircle Glass Card";
                     doc.selection.select([[sqX, sqY], [sqX + sqDim, sqY], [sqX + sqDim, sqY + sqDim], [sqX, sqY + sqDim]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 35, false);
-                    doc.selection.stroke(whiteCol, strokeW + 2, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, whiteCol, strokeW + 2, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
                     sqArt.applyGaussianBlur(Math.max(2, frostBlur * 0.35));
                     sqArt.blendMode = BlendMode.SCREEN;
@@ -2017,7 +2059,7 @@ app.bringToFront();
                     cylArt.name = "RI 3D Glass Cylinder";
                     doc.selection.select([[cylX, cylY], [cylX + cylW, cylY], [cylX + cylW, cylY + cylH], [cylX, cylY + cylH]]);
                     doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 40, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
                     cylArt.blendMode = BlendMode.SCREEN;
                     cylArt.opacity = opacity;
@@ -2032,10 +2074,10 @@ app.bringToFront();
                     var pyrCenter = [cx, Math.round(cy + h * 0.15)];
                     doc.selection.select([pyrTop, pyrCenter, pyrLeft]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 55, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.select([pyrTop, pyrRight, pyrCenter]);
                     doc.selection.fill(cyanCol, ColorBlendMode.NORMAL, 70, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     doc.selection.deselect();
                     pyrArt.blendMode = BlendMode.SCREEN;
                     pyrArt.opacity = opacity;
@@ -2046,7 +2088,7 @@ app.bringToFront();
                     fPrismArt.name = "RI Floating Glass Prism";
                     doc.selection.select([[cx, Math.round(cy - h * 0.25)], [Math.round(cx + w * 0.2), Math.round(cy + h * 0.25)], [Math.round(cx - w * 0.2), Math.round(cy + h * 0.25)]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 45, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
                     doc.selection.deselect();
                     fPrismArt.blendMode = BlendMode.SCREEN;
                     fPrismArt.opacity = opacity;
@@ -2065,7 +2107,7 @@ app.bringToFront();
                     }
                     doc.selection.select(starPts);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 45, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 95);
                     doc.selection.deselect();
                     starArt.blendMode = BlendMode.SCREEN;
                     starArt.opacity = opacity;
@@ -2095,7 +2137,7 @@ app.bringToFront();
                     fltArt.name = "RI Fluted Glass Card";
                     doc.selection.select([[fltX, fltY], [fltX + fltCardW, fltY], [fltX + fltCardW, fltY + fltCardH], [fltX, fltY + fltCardH]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 30, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
                     var numFlt = 16;
                     var fW = fltCardW / numFlt;
                     for (var fi = 0; fi < numFlt; fi++) {
@@ -2130,7 +2172,7 @@ app.bringToFront();
                     panArt.name = "RI 3D Glass Panel Body";
                     doc.selection.select([[panX, panY], [panX + panW, panY], [panX + panW, panY + panH], [panX, panY + panH]]);
                     doc.selection.fill(whiteCol, ColorBlendMode.NORMAL, 35, false);
-                    doc.selection.stroke(whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
+                    safeStrokeSelection(doc, whiteCol, strokeW, StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 90);
 
                     // Diagonal Light Sheen across top-left corner
                     var sheenW = Math.round(panW * 0.4);
@@ -2156,8 +2198,34 @@ app.bringToFront();
 
             var w = Math.round(toPx(doc.width));
             var h = Math.round(toPx(doc.height));
-            var style = cfg.glassStyle || "Frosted Glassmorphism (Floating 3D Slab)";
-            if (style === "Random 3D Glass Style") {
+            var style = cfg.glassStyle || "Random 3D Glass Style";
+
+            var STANDALONE_BG_STYLES = [
+                "10.01 3D Glass Wave", "10.02 3D Glass Layers", "10.03 3D Bubble",
+                "10.04 3D Crystal Cubes", "10.05 3D Glass Ribbon", "10.06 3D Hexagon",
+                "10.07 3D Glass Square", "10.08 3D Glass Spiral", "10.09 3D Glass Stripes",
+                "10.10 3D Glass Spheres", "10.11 3D Prism", "10.12 3D Liquid Glass",
+                "10.13 3D Glass Panel", "10.14 3D Glass Tiles", "10.15 3D Glass Streaks",
+                "10.16 3D Glass Ring", "10.17 3D Glass Curve", "10.18 3D Glass Plates",
+                "10.19 3D Glass Mountains", "10.20 3D Glass Fluid", "10.21 3D Layered Diamond",
+                "10.22 3D Glass Flow", "10.23 3D Transparent Balls", "10.24 3D Glass Bevel",
+                "10.25 3D Soft Glass",
+                "9.1 Silver Metallic Flow", "9.2 Black & Gold Wave", "9.3 Purple Satin Wave",
+                "9.4 Blue Liquid Wave", "9.5 Champagne Gold Flow", "9.6 Dark Chrome Wave",
+                "9.7 Iridescent Glass Flow", "9.8 Red Chrome Ribbon", "9.9 Blue-Purple Gradient Flow",
+                "9.10 Pearl Gold Wave", "9.11 Emerald Metallic Flow", "9.12 Crystal Blue Wave",
+                "9.13 Metallic Layered Curve", "9.14 Neon Blue-Pink Flow", "9.15 Silver Satin Texture",
+                "9.16 Deep Purple Glass Flow"
+            ];
+
+            var isStandalone = (cfg._isStandalone === true);
+            if (isStandalone) {
+                var isBgStyle = (style.indexOf("10.") === 0 || style.indexOf("9.") === 0 || style.indexOf("3D Glass") !== -1 || style.indexOf("Wave") !== -1 || style.indexOf("Bubble") !== -1 || style.indexOf("Cubes") !== -1 || style.indexOf("Hexagon") !== -1 || style.indexOf("Plates") !== -1 || style.indexOf("Mountains") !== -1 || style.indexOf("Flow") !== -1);
+                if (style === "Random 3D Glass Style" || !isBgStyle) {
+                    var pickIdx = (cfg._bgIndex !== undefined) ? (cfg._bgIndex % STANDALONE_BG_STYLES.length) : Math.floor(Math.random() * STANDALONE_BG_STYLES.length);
+                    style = STANDALONE_BG_STYLES[pickIdx];
+                }
+            } else if (style === "Random 3D Glass Style") {
                 var pickIdx = Math.floor(Math.random() * (GLASS_STYLE_PRESETS.length - 1)) + 1;
                 style = GLASS_STYLE_PRESETS[pickIdx];
             }
@@ -3253,7 +3321,7 @@ app.bringToFront();
             }
         }
 
-                // Guaranteed 10 MB+ Microstock Compliance: Standard JPEG COM padding
+                // Guaranteed 10 MB+ Microstock Compliance: Standard JPEG COM padding (Binary Safe & 64KB High-Speed Streaming)
         function padJpegFileToMinSize(fileObj, minBytes) {
             if (!fileObj || !fileObj.exists || fileObj.length >= minBytes) return true;
 
@@ -3271,17 +3339,18 @@ app.bringToFront();
                 var needed = minBytes - content.length;
                 if (needed <= 0) return true;
 
-                // 1KB buffer of null bytes
-                var chunk1K = "";
-                for (var b = 0; b < 1024; b++) {
-                    chunk1K += String.fromCharCode(0);
+                // Pre-allocated 64KB zero-byte block for fast file expansion
+                var chunk64K = "";
+                for (var b = 0; b < 65530; b++) {
+                    chunk64K += String.fromCharCode(0);
                 }
 
+                fileObj.encoding = "BINARY";
                 fileObj.open("w");
                 // Write SOI (FF D8)
                 fileObj.write(content.substring(0, 2));
 
-                // Write JPEG COM (0xFFFE) comment padding segments in safe chunks
+                // Write JPEG COM (0xFFFE) comment padding segments in 64KB safe chunks
                 var remaining = needed;
                 while (remaining > 0) {
                     var payloadSize = (remaining - 4 > 65530) ? 65530 : (remaining - 4);
@@ -3290,15 +3359,7 @@ app.bringToFront();
                     var segHeader = String.fromCharCode(0xFF) + String.fromCharCode(0xFE) +
                                     String.fromCharCode((segLen >> 8) & 0xFF) + String.fromCharCode(segLen & 0xFF);
                     fileObj.write(segHeader);
-
-                    var num1K = Math.floor(payloadSize / 1024);
-                    var remBytes = payloadSize % 1024;
-                    for (var k = 0; k < num1K; k++) {
-                        fileObj.write(chunk1K);
-                    }
-                    if (remBytes > 0) {
-                        fileObj.write(chunk1K.substring(0, remBytes));
-                    }
+                    fileObj.write(chunk64K.substring(0, payloadSize));
                     remaining -= (segLen + 2);
                 }
 
@@ -3329,11 +3390,29 @@ app.bringToFront();
 
             try {
                 var isStandalone = (primaryFile && primaryFile.isStandalone);
-            cfg._isStandalone = isStandalone;
-            if (isStandalone && !cfg.glassEnable) { cfg.glassEnable = true; }
+                cfg._isStandalone = isStandalone;
+                if (isStandalone) {
+                    cfg.glassEnable = true;
+                    if (!cfg.gradientEnable) {
+                        cfg.gradientEnable = true;
+                    }
+                    if (primaryFile.index !== undefined) {
+                        cfg._bgIndex = primaryFile.index;
+                        cfg._bgTotal = primaryFile.total;
+                    }
+                }
+
                 if (isStandalone) {
                     var docTitle = cfg.filenamePrefix + (seqCounter < 10 ? "00" : (seqCounter < 100 ? "0" : "")) + seqCounter;
-                    doc = app.documents.add(cfg.width, cfg.height, 300, docTitle, NewDocumentMode.RGB, DocumentFill.WHITE);
+                    try { if (typeof Units !== "undefined") app.preferences.rulerUnits = Units.PIXELS; } catch (eRu) {}
+                    doc = app.documents.add(
+                        new UnitValue(cfg.width, "px"),
+                        new UnitValue(cfg.height, "px"),
+                        300,
+                        docTitle,
+                        NewDocumentMode.RGB,
+                        DocumentFill.WHITE
+                    );
                     convertToHighPrecisionRGB(doc);
                     prepareBaseLayer(doc);
                 } else {
@@ -3668,6 +3747,14 @@ app.bringToFront();
             var btnSelectSpecific = modeRow.add("button", undefined, "Pick Files...");
             btnSelectSpecific.preferredSize = [75, 21];
             btnSelectSpecific.enabled = true;
+
+            var lblGenCount = modeRow.add("statictext", undefined, "Count:");
+            lblGenCount.preferredSize = [40, 20];
+            lblGenCount.visible = false;
+
+            var inpGenCount = modeRow.add("edittext", undefined, "10");
+            inpGenCount.preferredSize = [45, 21];
+            inpGenCount.visible = false;
 
             var lblScannedInfo = modeRow.add("statictext", undefined, "Found: 0 images");
             lblScannedInfo.preferredSize = [165, 20];
@@ -4058,7 +4145,9 @@ app.bringToFront();
                 config.height = parseIntSafe(inpHeight.text, 2000, 100, 30000);
                 config.resizeMode = ddResizeMode.selection ? ddResizeMode.selection.text : "Fit/Crop (Fill)";
                 config.seamlessBlend = chkSeamless.value;
-                config.maxBatchCount = parseIntSafe(inpMaxBatch.text, 500, 1, MAX_ALLOWED_BATCH);
+                config.maxBatchCount = (config.processMode === "Generate 3D Backgrounds (No Source Photo)" && typeof inpGenCount !== "undefined") ?
+                    parseIntSafe(inpGenCount.text, 10, 1, MAX_ALLOWED_BATCH) :
+                    parseIntSafe(inpMaxBatch.text, 500, 1, MAX_ALLOWED_BATCH);
 
                 config.exportFormat = ddExportFormat.selection ? ddExportFormat.selection.text : "JPEG (Baseline 300 DPI)";
                 config.jpegQuality = parseIntSafe(inpJpegQuality.text, 12, 1, 12);
@@ -4230,21 +4319,61 @@ app.bringToFront();
 
             ddBatchScope.onChange = function () {
                 var selMode = ddBatchScope.selection ? ddBatchScope.selection.text : "";
-                if (selMode === "Generate 3D Backgrounds (No Source Photo)") {
-                    lblScannedInfo.text = "Target: " + config.maxBatchCount + " backgrounds";
-                    lblCurrentFile.text = "Ready to generate " + config.maxBatchCount + " commercial 3D backgrounds. Pick Output Folder and click START.";
+                var isGen3D = (selMode === "Generate 3D Backgrounds (No Source Photo)");
+                btnSelectSpecific.visible = !isGen3D;
+                lblGenCount.visible = isGen3D;
+                inpGenCount.visible = isGen3D;
+
+                if (isGen3D) {
+                    var curCount = parseIntSafe(inpGenCount.text, 10, 1, MAX_ALLOWED_BATCH);
+                    inpGenCount.text = String(curCount);
+                    inpMaxBatch.text = String(curCount);
+                    config.maxBatchCount = curCount;
+                    lblScannedInfo.text = "Target: " + curCount + " 3D backgrounds";
+                    lblCurrentFile.text = "Ready to generate " + curCount + " commercial 3D backgrounds. Pick Output Folder and click START.";
                     btnBrowseSrc.enabled = false;
-                    btnSelectSpecific.enabled = false;
+                    txtSrcPath.enabled = false;
                     return;
                 } else {
                     btnBrowseSrc.enabled = true;
-                    btnSelectSpecific.enabled = true;
+                    txtSrcPath.enabled = true;
                 }
                 var isSelectedMode = (selMode === "Selected Images");
                 if (isSelectedMode && config.selectedFiles.length > 0) {
                     lblScannedInfo.text = "Picked: " + config.selectedFiles.length + " files";
                 } else {
                     lblScannedInfo.text = "Found: " + scannedFilesCache.length + " images";
+                }
+            };
+
+            inpGenCount.onChanging = function () {
+                var c = parseInt(inpGenCount.text, 10);
+                if (!isNaN(c) && c > 0) {
+                    config.maxBatchCount = c;
+                    inpMaxBatch.text = String(c);
+                    lblScannedInfo.text = "Target: " + c + " 3D backgrounds";
+                    lblCurrentFile.text = "Ready to generate " + c + " commercial 3D backgrounds. Pick Output Folder and click START.";
+                }
+            };
+            inpGenCount.onChange = function () {
+                var c = parseIntSafe(inpGenCount.text, 10, 1, MAX_ALLOWED_BATCH);
+                inpGenCount.text = String(c);
+                inpMaxBatch.text = String(c);
+                config.maxBatchCount = c;
+                lblScannedInfo.text = "Target: " + c + " 3D backgrounds";
+                lblCurrentFile.text = "Ready to generate " + c + " commercial 3D backgrounds. Pick Output Folder and click START.";
+            };
+
+            inpMaxBatch.onChanging = function () {
+                var c = parseInt(inpMaxBatch.text, 10);
+                if (!isNaN(c) && c > 0) {
+                    config.maxBatchCount = c;
+                    inpGenCount.text = String(c);
+                    var selMode = ddBatchScope.selection ? ddBatchScope.selection.text : "";
+                    if (selMode === "Generate 3D Backgrounds (No Source Photo)") {
+                        lblScannedInfo.text = "Target: " + c + " 3D backgrounds";
+                        lblCurrentFile.text = "Ready to generate " + c + " commercial 3D backgrounds. Pick Output Folder and click START.";
+                    }
                 }
             };
 
@@ -4325,10 +4454,16 @@ app.bringToFront();
 
             function buildProcessingQueue() {
                 if (config.processMode === "Generate 3D Backgrounds (No Source Photo)") {
-                    var genCount = Math.min(config.maxBatchCount || 10, 500);
+                    var genCount = parseIntSafe(inpGenCount ? inpGenCount.text : inpMaxBatch.text, (config.maxBatchCount || 10), 1, MAX_ALLOWED_BATCH);
+                    config.maxBatchCount = genCount;
                     var genQueue = [];
                     for (var g = 0; g < genCount; g++) {
-                        genQueue.push({ isStandalone: true, name: "3D_Stock_BG_" + (g + 1) });
+                        genQueue.push({
+                            isStandalone: true,
+                            name: "3D_Stock_BG_" + (g + 1),
+                            index: g,
+                            total: genCount
+                        });
                     }
                     return { queue: genQueue, totalScanned: genCount };
                 }
@@ -4478,7 +4613,10 @@ app.bringToFront();
                     updateStatsUI(0, endStatusMsg);
 
                     if (batchState.successCount > 0) {
-                        alert("Batch Processing Completed!\n\nSuccessfully Processed: " + batchState.successCount + " images\nFailed: " + batchState.failedCount + "\nOutput Directory:\n" + folders.processed.fsName);
+                        var successMsg = (config.processMode === "Generate 3D Backgrounds (No Source Photo)") ?
+                            ("3D Background Generation Completed!\n\nSuccessfully Generated: " + batchState.successCount + " 3D Backgrounds\nFailed: " + batchState.failedCount + "\nOutput Directory:\n" + folders.processed.fsName) :
+                            ("Batch Processing Completed!\n\nSuccessfully Processed: " + batchState.successCount + " images\nFailed: " + batchState.failedCount + "\nOutput Directory:\n" + folders.processed.fsName);
+                        alert(successMsg);
                     } else if (batchState.failedCount > 0 && !batchState.stopRequested) {
                         var firstErrMsg = (batchState.failedDetails && batchState.failedDetails.length > 0) ? batchState.failedDetails[0] : "Check reports for error details.";
                         alert("Batch processing ended, but 0 images were successfully saved.\nTotal Failed: " + batchState.failedCount + "\n\nFirst error:\n" + firstErrMsg);
@@ -4512,8 +4650,13 @@ app.bringToFront();
 
                     var built = buildProcessingQueue();
                     if (!built || !built.queue || built.queue.length === 0) {
-                        alert("No supported images (JPG, PNG, TIF, PSD, BMP) found in:\n" + config.sourcePath);
-                        lblCurrentFile.text = "Error: No supported images found to process.";
+                        if (config.processMode === "Generate 3D Backgrounds (No Source Photo)") {
+                            alert("Please enter a valid count (1 to " + MAX_ALLOWED_BATCH + ") of 3D backgrounds to generate.");
+                            lblCurrentFile.text = "Error: Please specify valid count to generate.";
+                        } else {
+                            alert("No supported images (JPG, PNG, TIF, PSD, BMP) found in:\n" + config.sourcePath);
+                            lblCurrentFile.text = "Error: No supported images found to process.";
+                        }
                         return;
                     }
 

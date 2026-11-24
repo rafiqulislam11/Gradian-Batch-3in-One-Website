@@ -867,7 +867,7 @@
                     </div>
                     <div>
                         <label class="studio-label text-[10px] block mb-0.5">Height (px)</label>
-                        <input id="inpOutHeight" type="number" min="400" max="12000" value="3000" class="studio-input w-full border rounded-md px-2 py-1 text-xs focus:outline-none">
+                        <input id="inpOutHeight" type="number" min="400" max="12000" value="4000" class="studio-input w-full border rounded-md px-2 py-1 text-xs focus:outline-none">
                     </div>
                     <div>
                         <label class="studio-label text-[10px] block mb-0.5">Target Min Size (MB)</label>
@@ -4893,8 +4893,9 @@
             // Ensures high-density rendering on Retina / 4K / Windows 125%-150% scaling,
             // and dynamically scales when the user zooms in browser (Ctrl + Plus).
             // High-Speed Balanced Studio DPR (60fps smoothness, zero lag on high-DPI/mobile screens)
-            const isMobile = window.innerWidth < 1024;
-            const dpr = isMobile ? 1.0 : Math.min(1.5, window.devicePixelRatio || 1);
+            // Ultra-Sharp Super-Sampling DPR (Retina / 4K / High-DPI screens):
+            // Delivers pin-sharp, native high-DPI rendering for all desktop, tablet & mobile devices
+            const dpr = Math.max(1.0, Math.min(2.5, window.devicePixelRatio || 1));
             
             canvas.width = Math.round(targetW * dpr);
             canvas.height = Math.round(targetH * dpr);
@@ -4912,10 +4913,28 @@
             ctx.imageSmoothingQuality = 'high';
         }
 
+        const _offscreenCanvasCache = {};
+        function getCachedOffscreenCanvas(key, w, h) {
+            if (!_offscreenCanvasCache[key]) {
+                _offscreenCanvasCache[key] = document.createElement('canvas');
+            }
+            const c = _offscreenCanvasCache[key];
+            if (c.width !== w) c.width = w;
+            if (c.height !== h) c.height = h;
+            return c;
+        }
+
+        /**
+         * Ultra-High Quality Image Cover Renderer:
+         * Uses multi-step mipmapped downsampling when scaling by >2.2x to prevent moiré and aliasing,
+         * ensuring razor-sharp commercial microstock photo placement.
+         */
         function drawImageCover(targetCtx, img, x, y, w, h, panRatioX = 0, panRatioY = 0) {
             targetCtx.imageSmoothingEnabled = true;
             targetCtx.imageSmoothingQuality = 'high';
-            const imgRatio = img.width / img.height;
+            const imgW = img.naturalWidth || img.width;
+            const imgH = img.naturalHeight || img.height;
+            const imgRatio = imgW / imgH;
             const targetRatio = w / h;
             let drawW, drawH, offsetX, offsetY;
             if (imgRatio > targetRatio) {
@@ -4931,7 +4950,21 @@
                 offsetX = x;
                 offsetY = y - maxShift / 2 + (panRatioY * maxShift);
             }
-            targetCtx.drawImage(img, offsetX, offsetY, drawW, drawH);
+
+            // High-Precision Multi-Step Downsampling (Eliminates pixel shimmer & moire on high-res camera photos)
+            if (imgW > drawW * 2.2 && imgH > drawH * 2.2 && typeof document !== 'undefined') {
+                const stepW = Math.round(drawW * 1.5);
+                const stepH = Math.round(drawH * 1.5);
+                const stepCanvas = getCachedOffscreenCanvas('downsampleBuffer', stepW, stepH);
+                const sCtx = stepCanvas.getContext('2d');
+                sCtx.clearRect(0, 0, stepW, stepH);
+                sCtx.imageSmoothingEnabled = true;
+                sCtx.imageSmoothingQuality = 'high';
+                sCtx.drawImage(img, 0, 0, stepW, stepH);
+                targetCtx.drawImage(stepCanvas, offsetX, offsetY, drawW, drawH);
+            } else {
+                targetCtx.drawImage(img, offsetX, offsetY, drawW, drawH);
+            }
         }
 
         // ====================================================================
@@ -6079,16 +6112,7 @@
         }
 
         // Core Multi-Layer Rendering Pipeline
-        const _offscreenCanvasCache = {};
-        function getCachedOffscreenCanvas(key, w, h) {
-            if (!_offscreenCanvasCache[key]) {
-                _offscreenCanvasCache[key] = document.createElement('canvas');
-            }
-            const c = _offscreenCanvasCache[key];
-            if (c.width !== w) c.width = w;
-            if (c.height !== h) c.height = h;
-            return c;
-        }
+
 
         // ============================================================================
         // ABSTRACT 3D METALLIC & GLASS FLOW PATTERNS ENGINE (16 Stock 3D Presets)
@@ -14540,6 +14564,59 @@ const GLASS_SHAPES_INFO = {
             });
         }
 
+        // Standard JFIF APP1/COM Padding to guarantee microstock minimum file size (e.g. 4MB for Adobe Stock)
+        function padJpegBlobToMinSize(blob, minBytes) {
+            if (blob.size >= minBytes) return Promise.resolve(blob);
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    try {
+                        const buffer = reader.result;
+                        const view = new DataView(buffer);
+                        if (view.getUint16(0) !== 0xFFD8) {
+                            resolve(blob);
+                            return;
+                        }
+                        const neededPadding = minBytes - buffer.byteLength;
+                        if (neededPadding <= 0) {
+                            resolve(blob);
+                            return;
+                        }
+                        // Construct standard JPEG COM (Comment 0xFFFE) marker segments (max 65530 bytes per segment)
+                        const segments = [];
+                        let remaining = neededPadding;
+                        while (remaining > 0) {
+                            const segPayloadSize = Math.min(65530, remaining - 4);
+                            if (segPayloadSize <= 0) break;
+                            const segLen = segPayloadSize + 2;
+                            const segHeader = new Uint8Array([0xFF, 0xFE, (segLen >> 8) & 0xFF, segLen & 0xFF]);
+                            const segPayload = new Uint8Array(segPayloadSize);
+                            segments.push(segHeader, segPayload);
+                            remaining -= (segLen + 2);
+                        }
+
+                        const origU8 = new Uint8Array(buffer);
+                        const totalNewBytes = segments.reduce((acc, s) => acc + s.byteLength, 0);
+                        const finalU8 = new Uint8Array(origU8.length + totalNewBytes);
+
+                        finalU8.set(origU8.subarray(0, 2), 0);
+                        let currentPos = 2;
+                        for (const seg of segments) {
+                            finalU8.set(seg, currentPos);
+                            currentPos += seg.byteLength;
+                        }
+                        finalU8.set(origU8.subarray(2), currentPos);
+
+                        resolve(new Blob([finalU8], { type: 'image/jpeg' }));
+                    } catch (e) {
+                        resolve(blob);
+                    }
+                };
+                reader.onerror = () => resolve(blob);
+                reader.readAsArrayBuffer(blob);
+            });
+        }
+
         async function exportHighResTargetFile(targetCanvas, targetCtx, mimeType, baseQuality, minMB, maxMB) {
             const minBytes = Math.max(0, minMB) * 1024 * 1024;
             const maxBytes = Math.max(minBytes + 1024 * 1024, maxMB * 1024 * 1024);
@@ -14554,6 +14631,9 @@ const GLASS_SHAPES_INFO = {
 
             if (mimeType === 'image/jpeg') {
                 blob = await inject300DpiToJpegBlob(blob);
+                if (minBytes > 0 && blob.size < minBytes) {
+                    blob = await padJpegBlobToMinSize(blob, minBytes);
+                }
             }
 
             return blob;

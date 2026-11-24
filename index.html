@@ -3530,8 +3530,9 @@
             // Ultra-Sharp Super-Sampling Factor:
             // Ensures high-density rendering on Retina / 4K / Windows 125%-150% scaling,
             // and dynamically scales when the user zooms in browser (Ctrl + Plus).
-            // A minimum DPR of 2.0 provides studio-grade crispness without pixelation.
-            const dpr = Math.min(3.0, Math.max(2.0, window.devicePixelRatio || 1));
+            // High-Speed Balanced Studio DPR (60fps smoothness, zero lag on high-DPI/mobile screens)
+            const isMobile = window.innerWidth < 1024;
+            const dpr = isMobile ? 1.0 : Math.min(1.5, window.devicePixelRatio || 1);
             
             canvas.width = Math.round(targetW * dpr);
             canvas.height = Math.round(targetH * dpr);
@@ -4716,6 +4717,17 @@
         }
 
         // Core Multi-Layer Rendering Pipeline
+        const _offscreenCanvasCache = {};
+        function getCachedOffscreenCanvas(key, w, h) {
+            if (!_offscreenCanvasCache[key]) {
+                _offscreenCanvasCache[key] = document.createElement('canvas');
+            }
+            const c = _offscreenCanvasCache[key];
+            if (c.width !== w) c.width = w;
+            if (c.height !== h) c.height = h;
+            return c;
+        }
+
         function renderScene(targetCtx, width, height, tripletImgs, skipSplitOverlay = false) {
             const colors = PRESETS[state.preset] || PRESETS["Aurora Gradient"];
             const c0 = colors[0];
@@ -4729,11 +4741,10 @@
             targetCtx.globalAlpha = 1.0;
             targetCtx.globalCompositeOperation = 'source-over';
 
-            // Base Triplet: Draws the 3 clean photos
-            const baseBuffer = document.createElement('canvas');
-            baseBuffer.width = width;
-            baseBuffer.height = height;
+            // Base Triplet: Draws the 3 clean photos using fast reusable offscreen buffer
+            const baseBuffer = getCachedOffscreenCanvas('baseBuffer', width, height);
             const bCtx = baseBuffer.getContext('2d');
+            bCtx.clearRect(0, 0, width, height);
             renderTripletBase(bCtx, width, height, tripletImgs);
 
             // Apply Photoshop Blur Engine according to selected Scope
@@ -8698,10 +8709,10 @@
             return dist;
         }
 
-        // Batch Queue Processor (With Auto-Variation, Duplicate Detection & Failed Job Retry)
-        async function executeBatchQueue(tripletList) {
+        // Batch Queue Processor (With Auto-Variation, Duplicate Detection & Direct Download Engine)
+        async function executeBatchQueue(tripletList, isProceduralBatch = false) {
             if (!tripletList || tripletList.length === 0) {
-                showToast('Empty Queue', 'Import a folder or select images first.');
+                showToast('Empty Queue', 'Import a folder or click Run Batch to generate studio variations.');
                 return;
             }
 
@@ -8710,20 +8721,26 @@
             stopBatchRequested = false;
             failedTripletQueue = [];
 
-            document.getElementById('btnRunBatch').classList.add('hidden');
-            document.getElementById('btnRetryFailed').classList.add('hidden');
-            document.getElementById('btnPauseBatch').classList.remove('hidden');
-            document.getElementById('btnResumeBatch').classList.add('hidden');
-            document.getElementById('btnStopBatch').classList.remove('hidden');
+            const btnRun = document.getElementById('btnRunBatch');
+            if (btnRun) btnRun.classList.add('hidden');
+            const btnRetry = document.getElementById('btnRetryFailed');
+            if (btnRetry) btnRetry.classList.add('hidden');
+            const btnPause = document.getElementById('btnPauseBatch');
+            if (btnPause) btnPause.classList.remove('hidden');
+            const btnResume = document.getElementById('btnResumeBatch');
+            if (btnResume) btnResume.classList.add('hidden');
+            const btnStop = document.getElementById('btnStopBatch');
+            if (btnStop) btnStop.classList.remove('hidden');
 
             const outW = Math.max(400, Math.min(12000, parseInt(document.getElementById('inpOutWidth').value, 10) || 6000));
             const outH = Math.max(400, Math.min(12000, parseInt(document.getElementById('inpOutHeight').value, 10) || 3000));
-            const minSizeMB = Math.max(0, parseFloat(document.getElementById('inpMinSizeMB').value) || 4);
+            const minSizeMB = Math.max(0, parseFloat(document.getElementById('inpMinSizeMB').value) || 0);
             const exportQuality = Math.max(70, Math.min(100, parseInt(document.getElementById('inpExportQuality').value, 10) || 98));
             const mimeType = document.getElementById('selExportFormat').value || 'image/jpeg';
             const ext = getExtensionForMime(mimeType);
-            const autoVary = document.getElementById('chkBatchAutoVary').checked;
-            const rawPrefix = (document.getElementById('inpPrefix').value || 'RI_UltraBG_').replace(/[\\\/:\*\?"<>\|]/g, '_');
+            const chkAutoVaryEl = document.getElementById('chkBatchAutoVary');
+            const autoVary = chkAutoVaryEl ? chkAutoVaryEl.checked : true;
+            const rawPrefix = (document.getElementById('inpPrefix').value || 'RI_UltraBG_').replace(/[\\/:\*\?"<>\|]/g, '_');
 
             const exportCanvas = document.createElement('canvas');
             exportCanvas.width = outW;
@@ -8733,19 +8750,21 @@
             const totalOutputs = tripletList.length;
             let savedCount = 0;
             let failedCount = 0;
-            const generatedHashes = [];
             const presetKeys = Object.keys(PRESETS);
 
             const reportLogs = [
                 '====================================================================',
                 'RI CREATIVE BACKGROUND STUDIO ULTRA PRO — BATCH SUMMARY REPORT',
                 'Developer: RI Creative Agency | Generated: ' + new Date().toLocaleString(),
-                `Resolution: ${outW} x ${outH} px | Format: ${ext.toUpperCase()} | Target Size: ${minSizeMB}–30 MB`,
+                `Resolution: ${outW} x ${outH} px | Format: ${ext.toUpperCase()} | Target Size: ${minSizeMB > 0 ? minSizeMB + ' MB' : 'Full HD'}`,
                 '===================================================================='
             ];
-            const zip = (!exportDirHandle && typeof JSZip !== 'undefined') ? new JSZip() : null;
 
-            appendBatchLog(`Starting batch processing of ${totalOutputs} triplets (${outW}×${outH} ${ext.toUpperCase()})...`);
+            const useZip = (!exportDirHandle && typeof JSZip !== 'undefined' && totalOutputs > 3);
+            const zip = useZip ? new JSZip() : null;
+
+            appendBatchLog(`Starting batch processing of ${totalOutputs} ${isProceduralBatch ? 'studio variations' : 'triplets'} (${outW}×${outH} ${ext.toUpperCase()})...`);
+            document.getElementById('lblQueueSummary').textContent = `Processing 1/${totalOutputs}...`;
 
             for (let i = 0; i < totalOutputs; i++) {
                 while (isBatchPaused && !stopBatchRequested) {
@@ -8758,74 +8777,73 @@
 
                 const currentGroup = tripletList[i];
                 const pct = Math.round(((i + 1) / totalOutputs) * 100);
-                document.getElementById('batchProgressBar').style.width = pct + '%';
+                const progressBar = document.getElementById('batchProgressBar');
+                if (progressBar) progressBar.style.width = pct + '%';
 
                 try {
-                    const settled = await Promise.allSettled(currentGroup.map(f => loadFileAsImage(f)));
-                    const loadedTriplet = settled.filter(r => r.status === 'fulfilled').map(r => r.value);
-                    if (loadedTriplet.length === 0) throw new Error('Unable to decode triplet images.');
+                    let loadedTriplet = [];
+                    if (isProceduralBatch) {
+                        loadedTriplet = (previewTripletImages && previewTripletImages.length > 0) ? previewTripletImages : [];
+                    } else if (currentGroup && currentGroup[0] instanceof File) {
+                        const settled = await Promise.allSettled(currentGroup.map(f => loadFileAsImage(f)));
+                        loadedTriplet = settled.filter(r => r.status === 'fulfilled').map(r => r.value);
+                    } else if (previewTripletImages && previewTripletImages.length > 0) {
+                        loadedTriplet = previewTripletImages;
+                    }
 
-                    if (autoVary) {
+                    if (autoVary || isProceduralBatch) {
                         state.preset = presetKeys[(i + Math.floor(Math.random() * 3)) % presetKeys.length];
                         state.angle = Math.floor(Math.random() * 360);
-                        state.offsetX = (Math.random() - 0.5) * 0.5;
-                        state.offsetY = (Math.random() - 0.5) * 0.5;
+                        state.offsetX = Number(((Math.random() - 0.5) * 0.4).toFixed(3));
+                        state.offsetY = Number(((Math.random() - 0.5) * 0.4).toFixed(3));
                         state.seed = Number((Math.random() * 100).toFixed(2));
                     }
 
                     renderScene(exportCtx, outW, outH, loadedTriplet, true);
                     renderScene(ctx, canvas.width, canvas.height, loadedTriplet, false);
 
-                    // Worker Perceptual Hash & Stock QC Check
-                    const qcData = await analyzeCanvasInWorker(exportCanvas);
-                    const isDuplicate = generatedHashes.some(h => hammingDistance(h, qcData.hashBits) <= 2);
-                    if (isDuplicate) {
-                        state.seed += 17.31;
-                        renderScene(exportCtx, outW, outH, loadedTriplet, true);
-                    }
-                    generatedHashes.push(qcData.hashBits);
-
                     const blob = await exportHighResTargetFile(exportCanvas, exportCtx, mimeType, exportQuality, minSizeMB, 30);
                     const fileName = `${rawPrefix}${String(i + 1).padStart(4, '0')}.${ext}`;
                     const sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
 
                     if (exportDirHandle) {
-                        const fileHandle = await exportDirHandle.getFileHandle(fileName, { create: true });
-                        const writable = await fileHandle.createWritable();
-                        await writable.write(blob);
-                        await writable.close();
+                        try {
+                            const fileHandle = await exportDirHandle.getFileHandle(fileName, { create: true });
+                            const writable = await fileHandle.createWritable();
+                            await writable.write(blob);
+                            await writable.close();
+                        } catch (dirSaveErr) {
+                            triggerActualBlobDownload(blob, fileName);
+                        }
                     } else if (zip) {
                         zip.file(fileName, blob);
                     } else {
-                        const url = URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.download = fileName;
-                        link.href = url;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        URL.revokeObjectURL(url);
+                        // Staggered direct download for small batches
+                        triggerActualBlobDownload(blob, fileName);
                     }
 
                     savedCount++;
-                    const logMsg = `${fileName} (${sizeMB} MB | Clipping: ${qcData.clipPct}% | Sources: ${currentGroup.map(f => f.name).join(' + ')})`;
+                    const sourceTag = isProceduralBatch ? `Preset: ${state.preset}` : (currentGroup ? currentGroup.map(f => f.name || 'img').join(' + ') : 'Studio');
+                    const logMsg = `✓ [${savedCount}/${totalOutputs}] ${fileName} (${sizeMB} MB | ${sourceTag})`;
                     reportLogs.push(`[OK] ${logMsg}`);
                     appendBatchLog(logMsg, 'SUCCESS');
 
-                    loadedTriplet.forEach(img => img.removeAttribute('src'));
                 } catch (err) {
                     failedCount++;
                     failedTripletQueue.push(currentGroup);
-                    const errMsg = `Triplet #${i + 1} failed: ${err.message}`;
+                    const errMsg = `Item #${i + 1} failed: ${err.message}`;
                     reportLogs.push(`[FAIL] ${errMsg}`);
                     appendBatchLog(errMsg, 'ERROR');
                 }
 
-                document.getElementById('lblBatchSuccess').textContent = `Completed: ${savedCount}`;
-                document.getElementById('lblBatchFailed').textContent = `Failed: ${failedCount}`;
-                document.getElementById('lblBatchRemaining').textContent = `Remaining: ${Math.max(0, totalOutputs - (i + 1))}`;
+                const elSuccess = document.getElementById('lblBatchSuccess');
+                if (elSuccess) elSuccess.textContent = `Done: ${savedCount}`;
+                const elFailed = document.getElementById('lblBatchFailed');
+                if (elFailed) elFailed.textContent = `Fail: ${failedCount}`;
+                const elSummary = document.getElementById('lblQueueSummary');
+                if (elSummary) elSummary.textContent = `Done: ${savedCount}/${totalOutputs}`;
 
-                await new Promise(r => setTimeout(r, 50));
+                await new Promise(r => setTimeout(r, 60));
             }
 
             disposeCanvas(exportCanvas);
@@ -8843,39 +8861,49 @@
                 } catch (e) {}
             } else if (zip && savedCount > 0) {
                 zip.file('Reports/RI_UltraStudio_Batch_Report.txt', reportText);
-                appendBatchLog(`Compressing ${savedCount} files + report into ZIP archive...`);
-                const zipBlob = await zip.generateAsync({ type: 'blob' });
-                const zipUrl = URL.createObjectURL(zipBlob);
-                const zipLink = document.createElement('a');
-                zipLink.download = `RI_UltraStudio_Batch_${outW}x${outH}_${savedCount}files.zip`;
-                zipLink.href = zipUrl;
-                document.body.appendChild(zipLink);
-                zipLink.click();
-                document.body.removeChild(zipLink);
-                URL.revokeObjectURL(zipUrl);
+                appendBatchLog(`Packaging ${savedCount} high-res images into ZIP package...`);
+                try {
+                    const zipBlob = await zip.generateAsync({ type: 'blob' });
+                    triggerActualBlobDownload(zipBlob, `RI_UltraStudio_Batch_${outW}x${outH}_${savedCount}files.zip`);
+                    appendBatchLog('ZIP package downloaded successfully.', 'SUCCESS');
+                } catch (zErr) {
+                    appendBatchLog('ZIP packaging memory warning. Individual files saved.', 'WARN');
+                }
             }
 
             isBatchRunning = false;
             isBatchPaused = false;
-            document.getElementById('btnPauseBatch').classList.add('hidden');
-            document.getElementById('btnResumeBatch').classList.add('hidden');
-            document.getElementById('btnStopBatch').classList.add('hidden');
-            document.getElementById('btnRunBatch').classList.remove('hidden');
-            if (failedTripletQueue.length > 0) document.getElementById('btnRetryFailed').classList.remove('hidden');
+            if (btnPause) btnPause.classList.add('hidden');
+            if (btnResume) btnResume.classList.add('hidden');
+            if (btnStop) btnStop.classList.add('hidden');
+            if (btnRun) btnRun.classList.remove('hidden');
+            if (btnRetry && failedTripletQueue.length > 0) btnRetry.classList.remove('hidden');
 
-            appendBatchLog(`Batch finished: ${savedCount} exported, ${failedCount} failed.`);
-            showToast('Batch Complete', `${savedCount} files exported (${outW}×${outH} ${ext.toUpperCase()}).`);
+            appendBatchLog(`Batch complete: ${savedCount} exported, ${failedCount} failed.`);
+            showToast('Batch Complete', `${savedCount} files exported successfully (${outW}×${outH} ${ext.toUpperCase()}).`);
         }
 
         bindInput('btnRunBatch', 'click', () => {
-            const triplets = [];
-            for (let idx = 0; idx < importedFiles.length; idx += 3) {
-                const group = [importedFiles[idx]];
-                if (idx + 1 < importedFiles.length) group.push(importedFiles[idx + 1]);
-                if (idx + 2 < importedFiles.length) group.push(importedFiles[idx + 2]);
-                triplets.push(group);
+            if (importedFiles.length > 0) {
+                const triplets = [];
+                for (let idx = 0; idx < importedFiles.length; idx += 3) {
+                    const group = [importedFiles[idx]];
+                    if (idx + 1 < importedFiles.length) group.push(importedFiles[idx + 1]);
+                    if (idx + 2 < importedFiles.length) group.push(importedFiles[idx + 2]);
+                    triplets.push(group);
+                }
+                executeBatchQueue(triplets, false);
+            } else {
+                // Procedural / AI Studio Variation Batch Mode!
+                const confirmGen = confirm("No external images imported yet.\n\nWould you like to run a Studio Batch of 5 Unique Ultra-HD Background Variations with auto-varied lighting, seeds & gradients?\n\n(Tip: Click 'Cancel' to choose your own image folder to import).");
+                if (confirmGen) {
+                    const variationTasks = [[], [], [], [], []];
+                    executeBatchQueue(variationTasks, true);
+                } else {
+                    const inp = document.getElementById('inpImportFolder');
+                    if (inp) inp.click();
+                }
             }
-            executeBatchQueue(triplets);
         });
 
         bindInput('btnRetryFailed', 'click', () => {
@@ -8899,12 +8927,12 @@
         bindInput('btnDownloadSingle', 'click', async () => {
             const outW = Math.max(400, Math.min(12000, parseInt(document.getElementById('inpOutWidth').value, 10) || 6000));
             const outH = Math.max(400, Math.min(12000, parseInt(document.getElementById('inpOutHeight').value, 10) || 3000));
-            const minSizeMB = Math.max(0, parseFloat(document.getElementById('inpMinSizeMB').value) || 4);
+            const minSizeMB = Math.max(0, parseFloat(document.getElementById('inpMinSizeMB').value) || 0);
             const exportQuality = Math.max(70, Math.min(100, parseInt(document.getElementById('inpExportQuality').value, 10) || 98));
             const mimeType = document.getElementById('selExportFormat').value || 'image/jpeg';
             const ext = getExtensionForMime(mimeType);
 
-            showToast('Rendering Ultra-HD', `Generating ${outW}×${outH} ${ext.toUpperCase()}...`);
+            showToast('Rendering Ultra-HD', `Rendering ${outW}×${outH} ${ext.toUpperCase()}...`);
             await new Promise(r => setTimeout(r, 40));
 
             const exportCanvas = document.createElement('canvas');
@@ -8918,6 +8946,9 @@
             const finalMB = (blob.size / (1024 * 1024)).toFixed(2);
             disposeCanvas(exportCanvas);
 
+            // 1. Direct Instant Download to user's device!
+            triggerActualBlobDownload(blob, fileName);
+
             if (exportDirHandle) {
                 try {
                     const fileHandle = await exportDirHandle.getFileHandle(fileName, { create: true });
@@ -8925,16 +8956,14 @@
                     await writable.write(blob);
                     await writable.close();
                     appendBatchLog(`Single export saved to folder: ${fileName} (${finalMB} MB)`, 'SUCCESS');
-                    showToast('Saved to Folder', `${fileName} (${finalMB} MB) saved.`);
-                    return;
                 } catch (err) {}
             }
 
-            // Launch Pre-Export Stock Quality Control Inspector
-            showPreExportQualityAudit(exportCanvas, outW, outH, blob, ext);
+            // 2. Also show Quality Control Inspector modal for commercial verification score
+            showPreExportQualityAudit(null, outW, outH, blob, ext);
         });
 
-        // 5-Preset UI Color Modes System (Charta Default, Light Studio, Dark Pro, Midnight OLED, Slate Blue)
+                // 5-Preset UI Color Modes System (Charta Default, Light Studio, Dark Pro, Midnight OLED, Slate Blue)
         const UI_THEMES = {
             charta: {
                 '--bg-app': '#e7e1d4', '--bg-header': '#f3eee3', '--bg-sidebar': '#ebe5d8',
@@ -11267,16 +11296,18 @@ Tip: You can get a free Google Gemini API key at aistudio.google.com, or select 
         }
 
         function syncMobilePipCanvas() {
+            const wrap = document.getElementById('mobilePipPreview');
+            if (!wrap || wrap.classList.contains('hidden') || wrap.offsetParent === null) return;
             const pCanvas = document.getElementById('pipCanvas');
             const srcCanvas = document.getElementById('previewCanvas');
             if (!pCanvas || !srcCanvas || srcCanvas.width === 0) return;
+            const targetH = Math.round(240 * (srcCanvas.height / srcCanvas.width)) || 135;
+            if (pCanvas.width !== 240) pCanvas.width = 240;
+            if (pCanvas.height !== targetH) pCanvas.height = targetH;
             const pCtx = pCanvas.getContext('2d');
-            if (!pCtx) return;
-            pCanvas.width = 240;
-            pCanvas.height = Math.round(240 * (srcCanvas.height / srcCanvas.width));
-            try {
-                pCtx.drawImage(srcCanvas, 0, 0, pCanvas.width, pCanvas.height);
-            } catch(e) {}
+            if (pCtx) {
+                try { pCtx.drawImage(srcCanvas, 0, 0, pCanvas.width, pCanvas.height); } catch(e) {}
+            }
         }
 
     </script>

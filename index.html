@@ -1939,7 +1939,7 @@
                     <span class="panel-accordion-chevron text-[10px] font-mono mr-1.5 transition-transform duration-200">▼</span>
                     <span class="studio-heading text-xs font-bold uppercase tracking-wider">7. Lighting &amp; Optical Engine</span>
                     <label class="studio-check flex items-center gap-1.5 text-[11px] cursor-pointer">
-                        <input id="chkLightEnable" type="checkbox" checked>
+                        <input id="chkLightEnable" type="checkbox">
                         <span>Enable</span>
                     </label>
                 </div>
@@ -2738,7 +2738,7 @@
             { id: "fractal", name: "4. Fractal Pro Engine", visible: true, opacity: 55, blend: "overlay" },
             { id: "glass", name: "5. Pro Ribbed Glass (40)", visible: false, opacity: 100, blend: "source-over" },
             { id: "geometric", name: "6. Geometric Pattern", visible: false, opacity: 28, blend: "overlay" },
-            { id: "lighting", name: "7. Optical Lighting", visible: true, opacity: 100, blend: "screen" },
+            { id: "lighting", name: "7. Optical Lighting", visible: false, opacity: 100, blend: "screen" },
             { id: "texture", name: "8. Surface Texture & Overlay", visible: true, opacity: 100, blend: "overlay" }
         ];
 
@@ -2947,7 +2947,7 @@
             geoBlend: "overlay",
             geoDensity: 24,
             geoOpacity: 28,
-            lightEnable: true,
+            lightEnable: false,
             lightFlare: 30,
             lightBokeh: 25,
             lightGlow: 35,
@@ -6714,7 +6714,13 @@
         bindInput('selPreset', 'change', (e) => { state.preset = e.target.value; triggerRedraw(); });
         bindInput('selGradType', 'change', (e) => { state.gradType = e.target.value; triggerRedraw(); });
         bindInput('selBlendMode', 'change', (e) => { state.blendMode = e.target.value; triggerRedraw(); });
-        bindInput('chkGradientEnable', 'change', (e) => { state.gradEnable = e.target.checked; renderLayerStackUI(); triggerRedraw(); });
+        bindInput('chkGradientEnable', 'change', (e) => {
+            state.gradEnable = e.target.checked;
+            const gradLayer = state.layers ? state.layers.find(l => l.id === 'gradient') : null;
+            if (gradLayer) gradLayer.visible = e.target.checked;
+            renderLayerStackUI();
+            triggerRedraw();
+        });
         bindInput('rngGradOpacity', 'input', (e) => { state.gradOpacity = parseInt(e.target.value, 10); triggerRedraw(true); });
         bindInput('rngGradOpacity', 'change', () => pushHistory());
         bindInput('rngGradDither', 'input', (e) => { state.gradDither = parseInt(e.target.value, 10); triggerRedraw(true); });
@@ -7154,7 +7160,13 @@
         });
         bindInput('rngLiquify', 'change', () => pushHistory());
 
-        bindInput('chkFractalEnable', 'change', (e) => { state.fractalEnable = e.target.checked; renderLayerStackUI(); triggerRedraw(); });
+        bindInput('chkFractalEnable', 'change', (e) => {
+            state.fractalEnable = e.target.checked;
+            const fracLayer = state.layers ? state.layers.find(l => l.id === 'fractal') : null;
+            if (fracLayer) fracLayer.visible = e.target.checked;
+            renderLayerStackUI();
+            triggerRedraw();
+        });
         bindInput('selFracStyle', 'change', (e) => { state.fracStyle = e.target.value; triggerRedraw(); });
         bindInput('selFracBlend', 'change', (e) => { state.fracBlend = e.target.value; triggerRedraw(); });
         bindInput('rngFracOctaves', 'input', (e) => { state.fracOctaves = parseInt(e.target.value, 10); triggerRedraw(true); });
@@ -7168,7 +7180,13 @@
         bindInput('rngFracOpacity', 'input', (e) => { state.fracOpacity = parseInt(e.target.value, 10); triggerRedraw(true); });
         bindInput('rngFracOpacity', 'change', () => pushHistory());
 
-        bindInput('chkFracGlassEnable', 'change', (e) => { state.fracGlassEnable = e.target.checked; renderLayerStackUI(); triggerRedraw(); });
+        bindInput('chkFracGlassEnable', 'change', (e) => {
+            state.fracGlassEnable = e.target.checked;
+            const glassLayer = state.layers ? state.layers.find(l => l.id === 'glass') : null;
+            if (glassLayer) glassLayer.visible = e.target.checked;
+            renderLayerStackUI();
+            triggerRedraw();
+        });
         bindInput('selFracGlassStyle', 'change', (e) => { state.fracGlassStyle = e.target.value; triggerRedraw(); });
         bindInput('selGlassDir', 'change', (e) => { state.glassDir = e.target.value; triggerRedraw(); });
         bindInput('selGlassGroove', 'change', (e) => { state.glassGroove = e.target.value; triggerRedraw(); });
@@ -7239,7 +7257,13 @@
         bindInput('rngGeoOpacity', 'input', (e) => { state.geoOpacity = parseInt(e.target.value, 10); triggerRedraw(true); });
         bindInput('rngGeoOpacity', 'change', () => pushHistory());
 
-        bindInput('chkLightEnable', 'change', (e) => { state.lightEnable = e.target.checked; renderLayerStackUI(); triggerRedraw(); });
+        bindInput('chkLightEnable', 'change', (e) => {
+            state.lightEnable = e.target.checked;
+            const lightLayer = state.layers ? state.layers.find(l => l.id === 'lighting') : null;
+            if (lightLayer) lightLayer.visible = e.target.checked;
+            renderLayerStackUI();
+            triggerRedraw();
+        });
         bindInput('rngLightFlare', 'input', (e) => { state.lightFlare = parseInt(e.target.value, 10); triggerRedraw(true); });
         bindInput('rngLightFlare', 'change', () => pushHistory());
         bindInput('rngLightBokeh', 'input', (e) => { state.lightBokeh = parseInt(e.target.value, 10); triggerRedraw(true); });
@@ -7249,7 +7273,13 @@
         bindInput('rngLightVignette', 'input', (e) => { state.lightVignette = parseInt(e.target.value, 10); triggerRedraw(true); });
         bindInput('rngLightVignette', 'change', () => pushHistory());
 
-        bindInput('chkNoiseEnable', 'change', (e) => { state.noiseEnable = e.target.checked; renderLayerStackUI(); triggerRedraw(); });
+        bindInput('chkNoiseEnable', 'change', (e) => {
+            state.noiseEnable = e.target.checked;
+            const noiseLayer = state.layers ? state.layers.find(l => l.id === 'texture') : null;
+            if (noiseLayer) noiseLayer.visible = e.target.checked;
+            renderLayerStackUI();
+            triggerRedraw();
+        });
         bindInput('selTextureType', 'change', (e) => { state.textureType = e.target.value; triggerRedraw(); });
         bindInput('selOverlayType', 'change', (e) => { state.overlayType = e.target.value; triggerRedraw(); });
         bindInput('rngNoise', 'input', (e) => { state.noise = parseInt(e.target.value, 10); triggerRedraw(true); });

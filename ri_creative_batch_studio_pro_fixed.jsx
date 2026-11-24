@@ -279,7 +279,54 @@ app.bringToFront();
             "9.13 Metallic Layered Curve",
             "9.14 Neon Blue-Pink Flow",
             "9.15 Silver Satin Texture",
-            "9.16 Deep Purple Glass Flow"
+            "9.16 Deep Purple Glass Flow",
+            // 10. 25 3D Glass Background Styles (Full-Frame Stock Presets)
+            "10.01 3D Glass Wave",
+            "10.02 3D Glass Layers",
+            "10.03 3D Bubble",
+            "10.04 3D Crystal Cubes",
+            "10.05 3D Glass Ribbon",
+            "10.06 3D Hexagon",
+            "10.07 3D Glass Square",
+            "10.08 3D Glass Spiral",
+            "10.09 3D Glass Stripes",
+            "10.10 3D Glass Spheres",
+            "10.11 3D Prism",
+            "10.12 3D Liquid Glass",
+            "10.13 3D Glass Panel",
+            "10.14 3D Glass Tiles",
+            "10.15 3D Glass Streaks",
+            "10.16 3D Glass Ring",
+            "10.17 3D Glass Curve",
+            "10.18 3D Glass Plates",
+            "10.19 3D Glass Mountains",
+            "10.20 3D Glass Fluid",
+            "10.21 3D Layered Diamond",
+            "10.22 3D Glass Flow",
+            "10.23 3D Transparent Balls",
+            "10.24 3D Glass Bevel",
+            "10.25 3D Soft Glass",
+            // 11. 20 Glass Effect Overlay Styles (Apply on Image)
+            "11.01 Frosted Glass Overlay",
+            "11.02 Classic Glass Plate",
+            "11.03 Glass with Specular Glow",
+            "11.04 3D Crystal Sphere Glass",
+            "11.05 Capsule Glass Pill",
+            "11.06 3D Tilt Glass Slab",
+            "11.07 Prism Diamond Glass",
+            "11.08 Neon Glowing Rim Glass",
+            "11.09 Droplet Liquid Glass",
+            "11.10 Triple Layered Glass",
+            "11.11 Sinusoidal Wave Glass",
+            "11.12 3D Ribbon Loop Glass",
+            "11.13 Crystal Hexagon Glass",
+            "11.14 Squircle App Icon Glass",
+            "11.15 Torus Ring Glass",
+            "11.16 Curved Sheet Glass",
+            "11.17 Floor Isometric Tilt Slab",
+            "11.18 5-Point Star Glass",
+            "11.19 3D Puffed Heart Glass",
+            "11.20 Brilliant Crystal Gem Glass"
         ];
 
         var DEFAULT_CONFIG = {
@@ -1237,6 +1284,8 @@ app.bringToFront();
                 var isCategory7Abstract = (style.indexOf("7.") === 0 || style.indexOf("Fragment") !== -1 || style.indexOf("Shard") !== -1 || style.indexOf("Mosaic") !== -1 || style.indexOf("Mesh") !== -1 || style.indexOf("Sheet") !== -1 || style.indexOf("Overlay") !== -1 || style.indexOf("56.") === 0);
                 var isCategory8Color = (style.indexOf("8.") === 0 || style.indexOf("Rose Gold") !== -1 || style.indexOf("Champagne") !== -1 || style.indexOf("Emerald") !== -1 || style.indexOf("Sapphire") !== -1 || style.indexOf("Amethyst") !== -1 || style.indexOf("Ruby") !== -1 || style.indexOf("Amber") !== -1 || style.indexOf("Ocean Blue") !== -1);
                 var isCategory9Flow = (style.indexOf("9.") === 0 || style.indexOf("Flow") !== -1 || style.indexOf("Chrome Wave") !== -1 || style.indexOf("Chrome Ribbon") !== -1 || style.indexOf("Gold Wave") !== -1 || style.indexOf("Metallic") !== -1);
+            var isCategory10Bg = (style.indexOf("10.") === 0 || style.indexOf("3D Glass") !== -1 || style.indexOf("Bubble") !== -1 || style.indexOf("Cubes") !== -1 || style.indexOf("Hexagon") !== -1 || style.indexOf("Plates") !== -1 || style.indexOf("Mountains") !== -1);
+            var isCategory11Shapes = (style.indexOf("11.") === 0 || style.indexOf("Overlay") !== -1 || style.indexOf("Pill") !== -1 || style.indexOf("Slab") !== -1 || style.indexOf("Star") !== -1 || style.indexOf("Heart") !== -1 || style.indexOf("Gem") !== -1);
                 var isSphere = (style.indexOf("Sphere") !== -1 || style.indexOf("Orb") !== -1 || style.indexOf("5.1") === 0 || style.indexOf("5.2") === 0 || style.indexOf("55.") === 0);
 
                 if (isCategory1Frosted) {
@@ -1379,7 +1428,45 @@ app.bringToFront();
                     glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.45));
                     glassLayer.opacity = opacity;
 
-                } else if (isCategory9Flow) {
+                } else if (isCategory10Bg || isCategory11Shapes) {
+                // Category 10 & 11: 25 3D Glass Backgrounds & 20 Floating Glass Shapes
+                try {
+                    if (style.indexOf("Wave") !== -1 || style.indexOf("Fluid") !== -1 || style.indexOf("Flow") !== -1) {
+                        glassLayer.applyZigZag(Math.round(distortion * 0.7), 6, ZigZagType.AROUNDCENTER);
+                        glassLayer.applyTwirl(Math.round((Math.random() > 0.5 ? 1 : -1) * 35));
+                    } else if (style.indexOf("Bubble") !== -1 || style.indexOf("Sphere") !== -1 || style.indexOf("Balls") !== -1) {
+                        glassLayer.applySpherize(Math.min(100, Math.round(distortion * 1.4)), SpherizeMode.NORMAL);
+                    } else if (style.indexOf("Cubes") !== -1 || style.indexOf("Square") !== -1 || style.indexOf("Hexagon") !== -1 || style.indexOf("Tiles") !== -1) {
+                        glassLayer.applyRipple(Math.round(distortion * 0.6), RippleSize.LARGE);
+                    } else if (style.indexOf("Spiral") !== -1 || style.indexOf("Ring") !== -1) {
+                        glassLayer.applyTwirl(Math.round(85));
+                    } else if (style.indexOf("Prism") !== -1 || style.indexOf("Mountains") !== -1 || style.indexOf("Diamond") !== -1) {
+                        glassLayer.applyZigZag(Math.round(distortion * 0.5), 8, ZigZagType.PONDRIPPLES);
+                    } else {
+                        glassLayer.applyGaussianBlur(Math.max(2, frostBlur * 0.8));
+                    }
+                } catch (eCat10) {}
+
+                glassLayer.applyGaussianBlur(Math.max(1, frostBlur * 0.4));
+                glassLayer.opacity = opacity;
+
+                // High-specular bevel edge rim layer
+                try {
+                    var rimArt = doc.artLayers.add();
+                    rimArt.name = "RI 3D Glass Specular Bevel Rim";
+                    var rimCol = new SolidColor();
+                    if (style.indexOf("Neon") !== -1) { rimCol.rgb.red = 0; rimCol.rgb.green = 230; rimCol.rgb.blue = 255; }
+                    else if (style.indexOf("Glow") !== -1) { rimCol.rgb.red = 255; rimCol.rgb.green = 240; rimCol.rgb.blue = 180; }
+                    else { rimCol.rgb.red = 255; rimCol.rgb.green = 255; rimCol.rgb.blue = 255; }
+
+                    doc.selection.selectAll();
+                    doc.selection.stroke(rimCol, Math.max(5, Math.round(w * 0.0035)), StrokeLocation.INSIDE, ColorBlendMode.NORMAL, 85);
+                    doc.selection.deselect();
+                    rimArt.blendMode = BlendMode.SCREEN;
+                    rimArt.opacity = 75;
+                } catch (eRim) {}
+
+            } else if (isCategory9Flow) {
                     // Category 9: Abstract 3D Metallic & Glass Flow Patterns (16 Stock Presets)
                     try {
                         glassLayer.applyTwirl(Math.round((distortion * 0.8) + 35));

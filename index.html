@@ -2194,9 +2194,9 @@
                                 <span class="text-xs">📜</span>
                                 <span class="truncate w-full text-center text-[8px]">Curved</span>
                             </button>
-                            <button type="button" data-glass-shape="slab" class="studio-btn py-1 px-1 rounded-lg border text-[9px] font-semibold flex flex-col items-center justify-center gap-0.5 transition hover:border-accent-main" title="Tilt Glass Slab (Isometric 3D floor slab)">
+                            <button type="button" data-glass-shape="cube" class="studio-btn py-1 px-1 rounded-lg border text-[9px] font-semibold flex flex-col items-center justify-center gap-0.5 transition hover:border-accent-main" title="3D Glass (Isometric 3D Glass Cube with Internal Refraction)">
                                 <span class="text-xs">🧊</span>
-                                <span class="truncate w-full text-center text-[8px]">Tilt Slab</span>
+                                <span class="truncate w-full text-center text-[8px]">3D Glass</span>
                             </button>
                             <button type="button" data-glass-shape="star" class="studio-btn py-1 px-1 rounded-lg border text-[9px] font-semibold flex flex-col items-center justify-center gap-0.5 transition hover:border-accent-main" title="Star Glass (5-point rounded star glass)">
                                 <span class="text-xs">⭐</span>
@@ -6748,27 +6748,27 @@
 
 
         // ============================================================================
-        // 20 GLASS EFFECT SHAPES & 25 3D GLASS BACKGROUNDS ENGINE
+        // 20 GLASS EFFECT SHAPES & 25 3D GLASS BACKGROUNDS ENGINE (TRUE PHYSICAL 3D)
         // ============================================================================
-
-        const GLASS_SHAPES_INFO = {
-            frosted: { name: 'Frosted Glass', icon: '🌫️', defaultBlur: 25, defaultRefract: 40, defaultBevel: 4 },
+const GLASS_SHAPES_INFO = {
+            frosted: { name: 'Frosted Glass', icon: '🌫️', defaultBlur: 25, defaultRefract: 40, defaultBevel: 5 },
             classic: { name: 'Classic Glass', icon: '🪟', defaultBlur: 6, defaultRefract: 35, defaultBevel: 5 },
-            glow: { name: 'Glass with Glow', icon: '✨', defaultBlur: 14, defaultRefract: 45, defaultBevel: 5, defaultNeon: 75 },
+            cube: { name: '3D Glass Cube', icon: '🧊', defaultBlur: 8, defaultRefract: 60, defaultBevel: 6 },
             sphere: { name: 'Sphere Glass', icon: '🔮', defaultBlur: 4, defaultRefract: 85, defaultBevel: 6 },
-            pill: { name: 'Glass Pill', icon: '💊', defaultBlur: 12, defaultRefract: 50, defaultBevel: 5 },
-            tilt: { name: 'Tilt Glass', icon: '📐', defaultBlur: 10, defaultRefract: 45, defaultBevel: 6 },
+            pill: { name: 'Glass Pill', icon: '💊', defaultBlur: 10, defaultRefract: 50, defaultBevel: 5 },
+            glow: { name: 'Glass with Glow', icon: '✨', defaultBlur: 14, defaultRefract: 45, defaultBevel: 5, defaultNeon: 75 },
             prism: { name: 'Prism Glass', icon: '💎', defaultBlur: 8, defaultRefract: 70, defaultBevel: 7 },
             neon: { name: 'Neon Glass', icon: '💡', defaultBlur: 12, defaultRefract: 40, defaultBevel: 5, defaultNeon: 90 },
             droplet: { name: 'Droplet Glass', icon: '💧', defaultBlur: 8, defaultRefract: 65, defaultBevel: 4 },
-            layered: { name: 'Layered Glass', icon: '📚', defaultBlur: 15, defaultRefract: 45, defaultBevel: 5 },
-            wave: { name: 'Wave Glass', icon: '🌊', defaultBlur: 10, defaultRefract: 50, defaultBevel: 5 },
+            layered: { name: 'Layered Glass', icon: '📚', defaultBlur: 14, defaultRefract: 45, defaultBevel: 5 },
             ribbon: { name: 'Ribbon Glass', icon: '🎀', defaultBlur: 8, defaultRefract: 60, defaultBevel: 6 },
+            wave: { name: 'Wave Glass', icon: '🌊', defaultBlur: 10, defaultRefract: 50, defaultBevel: 5 },
             hexagon: { name: 'Hexagon Glass', icon: '⬡', defaultBlur: 10, defaultRefract: 55, defaultBevel: 6 },
             app: { name: 'App Glass', icon: '📱', defaultBlur: 14, defaultRefract: 40, defaultBevel: 5 },
             ring: { name: 'Ring Glass', icon: '🪐', defaultBlur: 10, defaultRefract: 65, defaultBevel: 6 },
             curved: { name: 'Curved Glass', icon: '📜', defaultBlur: 10, defaultRefract: 50, defaultBevel: 5 },
-            slab: { name: 'Tilt Glass Slab', icon: '🧊', defaultBlur: 12, defaultRefract: 45, defaultBevel: 7 },
+            tilt: { name: 'Tilt Glass', icon: '📐', defaultBlur: 10, defaultRefract: 45, defaultBevel: 6 },
+            slab: { name: 'Tilt Glass Slab', icon: '🧊', defaultBlur: 12, defaultRefract: 50, defaultBevel: 7 },
             star: { name: 'Star Glass', icon: '⭐', defaultBlur: 10, defaultRefract: 60, defaultBevel: 6 },
             heart: { name: 'Heart Glass', icon: '💖', defaultBlur: 12, defaultRefract: 55, defaultBevel: 5 },
             crystal: { name: 'Crystal Glass', icon: '💠', defaultBlur: 6, defaultRefract: 80, defaultBevel: 8 }
@@ -6799,6 +6799,25 @@
                     break;
                 }
 
+                // 3D Glass Isometric Cube Outline
+                case 'cube': {
+                    const s = Math.min(hw, hh) * 0.92;
+                    const cos30 = 0.866;
+                    const sin30 = 0.5;
+                    const dx = s * cos30;
+                    const dy = s * sin30;
+
+                    // Perimeter of isometric cube: top-vertex, right-top, right-bottom, bottom-vertex, left-bottom, left-top
+                    ctx.moveTo(cx, cy - s);
+                    ctx.lineTo(cx + dx, cy - s + dy);
+                    ctx.lineTo(cx + dx, cy + dy);
+                    ctx.lineTo(cx, cy + s);
+                    ctx.lineTo(cx - dx, cy + dy);
+                    ctx.lineTo(cx - dx, cy - s + dy);
+                    ctx.closePath();
+                    break;
+                }
+
                 case 'sphere': {
                     const rad = Math.min(hw, hh);
                     ctx.arc(cx, cy, rad, 0, Math.PI * 2);
@@ -6824,6 +6843,20 @@
                     ctx.lineTo(cx + hw + skew, cy - hh * 0.7);
                     ctx.lineTo(cx + hw - skew, cy + hh);
                     ctx.lineTo(cx - hw - skew, cy + hh * 0.7);
+                    ctx.closePath();
+                    break;
+                }
+
+                case 'slab': {
+                    // 3D Perspective Glass Slab Outline
+                    const x0 = cx - hw * 0.9, y0 = cy + hh * 0.25;
+                    const x1 = cx - hw * 0.15, y1 = cy - hh * 0.85;
+                    const x2 = cx + hw * 0.9, y2 = cy - hh * 0.25;
+                    const x3 = cx + hw * 0.15, y3 = cy + hh * 0.85;
+                    ctx.moveTo(x0, y0);
+                    ctx.lineTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.lineTo(x3, y3);
                     ctx.closePath();
                     break;
                 }
@@ -6931,19 +6964,6 @@
                     break;
                 }
 
-                case 'slab': {
-                    const x0 = cx - hw * 0.85, y0 = cy + hh * 0.25;
-                    const x1 = cx - hw * 0.15, y1 = cy - hh * 0.85;
-                    const x2 = cx + hw * 0.85, y2 = cy - hh * 0.25;
-                    const x3 = cx + hw * 0.15, y3 = cy + hh * 0.85;
-                    ctx.moveTo(x0, y0);
-                    ctx.lineTo(x1, y1);
-                    ctx.lineTo(x2, y2);
-                    ctx.lineTo(x3, y3);
-                    ctx.closePath();
-                    break;
-                }
-
                 case 'star': {
                     const spikes = 5;
                     const outerR = Math.min(hw, hh);
@@ -7005,8 +7025,9 @@
             }
         }
 
-        /**
+/**
          * Renders the 20 Glass Effect Overlay Shapes directly over the underlying canvas
+         * with true physical 3D volumetric depth, multi-facet geometry, and optical caustics.
          */
         function render3DGlassShapeOnCanvas(targetCtx, width, height, opts = {}) {
             const shapeId = opts.shape || 'frosted';
@@ -7040,7 +7061,7 @@
             const baseDim = Math.min(width, height) * scalePct;
             let shapeW = baseDim * (aspectPct >= 100 ? (aspectPct / 100) : 1.0);
             let shapeH = baseDim * (aspectPct < 100 ? (100 / Math.max(25, aspectPct)) : 1.0);
-            if (shapeId === 'sphere' || shapeId === 'hexagon' || shapeId === 'ring') {
+            if (shapeId === 'sphere' || shapeId === 'cube' || shapeId === 'hexagon' || shapeId === 'ring') {
                 shapeW = baseDim;
                 shapeH = baseDim;
             } else if (shapeId === 'pill') {
@@ -7051,7 +7072,7 @@
             const rotRad = ((opts.rotation ?? 0) * Math.PI) / 180;
             const blurPx = Math.max(0, opts.blur ?? 20);
             const refractPct = (opts.refract ?? 45) / 100;
-            const bevelPx = Math.max(1, opts.bevel ?? 4);
+            const bevelPx = Math.max(1, opts.bevel ?? 5);
             const shinePct = (opts.shine ?? 85) / 100;
             const shadowPct = (opts.shadow ?? 70) / 100;
             const neonPct = (opts.neon ?? (shapeId === 'neon' ? 85 : 0)) / 100;
@@ -7061,17 +7082,19 @@
 
             targetCtx.save();
 
-            // 1. 3D Drop Shadow behind the glass shape
+            // ========================================================================
+            // 1. 3D AMBIENT OCCLUSION & GROUND CONTACT SHADOW
+            // ========================================================================
             if (shadowPct > 0.05) {
                 targetCtx.save();
                 targetCtx.translate(cx, cy);
                 if (rotRad !== 0) targetCtx.rotate(rotRad);
 
-                const shOffset = Math.max(6, baseDim * 0.04);
-                const shBlur = Math.max(12, baseDim * 0.08);
-                targetCtx.shadowColor = `rgba(5, 10, 25, ${0.65 * shadowPct})`;
+                const shOffset = Math.max(8, baseDim * 0.05);
+                const shBlur = Math.max(16, baseDim * 0.1);
+                targetCtx.shadowColor = 'rgba(5, 12, 35, ' + (0.65 * shadowPct) + ')';
                 targetCtx.shadowBlur = shBlur;
-                targetCtx.shadowOffsetX = shOffset * 0.6;
+                targetCtx.shadowOffsetX = shOffset * 0.5;
                 targetCtx.shadowOffsetY = shOffset;
 
                 buildGlassShapePath(targetCtx, shapeId, 0, 0, shapeW, shapeH, { cornerRadius: Math.min(shapeW, shapeH) * 0.1 });
@@ -7080,14 +7103,15 @@
                 targetCtx.restore();
             }
 
-            // 2. Sample underlying canvas for Frosted Glass & Refraction
+            // ========================================================================
+            // 2. SAMPLE UNDERLYING CANVAS FOR OPTICAL REFRACTION & FROSTING
+            // ========================================================================
             const sampleCanvas = document.createElement('canvas');
             sampleCanvas.width = width;
             sampleCanvas.height = height;
             const sCtx = sampleCanvas.getContext('2d');
             sCtx.drawImage(targetCtx.canvas, 0, 0);
 
-            // Apply cross-browser blur to the sampled canvas if requested
             let blurredCanvas = null;
             if (blurPx > 0 && typeof applyCrossBrowserBlur === 'function') {
                 blurredCanvas = document.createElement('canvas');
@@ -7096,7 +7120,9 @@
                 applyCrossBrowserBlur(sampleCanvas, blurredCanvas.getContext('2d'), width, height, blurPx);
             }
 
-            // 3. Clip and Render Glass Body
+            // ========================================================================
+            // 3. CLIP AND RENDER GLASS BODY WITH PHYSICAL 3D OPTICS
+            // ========================================================================
             targetCtx.save();
             targetCtx.translate(cx, cy);
             if (rotRad !== 0) targetCtx.rotate(rotRad);
@@ -7104,6 +7130,7 @@
             buildGlassShapePath(targetCtx, shapeId, 0, 0, shapeW, shapeH, { cornerRadius: Math.min(shapeW, shapeH) * 0.1 });
             targetCtx.clip('evenodd');
 
+            // Draw Refracted / Blurred Canvas Base
             targetCtx.save();
             const refractZoom = 1.0 + refractPct * 0.18;
             targetCtx.scale(refractZoom, refractZoom);
@@ -7111,17 +7138,333 @@
             targetCtx.drawImage(drawSrc, -cx, -cy);
             targetCtx.restore();
 
-            if (shapeId === 'sphere') {
-                const sphRad = Math.min(shapeW, shapeH) * 0.5;
-                const causticGrad = targetCtx.createRadialGradient(-sphRad * 0.35, -sphRad * 0.35, sphRad * 0.05, 0, 0, sphRad);
-                causticGrad.addColorStop(0, `rgba(255, 255, 255, ${0.75 * shinePct})`);
-                causticGrad.addColorStop(0.3, 'rgba(180, 235, 255, 0.2)');
-                causticGrad.addColorStop(0.7, 'rgba(235, 120, 255, 0.15)');
-                causticGrad.addColorStop(1, `rgba(255, 255, 255, ${0.65 * shinePct})`);
-                targetCtx.fillStyle = causticGrad;
-                targetCtx.fill('evenodd');
+            // ------------------------------------------------------------------------
+            // 3A. TRUE PHYSICAL 3D ISOMETRIC GLASS CUBE (Multi-Facet + Internal Back Edges)
+            // ------------------------------------------------------------------------
+            if (shapeId === 'cube') {
+                const s = Math.min(shapeW, shapeH) * 0.46;
+                const cos30 = 0.866;
+                const sin30 = 0.5;
+                const dx = s * cos30;
+                const dy = s * sin30;
+
+                // Translucent internal back edges (optical glass internal refraction)
+                targetCtx.save();
+                targetCtx.lineWidth = Math.max(1.5, bevelPx * 0.4);
+                targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+                targetCtx.setLineDash([4, 3]);
+                targetCtx.beginPath();
+                targetCtx.moveTo(0, 0); targetCtx.lineTo(0, -s);
+                targetCtx.moveTo(0, 0); targetCtx.lineTo(-dx, dy);
+                targetCtx.moveTo(0, 0); targetCtx.lineTo(dx, dy);
+                targetCtx.stroke();
+                targetCtx.setLineDash([]);
+                targetCtx.restore();
+
+                // Top Face (Rhombus)
+                targetCtx.save();
+                targetCtx.beginPath();
+                targetCtx.moveTo(0, -s);
+                targetCtx.lineTo(dx, -s + dy);
+                targetCtx.lineTo(0, 0);
+                targetCtx.lineTo(-dx, -s + dy);
+                ctxTopGrad = targetCtx.createLinearGradient(-dx, -s, dx, 0);
+                ctxTopGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.55 * shinePct) + ')');
+                ctxTopGrad.addColorStop(0.5, 'rgba(200, 240, 255, 0.22)');
+                ctxTopGrad.addColorStop(1, 'rgba(255, 255, 255, ' + (0.35 * shinePct) + ')');
+                targetCtx.fillStyle = ctxTopGrad;
+                targetCtx.fill();
+                targetCtx.lineWidth = Math.max(1, bevelPx * 0.5);
+                targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                targetCtx.stroke();
+                targetCtx.restore();
+
+                // Left Front Face (Rhombus)
+                targetCtx.save();
+                targetCtx.beginPath();
+                targetCtx.moveTo(-dx, -s + dy);
+                targetCtx.lineTo(0, 0);
+                targetCtx.lineTo(0, s);
+                targetCtx.lineTo(-dx, dy);
+                targetCtx.closePath();
+                const ctxLeftGrad = targetCtx.createLinearGradient(-dx, 0, 0, s);
+                ctxLeftGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.35 * shinePct) + ')');
+                ctxLeftGrad.addColorStop(0.7, 'rgba(56, 189, 248, 0.18)');
+                ctxLeftGrad.addColorStop(1, 'rgba(20, 40, 90, 0.28)');
+                targetCtx.fillStyle = ctxLeftGrad;
+                targetCtx.fill();
+                targetCtx.lineWidth = Math.max(1, bevelPx * 0.5);
+                targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+                targetCtx.stroke();
+                targetCtx.restore();
+
+                // Right Front Face (Rhombus)
+                targetCtx.save();
+                targetCtx.beginPath();
+                targetCtx.moveTo(0, 0);
+                targetCtx.lineTo(dx, -s + dy);
+                targetCtx.lineTo(dx, dy);
+                targetCtx.lineTo(0, s);
+                targetCtx.closePath();
+                const ctxRightGrad = targetCtx.createLinearGradient(0, 0, dx, dy);
+                ctxRightGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.28 * shinePct) + ')');
+                ctxRightGrad.addColorStop(0.5, 'rgba(168, 85, 247, 0.15)');
+                ctxRightGrad.addColorStop(1, 'rgba(10, 25, 60, 0.35)');
+                targetCtx.fillStyle = ctxRightGrad;
+                targetCtx.fill();
+                targetCtx.lineWidth = Math.max(1, bevelPx * 0.5);
+                targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+                targetCtx.stroke();
+                targetCtx.restore();
+
+                // Bright Caustic Center Vertex & Highlights
+                targetCtx.save();
+                targetCtx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                targetCtx.beginPath();
+                targetCtx.arc(0, 0, Math.max(2, bevelPx * 0.6), 0, Math.PI * 2);
+                targetCtx.fill();
+                targetCtx.restore();
             }
 
+            // ------------------------------------------------------------------------
+            // 3B. TRUE 3D SPHERICAL GLASS ORB (Barrel Refraction + Fresnel + Caustics)
+            // ------------------------------------------------------------------------
+            else if (shapeId === 'sphere') {
+                const sphRad = Math.min(shapeW, shapeH) * 0.5;
+
+                // Spherical Fresnel Rim & Internal Caustic Flare
+                const causticGrad = targetCtx.createRadialGradient(-sphRad * 0.35, -sphRad * 0.35, sphRad * 0.05, 0, 0, sphRad);
+                causticGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.95 * shinePct) + ')');
+                causticGrad.addColorStop(0.2, 'rgba(255, 255, 255, 0.45)');
+                causticGrad.addColorStop(0.55, 'rgba(180, 235, 255, 0.12)');
+                causticGrad.addColorStop(0.85, 'rgba(216, 180, 254, 0.25)');
+                causticGrad.addColorStop(1, 'rgba(255, 255, 255, ' + (0.85 * shinePct) + ')');
+                targetCtx.fillStyle = causticGrad;
+                targetCtx.fill('evenodd');
+
+                // Bottom-right internal caustic focus
+                const causticFocus = targetCtx.createRadialGradient(sphRad * 0.28, sphRad * 0.32, sphRad * 0.02, sphRad * 0.28, sphRad * 0.32, sphRad * 0.45);
+                causticFocus.addColorStop(0, 'rgba(255, 255, 255, ' + (0.65 * shinePct) + ')');
+                causticFocus.addColorStop(0.4, 'rgba(147, 197, 253, 0.35)');
+                causticFocus.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                targetCtx.fillStyle = causticFocus;
+                targetCtx.fill('evenodd');
+
+                // Spherical perimeter rim ring
+                targetCtx.save();
+                targetCtx.lineWidth = Math.max(2, bevelPx * 0.75);
+                const rimGrad = targetCtx.createLinearGradient(-sphRad, -sphRad, sphRad, sphRad);
+                rimGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+                rimGrad.addColorStop(0.5, 'rgba(147, 197, 253, 0.4)');
+                rimGrad.addColorStop(1, 'rgba(255, 255, 255, 0.85)');
+                targetCtx.strokeStyle = rimGrad;
+                targetCtx.stroke();
+                targetCtx.restore();
+            }
+
+            // ------------------------------------------------------------------------
+            // 3C. 3D GLASS PILL (Horizontal Stadium Lens with Cylindrical Highlight)
+            // ------------------------------------------------------------------------
+            else if (shapeId === 'pill') {
+                // Cylindrical ridge highlight across upper third
+                const cylGrad = targetCtx.createLinearGradient(0, -shapeH / 2, 0, shapeH / 2);
+                cylGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.85 * shinePct) + ')');
+                cylGrad.addColorStop(0.25, 'rgba(255, 255, 255, 0.35)');
+                cylGrad.addColorStop(0.65, 'rgba(255, 255, 255, 0.08)');
+                cylGrad.addColorStop(1, 'rgba(255, 255, 255, ' + (0.55 * shinePct) + ')');
+                targetCtx.fillStyle = cylGrad;
+                targetCtx.fill('evenodd');
+
+                // Luminous horizontal specular crest line
+                targetCtx.save();
+                targetCtx.beginPath();
+                targetCtx.moveTo(-shapeW * 0.35, -shapeH * 0.22);
+                targetCtx.lineTo(shapeW * 0.35, -shapeH * 0.22);
+                targetCtx.lineWidth = Math.max(2, bevelPx * 0.6);
+                targetCtx.strokeStyle = 'rgba(255, 255, 255, ' + (0.85 * shinePct) + ')';
+                targetCtx.stroke();
+                targetCtx.restore();
+            }
+
+            // ------------------------------------------------------------------------
+            // 3D. RIBBON GLASS (Saturn Glass Orb with Tilted 3D Torus Ring)
+            // ------------------------------------------------------------------------
+            else if (shapeId === 'ribbon') {
+                // Central Sphere Core
+                const coreR = Math.min(shapeW, shapeH) * 0.38;
+                const orbGrad = targetCtx.createRadialGradient(-coreR * 0.3, -coreR * 0.3, coreR * 0.05, 0, 0, coreR);
+                orbGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+                orbGrad.addColorStop(0.35, 'rgba(186, 230, 253, 0.35)');
+                orbGrad.addColorStop(0.8, 'rgba(216, 180, 254, 0.25)');
+                orbGrad.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
+                targetCtx.fillStyle = orbGrad;
+                targetCtx.beginPath();
+                targetCtx.arc(0, 0, coreR, 0, Math.PI * 2);
+                targetCtx.fill();
+
+                // Tilted 3D Orbiting Glass Torus Ring
+                targetCtx.save();
+                targetCtx.rotate(-0.35);
+                targetCtx.beginPath();
+                targetCtx.ellipse(0, 0, shapeW * 0.46, shapeH * 0.16, 0, 0, Math.PI * 2);
+                targetCtx.lineWidth = Math.max(4, bevelPx * 1.5);
+                const ringStrokeGrad = targetCtx.createLinearGradient(-shapeW * 0.46, 0, shapeW * 0.46, 0);
+                ringStrokeGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+                ringStrokeGrad.addColorStop(0.5, 'rgba(125, 211, 252, 0.45)');
+                ringStrokeGrad.addColorStop(1, 'rgba(255, 255, 255, 0.95)');
+                targetCtx.strokeStyle = ringStrokeGrad;
+                targetCtx.stroke();
+                targetCtx.restore();
+            }
+
+            // ------------------------------------------------------------------------
+            // 3E. LAYERED GLASS (3-Tier Stepped Floating Glass Shelves)
+            // ------------------------------------------------------------------------
+            else if (shapeId === 'layered') {
+                const tiers = 3;
+                for (let t = 0; t < tiers; t++) {
+                    targetCtx.save();
+                    const tx = (t - 1) * shapeW * 0.08;
+                    const ty = (t - 1) * shapeH * 0.1;
+                    const tw = shapeW * (0.8 - t * 0.08);
+                    const th = shapeH * (0.8 - t * 0.08);
+
+                    targetCtx.translate(tx, ty);
+                    targetCtx.beginPath();
+                    const tr = Math.min(tw, th) * 0.08;
+                    targetCtx.roundRect(-tw / 2, -th / 2, tw, th, tr);
+
+                    const tierGrad = targetCtx.createLinearGradient(-tw / 2, -th / 2, tw / 2, th / 2);
+                    tierGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.45 * shinePct) + ')');
+                    tierGrad.addColorStop(0.5, 'rgba(147, 197, 253, 0.2)');
+                    tierGrad.addColorStop(1, 'rgba(255, 255, 255, ' + (0.35 * shinePct) + ')');
+                    targetCtx.fillStyle = tierGrad;
+                    targetCtx.fill();
+
+                    targetCtx.lineWidth = Math.max(1.5, bevelPx * 0.6);
+                    targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                    targetCtx.stroke();
+                    targetCtx.restore();
+                }
+            }
+
+            // ------------------------------------------------------------------------
+            // 3F. CRYSTAL GLASS (Brilliant-Cut Diamond Gemstone Facets)
+            // ------------------------------------------------------------------------
+            else if (shapeId === 'crystal') {
+                const tableW = shapeW * 0.32;
+                const girdleY = -shapeH * 0.05;
+                const culetY = shapeH * 0.48;
+                const topY = -shapeH * 0.48;
+
+                // Table Facet (Top)
+                targetCtx.save();
+                targetCtx.beginPath();
+                targetCtx.moveTo(-tableW, topY);
+                targetCtx.lineTo(tableW, topY);
+                targetCtx.lineTo(shapeW * 0.2, girdleY);
+                targetCtx.lineTo(-shapeW * 0.2, girdleY);
+                targetCtx.closePath();
+                const tableGrad = targetCtx.createLinearGradient(0, topY, 0, girdleY);
+                tableGrad.addColorStop(0, 'rgba(255, 255, 255, 0.75)');
+                tableGrad.addColorStop(1, 'rgba(186, 230, 253, 0.35)');
+                targetCtx.fillStyle = tableGrad;
+                targetCtx.fill();
+                targetCtx.lineWidth = Math.max(1, bevelPx * 0.5);
+                targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                targetCtx.stroke();
+                targetCtx.restore();
+
+                // Lower Pavilion Triangular Facets
+                const pavPoints = [-shapeW * 0.48, -shapeW * 0.2, 0, shapeW * 0.2, shapeW * 0.48];
+                for (let p = 0; p < pavPoints.length - 1; p++) {
+                    targetCtx.save();
+                    targetCtx.beginPath();
+                    targetCtx.moveTo(pavPoints[p], girdleY);
+                    targetCtx.lineTo(pavPoints[p + 1], girdleY);
+                    targetCtx.lineTo(0, culetY);
+                    targetCtx.closePath();
+
+                    const pGrad = targetCtx.createLinearGradient(pavPoints[p], girdleY, 0, culetY);
+                    if (p % 2 === 0) {
+                        pGrad.addColorStop(0, 'rgba(255, 255, 255, 0.55)');
+                        pGrad.addColorStop(0.5, 'rgba(192, 132, 252, 0.25)');
+                        pGrad.addColorStop(1, 'rgba(56, 189, 248, 0.45)');
+                    } else {
+                        pGrad.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
+                        pGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.2)');
+                        pGrad.addColorStop(1, 'rgba(192, 132, 252, 0.35)');
+                    }
+                    targetCtx.fillStyle = pGrad;
+                    targetCtx.fill();
+                    targetCtx.lineWidth = Math.max(1, bevelPx * 0.4);
+                    targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                    targetCtx.stroke();
+                    targetCtx.restore();
+                }
+            }
+
+            // ------------------------------------------------------------------------
+            // 3G. APP GLASS (iOS Squircle Icon Glass with 3D Embossed Home Logo)
+            // ------------------------------------------------------------------------
+            else if (shapeId === 'app') {
+                targetCtx.save();
+                const iconS = Math.min(shapeW, shapeH) * 0.28;
+                // Roof Triangle
+                targetCtx.beginPath();
+                targetCtx.moveTo(0, -iconS * 0.9);
+                targetCtx.lineTo(iconS * 0.9, -iconS * 0.1);
+                targetCtx.lineTo(-iconS * 0.9, -iconS * 0.1);
+                targetCtx.closePath();
+                // Base Square
+                targetCtx.rect(-iconS * 0.65, -iconS * 0.1, iconS * 1.3, iconS * 1.0);
+                targetCtx.fillStyle = 'rgba(255, 255, 255, ' + (0.75 * shinePct) + ')';
+                targetCtx.fill();
+                targetCtx.lineWidth = Math.max(2, bevelPx * 0.7);
+                targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+                targetCtx.stroke();
+                targetCtx.restore();
+            }
+
+            // ------------------------------------------------------------------------
+            // 3H. 3D GLASS SLAB (Extruded Perspective Thickness Edge)
+            // ------------------------------------------------------------------------
+            else if (shapeId === 'slab') {
+                targetCtx.save();
+                const depthOffset = Math.max(8, shapeH * 0.08);
+                // Top surface
+                targetCtx.beginPath();
+                targetCtx.moveTo(-shapeW * 0.45, -shapeH * 0.35);
+                targetCtx.lineTo(shapeW * 0.45, -shapeH * 0.35);
+                targetCtx.lineTo(shapeW * 0.3, shapeH * 0.25);
+                targetCtx.lineTo(-shapeW * 0.3, shapeH * 0.25);
+                targetCtx.closePath();
+                const slabTopGrad = targetCtx.createLinearGradient(-shapeW * 0.45, -shapeH * 0.35, shapeW * 0.3, shapeH * 0.25);
+                slabTopGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.55 * shinePct) + ')');
+                slabTopGrad.addColorStop(1, 'rgba(186, 230, 253, 0.25)');
+                targetCtx.fillStyle = slabTopGrad;
+                targetCtx.fill();
+
+                // Extruded front edge
+                targetCtx.beginPath();
+                targetCtx.moveTo(-shapeW * 0.3, shapeH * 0.25);
+                targetCtx.lineTo(shapeW * 0.3, shapeH * 0.25);
+                targetCtx.lineTo(shapeW * 0.3, shapeH * 0.25 + depthOffset);
+                targetCtx.lineTo(-shapeW * 0.3, shapeH * 0.25 + depthOffset);
+                targetCtx.closePath();
+                const edgeGrad = targetCtx.createLinearGradient(0, shapeH * 0.25, 0, shapeH * 0.25 + depthOffset);
+                edgeGrad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+                edgeGrad.addColorStop(1, 'rgba(56, 189, 248, 0.35)');
+                targetCtx.fillStyle = edgeGrad;
+                targetCtx.fill();
+
+                targetCtx.lineWidth = Math.max(1.5, bevelPx * 0.6);
+                targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                targetCtx.stroke();
+                targetCtx.restore();
+            }
+
+            // Standard Surface Specular Sheen for all shapes
             if (tintOpacity > 0) {
                 targetCtx.fillStyle = tintColor;
                 targetCtx.globalAlpha = tintOpacity;
@@ -7130,58 +7473,53 @@
             }
 
             const shineGrad = targetCtx.createLinearGradient(-shapeW / 2, -shapeH / 2, shapeW / 2, shapeH / 2);
-            shineGrad.addColorStop(0, `rgba(255, 255, 255, ${0.65 * shinePct})`);
+            shineGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.65 * shinePct) + ')');
             shineGrad.addColorStop(0.35, 'rgba(255, 255, 255, 0.08)');
             shineGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.08)');
-            shineGrad.addColorStop(1, `rgba(255, 255, 255, ${0.45 * shinePct})`);
+            shineGrad.addColorStop(1, 'rgba(255, 255, 255, ' + (0.45 * shinePct) + ')');
             targetCtx.fillStyle = shineGrad;
             targetCtx.fill('evenodd');
 
-            if (shapeId === 'ribbon') {
-                targetCtx.save();
-                targetCtx.rotate(-0.35);
-                targetCtx.beginPath();
-                targetCtx.ellipse(0, 0, shapeW * 0.72, shapeH * 0.28, 0, 0, Math.PI * 2);
-                targetCtx.lineWidth = Math.max(3, bevelPx * 1.4);
-                targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-                targetCtx.stroke();
-                targetCtx.restore();
-            }
-
             targetCtx.restore(); // end clip
 
-            // 4. Specular Perimeter Rim Bevel (Outer Stroke)
+            // ========================================================================
+            // 4. SPECULAR PERIMETER RIM BEVEL (OUTER POLISHED CHROME / GLASS EDGE)
+            // ========================================================================
             targetCtx.save();
             targetCtx.translate(cx, cy);
             if (rotRad !== 0) targetCtx.rotate(rotRad);
 
             buildGlassShapePath(targetCtx, shapeId, 0, 0, shapeW, shapeH, { cornerRadius: Math.min(shapeW, shapeH) * 0.1 });
             const rimGrad = targetCtx.createLinearGradient(-shapeW / 2, -shapeH / 2, shapeW / 2, shapeH / 2);
-            rimGrad.addColorStop(0, `rgba(255, 255, 255, ${0.95 * shinePct})`);
-            rimGrad.addColorStop(0.4, 'rgba(255, 255, 255, 0.35)');
-            rimGrad.addColorStop(0.75, 'rgba(120, 200, 255, 0.25)');
-            rimGrad.addColorStop(1, `rgba(255, 255, 255, ${0.85 * shinePct})`);
+            rimGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.95 * shinePct) + ')');
+            rimGrad.addColorStop(0.35, 'rgba(255, 255, 255, 0.35)');
+            rimGrad.addColorStop(0.7, 'rgba(120, 200, 255, 0.28)');
+            rimGrad.addColorStop(1, 'rgba(255, 255, 255, ' + (0.85 * shinePct) + ')');
             targetCtx.lineWidth = bevelPx;
             targetCtx.strokeStyle = rimGrad;
             targetCtx.stroke();
 
-            // 5. Neon Glowing Rim Border (if enabled or Neon Glass)
+            // ========================================================================
+            // 5. NEON GLOWING RIM BORDER (IF ENABLED OR NEON GLASS)
+            // ========================================================================
             if (neonPct > 0.05) {
                 targetCtx.save();
                 targetCtx.shadowColor = neonColor;
-                targetCtx.shadowBlur = Math.max(12, bevelPx * 4 * neonPct);
+                targetCtx.shadowBlur = Math.max(14, bevelPx * 4 * neonPct);
                 targetCtx.strokeStyle = neonColor;
                 targetCtx.lineWidth = Math.max(2, bevelPx * 0.85);
                 targetCtx.stroke();
                 targetCtx.shadowColor = '#f43f5e';
-                targetCtx.shadowBlur = Math.max(6, bevelPx * 2 * neonPct);
+                targetCtx.shadowBlur = Math.max(7, bevelPx * 2 * neonPct);
                 targetCtx.strokeStyle = '#ffffff';
                 targetCtx.lineWidth = Math.max(1, bevelPx * 0.4);
                 targetCtx.stroke();
                 targetCtx.restore();
             }
 
-            // 6. Corner Specular Sparkle Glint
+            // ========================================================================
+            // 6. SPECULAR CORNER SPARKLE GLINT & OPTICAL CAUSTIC HOTSPOT
+            // ========================================================================
             if (shinePct > 0.4 && shapeId !== 'sphere') {
                 targetCtx.save();
                 const glintX = -shapeW * 0.38;
@@ -7206,8 +7544,9 @@
             targetCtx.restore();
         }
 
-        /**
+/**
          * Renders the 25 3D Glass Background Styles (Full-Frame Stock Wallpapers)
+         * 100% Procedural 3D Physical Volumetric Rendering matching Professional Microstock Standards
          */
         function render3DGlassBackground(ctx, width, height, styleKey, opts = {}) {
             ctx.save();
@@ -7216,86 +7555,79 @@
             const density = Math.max(4, Math.round((opts.density ?? 100) / 10));
             const scale = Math.max(0.4, (opts.scale ?? 100) / 100);
             const rotDeg = opts.rotation ?? 0;
+            const rotRad = (rotDeg * Math.PI) / 180;
 
-            const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-            bgGrad.addColorStop(0, '#0a1936');
-            bgGrad.addColorStop(0.35, '#123366');
-            bgGrad.addColorStop(0.7, '#1a244d');
-            bgGrad.addColorStop(1, '#070f24');
+            // Deep Studio Backdrop Gradient (Oceanic Sapphire to Cosmic Violet)
+            const bgGrad = ctx.createRadialGradient(width * 0.5, height * 0.45, Math.min(width, height) * 0.15, width * 0.5, height * 0.5, Math.hypot(width, height) * 0.65);
+            bgGrad.addColorStop(0, '#102a54');
+            bgGrad.addColorStop(0.35, '#0c1b3d');
+            bgGrad.addColorStop(0.7, '#071026');
+            bgGrad.addColorStop(1, '#030714');
             ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, width, height);
 
+            if (rotRad !== 0) {
+                ctx.translate(width / 2, height / 2);
+                ctx.rotate(rotRad);
+                ctx.translate(-width / 2, -height / 2);
+            }
+
             switch (styleKey) {
-                case 'bg_glass_1': // 3D Glass Wave
-                case 'bg_glass_20': // 3D Glass Fluid
-                case 'bg_glass_22': // 3D Glass Flow
-                case 'bg_glass_25': { // 3D Soft Glass
-                    const numWaves = 5;
-                    for (let i = 0; i < numWaves; i++) {
+                // ====================================================================
+                // 10.01 3D Glass Wave — Translucent undulating ocean wave
+                // ====================================================================
+                case 'bg_glass_1': {
+                    const waves = 6;
+                    for (let i = 0; i < waves; i++) {
                         ctx.save();
+                        const y0 = height * (0.15 + i * 0.14);
                         ctx.beginPath();
-                        const y0 = height * (0.2 + i * 0.16);
                         ctx.moveTo(0, y0);
-                        ctx.bezierCurveTo(width * 0.35, y0 - height * 0.22, width * 0.65, y0 + height * 0.32, width, y0 - height * 0.05);
+                        ctx.bezierCurveTo(width * 0.32, y0 - height * 0.28, width * 0.68, y0 + height * 0.35, width, y0 - height * 0.08);
                         ctx.lineTo(width, height);
                         ctx.lineTo(0, height);
                         ctx.closePath();
 
-                        const wGrad = ctx.createLinearGradient(0, y0 - height * 0.1, width, y0 + height * 0.3);
-                        wGrad.addColorStop(0, 'rgba(56, 189, 248, 0.45)');
-                        wGrad.addColorStop(0.4, 'rgba(168, 85, 247, 0.35)');
-                        wGrad.addColorStop(0.8, 'rgba(37, 99, 235, 0.55)');
-                        wGrad.addColorStop(1, 'rgba(15, 23, 42, 0.75)');
+                        const wGrad = ctx.createLinearGradient(0, y0 - height * 0.2, width, y0 + height * 0.4);
+                        wGrad.addColorStop(0, 'rgba(56, 189, 248, 0.42)');
+                        wGrad.addColorStop(0.35, 'rgba(168, 85, 247, 0.3)');
+                        wGrad.addColorStop(0.7, 'rgba(37, 99, 235, 0.52)');
+                        wGrad.addColorStop(1, 'rgba(15, 23, 42, 0.7)');
                         ctx.fillStyle = wGrad;
                         ctx.fill();
 
-                        ctx.lineWidth = Math.max(2, 5 * scale);
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+                        // Glass Rim Light
+                        ctx.lineWidth = Math.max(2, (5.5 - i * 0.5) * scale);
+                        ctx.strokeStyle = i === 0 ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.65)';
                         ctx.stroke();
                         ctx.restore();
                     }
                     break;
                 }
 
-                case 'bg_glass_2': // 3D Glass Layers
-                case 'bg_glass_13': // 3D Glass Panel
-                case 'bg_glass_18': { // 3D Glass Plates
-                    const numPlates = 6;
-                    for (let i = 0; i < numPlates; i++) {
+                // ====================================================================
+                // 10.02 3D Glass Layers — Slanted diagonal translucent glass sheets
+                // ====================================================================
+                case 'bg_glass_2': {
+                    const layers = 6;
+                    for (let i = 0; i < layers; i++) {
                         ctx.save();
-                        const px = width * (0.15 + i * 0.13);
-                        const py = height * (0.15 + i * 0.12);
-                        const pw = width * 0.42 * scale;
-                        const ph = height * 0.38 * scale;
-
-                        ctx.translate(px, py);
-                        ctx.rotate(-0.32);
-
-                        ctx.shadowColor = 'rgba(5, 15, 40, 0.45)';
-                        ctx.shadowBlur = 35;
-                        ctx.shadowOffsetY = 20;
-
+                        const lx = -width * 0.2 + i * (width * 0.22);
                         ctx.beginPath();
-                        const r = 24 * scale;
-                        ctx.moveTo(-pw / 2 + r, -ph / 2);
-                        ctx.lineTo(pw / 2 - r, -ph / 2);
-                        ctx.quadraticCurveTo(pw / 2, -ph / 2, pw / 2, -ph / 2 + r);
-                        ctx.lineTo(pw / 2, ph / 2 - r);
-                        ctx.quadraticCurveTo(pw / 2, ph / 2, pw / 2 - r, ph / 2);
-                        ctx.lineTo(-pw / 2 + r, ph / 2);
-                        ctx.quadraticCurveTo(-pw / 2, ph / 2, -pw / 2, ph / 2 - r);
-                        ctx.lineTo(-pw / 2, -ph / 2 + r);
-                        ctx.quadraticCurveTo(-pw / 2, -ph / 2, -pw / 2 + r, -ph / 2);
+                        ctx.moveTo(lx, -height * 0.1);
+                        ctx.lineTo(lx + width * 0.35, -height * 0.1);
+                        ctx.lineTo(lx + width * 0.15, height * 1.1);
+                        ctx.lineTo(lx - width * 0.2, height * 1.1);
                         ctx.closePath();
 
-                        const pGrad = ctx.createLinearGradient(-pw / 2, -ph / 2, pw / 2, ph / 2);
-                        pGrad.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
-                        pGrad.addColorStop(0.5, 'rgba(96, 165, 250, 0.25)');
-                        pGrad.addColorStop(1, 'rgba(192, 132, 252, 0.35)');
-                        ctx.fillStyle = pGrad;
+                        const lGrad = ctx.createLinearGradient(lx, 0, lx + width * 0.3, height);
+                        lGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+                        lGrad.addColorStop(0.3, 'rgba(96, 165, 250, 0.25)');
+                        lGrad.addColorStop(0.7, 'rgba(192, 132, 252, 0.32)');
+                        lGrad.addColorStop(1, 'rgba(14, 165, 233, 0.45)');
+                        ctx.fillStyle = lGrad;
                         ctx.fill();
 
-                        ctx.shadowColor = 'transparent';
                         ctx.lineWidth = 3.5 * scale;
                         ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
                         ctx.stroke();
@@ -7304,97 +7636,165 @@
                     break;
                 }
 
-                case 'bg_glass_3': // 3D Bubble
-                case 'bg_glass_10': // 3D Glass Spheres
-                case 'bg_glass_23': { // 3D Transparent Balls
-                    const spheres = [
-                        { x: 0.5, y: 0.55, r: 0.26 },
-                        { x: 0.22, y: 0.3, r: 0.14 },
-                        { x: 0.78, y: 0.28, r: 0.16 },
-                        { x: 0.16, y: 0.72, r: 0.11 },
-                        { x: 0.84, y: 0.75, r: 0.15 },
-                        { x: 0.36, y: 0.18, r: 0.08 },
-                        { x: 0.64, y: 0.82, r: 0.09 }
+                // ====================================================================
+                // 10.03 3D Bubble — Floating glass bubbles with soft caustic reflections
+                // ====================================================================
+                case 'bg_glass_3': {
+                    const bubbles = [
+                        { x: 0.5, y: 0.52, r: 0.24 },
+                        { x: 0.25, y: 0.28, r: 0.14 },
+                        { x: 0.76, y: 0.32, r: 0.16 },
+                        { x: 0.18, y: 0.72, r: 0.11 },
+                        { x: 0.82, y: 0.74, r: 0.13 },
+                        { x: 0.38, y: 0.15, r: 0.08 },
+                        { x: 0.65, y: 0.85, r: 0.09 },
+                        { x: 0.88, y: 0.18, r: 0.07 }
                     ];
-                    spheres.forEach(s => {
+                    bubbles.forEach(b => {
                         ctx.save();
-                        const sx = width * s.x;
-                        const sy = height * s.y;
-                        const sr = Math.min(width, height) * s.r * scale;
+                        const bx = width * b.x;
+                        const by = height * b.y;
+                        const br = Math.min(width, height) * b.r * scale;
 
-                        ctx.shadowColor = 'rgba(3, 10, 30, 0.5)';
-                        ctx.shadowBlur = sr * 0.45;
-                        ctx.shadowOffsetY = sr * 0.25;
+                        ctx.shadowColor = 'rgba(5, 12, 35, 0.45)';
+                        ctx.shadowBlur = br * 0.45;
+                        ctx.shadowOffsetY = br * 0.2;
 
                         ctx.beginPath();
-                        ctx.arc(sx, sy, sr, 0, Math.PI * 2);
-                        const sGrad = ctx.createRadialGradient(sx - sr * 0.35, sy - sr * 0.35, sr * 0.05, sx, sy, sr);
-                        sGrad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
-                        sGrad.addColorStop(0.28, 'rgba(147, 197, 253, 0.35)');
-                        sGrad.addColorStop(0.7, 'rgba(216, 180, 254, 0.25)');
-                        sGrad.addColorStop(1, 'rgba(255, 255, 255, 0.75)');
-                        ctx.fillStyle = sGrad;
+                        ctx.arc(bx, by, br, 0, Math.PI * 2);
+                        const bGrad = ctx.createRadialGradient(bx - br * 0.35, by - br * 0.35, br * 0.05, bx, by, br);
+                        bGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+                        bGrad.addColorStop(0.25, 'rgba(186, 230, 253, 0.38)');
+                        bGrad.addColorStop(0.65, 'rgba(216, 180, 254, 0.22)');
+                        bGrad.addColorStop(0.9, 'rgba(56, 189, 248, 0.4)');
+                        bGrad.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
+                        ctx.fillStyle = bGrad;
                         ctx.fill();
 
                         ctx.shadowColor = 'transparent';
-                        ctx.lineWidth = Math.max(2, sr * 0.04);
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.lineWidth = Math.max(1.5, br * 0.04);
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
                         ctx.stroke();
                         ctx.restore();
                     });
                     break;
                 }
 
-                case 'bg_glass_4': // 3D Crystal Cubes
-                case 'bg_glass_7': // 3D Glass Square
-                case 'bg_glass_21': { // 3D Layered Diamond
-                    const cubes = [
-                        { x: 0.48, y: 0.45, s: 0.32 },
-                        { x: 0.24, y: 0.32, s: 0.2 },
-                        { x: 0.74, y: 0.36, s: 0.22 },
-                        { x: 0.32, y: 0.68, s: 0.18 },
-                        { x: 0.68, y: 0.68, s: 0.2 }
+                // ====================================================================
+                // 10.04 3D Crystal Cubes — Multiple floating isometric crystal glass blocks
+                // ====================================================================
+                case 'bg_glass_4': {
+                    const cubeCluster = [
+                        { x: 0.5, y: 0.48, s: 0.22, rot: 0 },
+                        { x: 0.26, y: 0.35, s: 0.14, rot: 0.15 },
+                        { x: 0.74, y: 0.32, s: 0.16, rot: -0.2 },
+                        { x: 0.35, y: 0.72, s: 0.13, rot: 0.25 },
+                        { x: 0.68, y: 0.7, s: 0.15, rot: -0.12 },
+                        { x: 0.85, y: 0.55, s: 0.1, rot: 0.3 },
+                        { x: 0.15, y: 0.58, s: 0.09, rot: -0.3 }
                     ];
-                    cubes.forEach(c => {
+
+                    cubeCluster.forEach(c => {
                         ctx.save();
                         const cx = width * c.x;
                         const cy = height * c.y;
                         const cs = Math.min(width, height) * c.s * scale;
 
                         ctx.translate(cx, cy);
-                        ctx.rotate(styleKey === 'bg_glass_21' ? Math.PI / 4 : 0.22);
+                        if (c.rot) ctx.rotate(c.rot);
 
-                        ctx.shadowColor = 'rgba(10, 20, 50, 0.45)';
-                        ctx.shadowBlur = cs * 0.4;
-                        ctx.shadowOffsetY = cs * 0.2;
+                        const dx = cs * 0.866;
+                        const dy = cs * 0.5;
 
+                        // Top Face
                         ctx.beginPath();
-                        ctx.rect(-cs / 2, -cs / 2, cs, cs);
-                        const cGrad = ctx.createLinearGradient(-cs / 2, -cs / 2, cs / 2, cs / 2);
-                        cGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
-                        cGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.25)');
-                        cGrad.addColorStop(1, 'rgba(168, 85, 247, 0.45)');
-                        ctx.fillStyle = cGrad;
+                        ctx.moveTo(0, -cs);
+                        ctx.lineTo(dx, -cs + dy);
+                        ctx.lineTo(0, 0);
+                        ctx.lineTo(-dx, -cs + dy);
+                        ctx.closePath();
+                        const tGrad = ctx.createLinearGradient(-dx, -cs, dx, 0);
+                        tGrad.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
+                        tGrad.addColorStop(1, 'rgba(186, 230, 253, 0.35)');
+                        ctx.fillStyle = tGrad;
                         ctx.fill();
-
-                        ctx.shadowColor = 'transparent';
-                        ctx.lineWidth = 4 * scale;
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                        ctx.lineWidth = 2.5 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
                         ctx.stroke();
+
+                        // Left Face
+                        ctx.beginPath();
+                        ctx.moveTo(-dx, -cs + dy);
+                        ctx.lineTo(0, 0);
+                        ctx.lineTo(0, cs);
+                        ctx.lineTo(-dx, dy);
+                        ctx.closePath();
+                        const lGrad = ctx.createLinearGradient(-dx, 0, 0, cs);
+                        lGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+                        lGrad.addColorStop(1, 'rgba(56, 189, 248, 0.25)');
+                        ctx.fillStyle = lGrad;
+                        ctx.fill();
+                        ctx.stroke();
+
+                        // Right Face
+                        ctx.beginPath();
+                        ctx.moveTo(0, 0);
+                        ctx.lineTo(dx, -cs + dy);
+                        ctx.lineTo(dx, dy);
+                        ctx.lineTo(0, cs);
+                        ctx.closePath();
+                        const rGrad = ctx.createLinearGradient(0, 0, dx, dy);
+                        rGrad.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
+                        rGrad.addColorStop(1, 'rgba(192, 132, 252, 0.28)');
+                        ctx.fillStyle = rGrad;
+                        ctx.fill();
+                        ctx.stroke();
+
                         ctx.restore();
                     });
                     break;
                 }
 
-                case 'bg_glass_6': // 3D Hexagon
-                case 'bg_glass_14': { // 3D Glass Tiles
-                    const hexR = Math.min(width, height) * 0.11 * scale;
-                    const cols = 8;
-                    const rows = 5;
+                // ====================================================================
+                // 10.05 3D Glass Ribbon — Flowing 3D glass spiral banner
+                // ====================================================================
+                case 'bg_glass_5': {
+                    const ribbons = 4;
+                    for (let r = 0; r < ribbons; r++) {
+                        ctx.save();
+                        const ry = height * (0.2 + r * 0.18);
+                        ctx.beginPath();
+                        ctx.moveTo(-width * 0.1, ry);
+                        ctx.bezierCurveTo(width * 0.3, ry - height * 0.35, width * 0.7, ry + height * 0.35, width * 1.1, ry);
+                        ctx.lineWidth = Math.max(8, 22 * scale);
+
+                        const ribGrad = ctx.createLinearGradient(0, ry - height * 0.2, width, ry + height * 0.2);
+                        ribGrad.addColorStop(0, 'rgba(56, 189, 248, 0.55)');
+                        ribGrad.addColorStop(0.5, 'rgba(236, 72, 153, 0.45)');
+                        ribGrad.addColorStop(1, 'rgba(168, 85, 247, 0.55)');
+                        ctx.strokeStyle = ribGrad;
+                        ctx.stroke();
+
+                        // Specular Bevel Line along center of ribbon
+                        ctx.lineWidth = 3 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 10.06 3D Hexagon — Deep honeycomb crystal grid with glowing joints
+                // ====================================================================
+                case 'bg_glass_6': {
+                    const hexR = Math.min(width, height) * 0.12 * scale;
+                    const cols = 9;
+                    const rows = 6;
                     for (let r = 0; r < rows; r++) {
                         for (let c = 0; c < cols; c++) {
-                            const hx = width * 0.1 + c * hexR * 1.75;
-                            const hy = height * 0.15 + r * hexR * 1.55 + (c % 2) * hexR * 0.75;
+                            const hx = width * 0.05 + c * hexR * 1.75;
+                            const hy = height * 0.08 + r * hexR * 1.55 + (c % 2) * hexR * 0.75;
                             ctx.save();
                             ctx.beginPath();
                             for (let a = 0; a < 6; a++) {
@@ -7406,15 +7806,15 @@
                             }
                             ctx.closePath();
 
-                            const hGrad = ctx.createRadialGradient(hx, hy, hexR * 0.1, hx, hy, hexR);
-                            hGrad.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
-                            hGrad.addColorStop(0.7, 'rgba(37, 99, 235, 0.25)');
+                            const hGrad = ctx.createRadialGradient(hx, hy, hexR * 0.15, hx, hy, hexR);
+                            hGrad.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+                            hGrad.addColorStop(0.65, 'rgba(37, 99, 235, 0.25)');
                             hGrad.addColorStop(1, 'rgba(147, 197, 253, 0.45)');
                             ctx.fillStyle = hGrad;
                             ctx.fill();
 
-                            ctx.lineWidth = 2.5 * scale;
-                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+                            ctx.lineWidth = 3 * scale;
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
                             ctx.stroke();
                             ctx.restore();
                         }
@@ -7422,91 +7822,691 @@
                     break;
                 }
 
-                case 'bg_glass_5': // 3D Glass Ribbon
-                case 'bg_glass_8': // 3D Glass Spiral
-                case 'bg_glass_16': { // 3D Glass Ring
-                    const cx = width * 0.5;
-                    const cy = height * 0.5;
-                    const rOuter = Math.min(width, height) * 0.36 * scale;
-                    const rInner = rOuter * 0.65;
-
-                    ctx.save();
-                    ctx.shadowColor = 'rgba(8, 20, 55, 0.5)';
-                    ctx.shadowBlur = 45;
-                    ctx.shadowOffsetY = 25;
-
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, rOuter, 0, Math.PI * 2, false);
-                    ctx.arc(cx, cy, rInner, 0, Math.PI * 2, true);
-                    ctx.closePath();
-
-                    const ringGrad = ctx.createLinearGradient(cx - rOuter, cy - rOuter, cx + rOuter, cy + rOuter);
-                    ringGrad.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
-                    ringGrad.addColorStop(0.3, 'rgba(56, 189, 248, 0.35)');
-                    ringGrad.addColorStop(0.7, 'rgba(216, 180, 254, 0.35)');
-                    ringGrad.addColorStop(1, 'rgba(255, 255, 255, 0.65)');
-                    ctx.fillStyle = ringGrad;
-                    ctx.fill('evenodd');
-
-                    ctx.shadowColor = 'transparent';
-                    ctx.lineWidth = 5 * scale;
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-                    ctx.stroke();
-                    ctx.restore();
-                    break;
-                }
-
-                case 'bg_glass_11': // 3D Prism
-                case 'bg_glass_19': { // 3D Glass Mountains
-                    const peaks = [
-                        { x: 0.28, y: 0.65, w: 0.45, h: 0.55 },
-                        { x: 0.52, y: 0.6, w: 0.5, h: 0.65 },
-                        { x: 0.74, y: 0.68, w: 0.42, h: 0.5 }
+                // ====================================================================
+                // 10.07 3D Glass Square — Floating square glass panels in perspective
+                // ====================================================================
+                case 'bg_glass_7': {
+                    const squares = [
+                        { x: 0.5, y: 0.5, s: 0.35, rot: 0.2 },
+                        { x: 0.38, y: 0.42, s: 0.28, rot: -0.1 },
+                        { x: 0.62, y: 0.58, s: 0.25, rot: 0.35 },
+                        { x: 0.25, y: 0.65, s: 0.18, rot: 0.15 }
                     ];
-                    peaks.forEach(p => {
+                    squares.forEach((sq, idx) => {
                         ctx.save();
-                        const mx = width * p.x;
-                        const my = height * p.y;
-                        const mw = width * p.w * scale;
-                        const mh = height * p.h * scale;
+                        const sx = width * sq.x;
+                        const sy = height * sq.y;
+                        const ss = Math.min(width, height) * sq.s * scale;
+
+                        ctx.translate(sx, sy);
+                        ctx.rotate(sq.rot);
+
+                        ctx.shadowColor = 'rgba(5, 12, 35, 0.45)';
+                        ctx.shadowBlur = 30;
+                        ctx.shadowOffsetY = 15;
 
                         ctx.beginPath();
-                        ctx.moveTo(mx, my - mh);
-                        ctx.lineTo(mx + mw / 2, my);
-                        ctx.lineTo(mx - mw / 2, my);
-                        ctx.closePath();
+                        ctx.roundRect(-ss / 2, -ss / 2, ss, ss, ss * 0.08);
 
-                        const pGrad = ctx.createLinearGradient(mx - mw / 2, my, mx, my - mh);
-                        pGrad.addColorStop(0, 'rgba(14, 165, 233, 0.35)');
-                        pGrad.addColorStop(0.5, 'rgba(236, 72, 153, 0.35)');
-                        pGrad.addColorStop(1, 'rgba(255, 255, 255, 0.75)');
-                        ctx.fillStyle = pGrad;
+                        const sqGrad = ctx.createLinearGradient(-ss / 2, -ss / 2, ss / 2, ss / 2);
+                        sqGrad.addColorStop(0, 'rgba(255, 255, 255, 0.55)');
+                        sqGrad.addColorStop(0.5, 'rgba(96, 165, 250, 0.25)');
+                        sqGrad.addColorStop(1, 'rgba(192, 132, 252, 0.45)');
+                        ctx.fillStyle = sqGrad;
                         ctx.fill();
 
-                        ctx.lineWidth = 3.5 * scale;
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = 4 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
                         ctx.stroke();
                         ctx.restore();
                     });
                     break;
                 }
 
-                default: {
-                    const numBands = 8;
-                    const bW = width / numBands;
-                    for (let b = 0; b < numBands; b++) {
+                // ====================================================================
+                // 10.08 3D Glass Spiral — Concentric 3D glass torus rings in depth
+                // ====================================================================
+                case 'bg_glass_8': {
+                    const cx = width * 0.5;
+                    const cy = height * 0.5;
+                    const rings = 5;
+                    for (let r = rings; r >= 1; r--) {
                         ctx.save();
+                        const rOuter = Math.min(width, height) * (0.08 + r * 0.08) * scale;
+                        const rInner = rOuter * 0.72;
+
                         ctx.beginPath();
-                        ctx.rect(b * bW, 0, bW, height);
-                        const bGrad = ctx.createLinearGradient(b * bW, 0, (b + 1) * bW, 0);
-                        bGrad.addColorStop(0, 'rgba(255, 255, 255, 0.25)');
-                        bGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.15)');
-                        bGrad.addColorStop(1, 'rgba(168, 85, 247, 0.25)');
-                        ctx.fillStyle = bGrad;
+                        ctx.ellipse(cx, cy + (rings - r) * 15 * scale, rOuter, rOuter * 0.45, -0.2, 0, Math.PI * 2);
+                        ctx.ellipse(cx, cy + (rings - r) * 15 * scale, rInner, rInner * 0.45, -0.2, 0, Math.PI * 2);
+
+                        const ringGrad = ctx.createLinearGradient(cx - rOuter, cy, cx + rOuter, cy);
+                        ringGrad.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
+                        ringGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.35)');
+                        ringGrad.addColorStop(1, 'rgba(255, 255, 255, 0.75)');
+                        ctx.fillStyle = ringGrad;
+                        ctx.fill('evenodd');
+
+                        ctx.lineWidth = 3.5 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 10.09 3D Glass Stripes — Tubular diagonal glass bars with neon glow
+                // ====================================================================
+                case 'bg_glass_9': {
+                    const stripes = 8;
+                    const sH = (height * 1.5) / stripes;
+                    ctx.save();
+                    ctx.translate(width / 2, height / 2);
+                    ctx.rotate(-0.35);
+                    ctx.translate(-width / 2, -height / 2);
+
+                    for (let i = -2; i < stripes + 2; i++) {
+                        const sy = i * sH;
+                        ctx.beginPath();
+                        ctx.roundRect(-width * 0.2, sy, width * 1.4, sH * 0.55, sH * 0.25);
+
+                        const stGrad = ctx.createLinearGradient(0, sy, 0, sy + sH * 0.55);
+                        stGrad.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
+                        stGrad.addColorStop(0.3, 'rgba(147, 197, 253, 0.3)');
+                        stGrad.addColorStop(0.7, 'rgba(192, 132, 252, 0.25)');
+                        stGrad.addColorStop(1, 'rgba(255, 255, 255, 0.55)');
+                        ctx.fillStyle = stGrad;
+                        ctx.fill();
+
+                        ctx.lineWidth = 3 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+                    break;
+                }
+
+                // ====================================================================
+                // 10.10 3D Glass Spheres — Clustered zero-g crystal spheres & drops
+                // ====================================================================
+                case 'bg_glass_10': {
+                    const spheres = [
+                        { x: 0.48, y: 0.5, r: 0.22 },
+                        { x: 0.2, y: 0.32, r: 0.12 },
+                        { x: 0.75, y: 0.26, r: 0.15 },
+                        { x: 0.25, y: 0.72, r: 0.11 },
+                        { x: 0.82, y: 0.68, r: 0.13 },
+                        { x: 0.58, y: 0.22, r: 0.08 },
+                        { x: 0.35, y: 0.18, r: 0.06 },
+                        { x: 0.65, y: 0.82, r: 0.07 },
+                        { x: 0.88, y: 0.42, r: 0.08 },
+                        { x: 0.12, y: 0.52, r: 0.07 }
+                    ];
+                    spheres.forEach(s => {
+                        ctx.save();
+                        const sx = width * s.x;
+                        const sy = height * s.y;
+                        const sr = Math.min(width, height) * s.r * scale;
+
+                        ctx.beginPath();
+                        ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+                        const sGrad = ctx.createRadialGradient(sx - sr * 0.35, sy - sr * 0.35, sr * 0.05, sx, sy, sr);
+                        sGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+                        sGrad.addColorStop(0.25, 'rgba(186, 230, 253, 0.4)');
+                        sGrad.addColorStop(0.7, 'rgba(216, 180, 254, 0.22)');
+                        sGrad.addColorStop(1, 'rgba(255, 255, 255, 0.85)');
+                        ctx.fillStyle = sGrad;
+                        ctx.fill();
+
+                        ctx.lineWidth = Math.max(1.5, sr * 0.04);
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+                        ctx.stroke();
+                        ctx.restore();
+                    });
+                    break;
+                }
+
+                // ====================================================================
+                // 10.11 3D Prism — Massive faceted crystal glass pyramids & obelisks
+                // ====================================================================
+                case 'bg_glass_11': {
+                    const pyramids = [
+                        { x: 0.5, y: 0.35, w: 0.38, h: 0.6 },
+                        { x: 0.22, y: 0.48, w: 0.28, h: 0.48 },
+                        { x: 0.78, y: 0.46, w: 0.3, h: 0.52 }
+                    ];
+                    pyramids.forEach(p => {
+                        ctx.save();
+                        const px = width * p.x;
+                        const py = height * p.y;
+                        const pw = width * p.w * scale;
+                        const ph = height * p.h * scale;
+
+                        // Left Face
+                        ctx.beginPath();
+                        ctx.moveTo(px, py);
+                        ctx.lineTo(px - pw / 2, py + ph);
+                        ctx.lineTo(px, py + ph * 0.85);
+                        ctx.closePath();
+                        const lGrad = ctx.createLinearGradient(px - pw / 2, py, px, py + ph);
+                        lGrad.addColorStop(0, 'rgba(255, 255, 255, 0.75)');
+                        lGrad.addColorStop(1, 'rgba(56, 189, 248, 0.3)');
+                        ctx.fillStyle = lGrad;
+                        ctx.fill();
+                        ctx.lineWidth = 2.5 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.stroke();
+
+                        // Right Face
+                        ctx.beginPath();
+                        ctx.moveTo(px, py);
+                        ctx.lineTo(px, py + ph * 0.85);
+                        ctx.lineTo(px + pw / 2, py + ph);
+                        ctx.closePath();
+                        const rGrad = ctx.createLinearGradient(px, py, px + pw / 2, py + ph);
+                        rGrad.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+                        rGrad.addColorStop(1, 'rgba(192, 132, 252, 0.35)');
+                        ctx.fillStyle = rGrad;
+                        ctx.fill();
+                        ctx.stroke();
+
+                        ctx.restore();
+                    });
+                    break;
+                }
+
+                // ====================================================================
+                // 10.12 3D Liquid Glass — Viscous undulating liquid glass with splashing beads
+                // ====================================================================
+                case 'bg_glass_12': {
+                    ctx.save();
+                    const cy = height * 0.55;
+                    ctx.beginPath();
+                    ctx.moveTo(0, cy);
+                    ctx.bezierCurveTo(width * 0.25, cy - height * 0.28, width * 0.45, cy + height * 0.25, width * 0.7, cy - height * 0.15);
+                    ctx.bezierCurveTo(width * 0.85, cy - height * 0.35, width * 0.95, cy - height * 0.1, width, cy);
+                    ctx.lineTo(width, height);
+                    ctx.lineTo(0, height);
+                    ctx.closePath();
+
+                    const liqGrad = ctx.createLinearGradient(0, cy - height * 0.2, width, height);
+                    liqGrad.addColorStop(0, 'rgba(56, 189, 248, 0.55)');
+                    liqGrad.addColorStop(0.4, 'rgba(147, 197, 253, 0.35)');
+                    liqGrad.addColorStop(0.8, 'rgba(37, 99, 235, 0.6)');
+                    liqGrad.addColorStop(1, 'rgba(15, 23, 42, 0.8)');
+                    ctx.fillStyle = liqGrad;
+                    ctx.fill();
+
+                    // Liquid Crest Edge
+                    ctx.lineWidth = 5 * scale;
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+                    ctx.stroke();
+
+                    // Splashing Liquid Drops
+                    const splashDrops = [
+                        { x: 0.3, y: 0.32, r: 0.02 },
+                        { x: 0.48, y: 0.25, r: 0.025 },
+                        { x: 0.65, y: 0.28, r: 0.018 },
+                        { x: 0.8, y: 0.22, r: 0.022 }
+                    ];
+                    splashDrops.forEach(d => {
+                        ctx.beginPath();
+                        ctx.arc(width * d.x, height * d.y, Math.min(width, height) * d.r * scale, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.fill();
+                    });
+                    ctx.restore();
+                    break;
+                }
+
+                // ====================================================================
+                // 10.13 3D Glass Panel — Monumental curved architectural glass shield
+                // ====================================================================
+                case 'bg_glass_13': {
+                    ctx.save();
+                    const pw = width * 0.75 * scale;
+                    const ph = height * 0.65 * scale;
+                    const px = width * 0.5;
+                    const py = height * 0.52;
+
+                    ctx.shadowColor = 'rgba(5, 12, 35, 0.55)';
+                    ctx.shadowBlur = 45;
+                    ctx.shadowOffsetY = 25;
+
+                    ctx.beginPath();
+                    ctx.roundRect(px - pw / 2, py - ph / 2, pw, ph, 32 * scale);
+
+                    const panGrad = ctx.createLinearGradient(px - pw / 2, py - ph / 2, px + pw / 2, py + ph / 2);
+                    panGrad.addColorStop(0, 'rgba(255, 255, 255, 0.55)');
+                    panGrad.addColorStop(0.4, 'rgba(56, 189, 248, 0.25)');
+                    panGrad.addColorStop(0.8, 'rgba(192, 132, 252, 0.22)');
+                    panGrad.addColorStop(1, 'rgba(255, 255, 255, 0.45)');
+                    ctx.fillStyle = panGrad;
+                    ctx.fill();
+
+                    ctx.shadowColor = 'transparent';
+                    ctx.lineWidth = 5 * scale;
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+                    ctx.stroke();
+                    ctx.restore();
+                    break;
+                }
+
+                // ====================================================================
+                // 10.14 3D Glass Tiles — Rounded square glass mosaic grid
+                // ====================================================================
+                case 'bg_glass_14': {
+                    const cols = 9;
+                    const rows = 6;
+                    const tileW = width / cols;
+                    const tileH = height / rows;
+                    for (let r = 0; r < rows; r++) {
+                        for (let c = 0; c < cols; c++) {
+                            const tx = c * tileW + tileW * 0.08;
+                            const ty = r * tileH + tileH * 0.08;
+                            const tw = tileW * 0.84;
+                            const th = tileH * 0.84;
+
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.roundRect(tx, ty, tw, th, 10 * scale);
+
+                            const tGrad = ctx.createLinearGradient(tx, ty, tx + tw, ty + th);
+                            tGrad.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
+                            tGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.22)');
+                            tGrad.addColorStop(1, 'rgba(147, 197, 253, 0.45)');
+                            ctx.fillStyle = tGrad;
+                            ctx.fill();
+
+                            ctx.lineWidth = 2 * scale;
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+                            ctx.stroke();
+                            ctx.restore();
+                        }
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 10.15 3D Glass Streaks — Diagonal optical glass light trails
+                // ====================================================================
+                case 'bg_glass_15': {
+                    const streaks = 12;
+                    for (let i = 0; i < streaks; i++) {
+                        ctx.save();
+                        const sx = -width * 0.2 + i * (width * 0.12);
+                        ctx.beginPath();
+                        ctx.moveTo(sx, -height * 0.1);
+                        ctx.lineTo(sx + width * 0.08, -height * 0.1);
+                        ctx.lineTo(sx + width * 0.45, height * 1.1);
+                        ctx.lineTo(sx + width * 0.37, height * 1.1);
+                        ctx.closePath();
+
+                        const sGrad = ctx.createLinearGradient(sx, 0, sx + width * 0.4, height);
+                        sGrad.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
+                        sGrad.addColorStop(0.3, 'rgba(56, 189, 248, 0.35)');
+                        sGrad.addColorStop(0.7, 'rgba(168, 85, 247, 0.3)');
+                        sGrad.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
+                        ctx.fillStyle = sGrad;
                         ctx.fill();
 
                         ctx.lineWidth = 2 * scale;
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 10.16 3D Glass Ring — Dual interlocking 3D glass torus rings
+                // ====================================================================
+                case 'bg_glass_16': {
+                    const rings = [
+                        { x: 0.42, y: 0.48, r: 0.34, rot: -0.2 },
+                        { x: 0.58, y: 0.52, r: 0.32, rot: 0.3 }
+                    ];
+                    rings.forEach(rng => {
+                        ctx.save();
+                        const rx = width * rng.x;
+                        const ry = height * rng.y;
+                        const rOuter = Math.min(width, height) * rng.r * scale;
+                        const rInner = rOuter * 0.68;
+
+                        ctx.translate(rx, ry);
+                        ctx.rotate(rng.rot);
+
+                        ctx.shadowColor = 'rgba(5, 12, 35, 0.5)';
+                        ctx.shadowBlur = 40;
+                        ctx.shadowOffsetY = 20;
+
+                        ctx.beginPath();
+                        ctx.arc(0, 0, rOuter, 0, Math.PI * 2, false);
+                        ctx.arc(0, 0, rInner, 0, Math.PI * 2, true);
+                        ctx.closePath();
+
+                        const rGrad = ctx.createLinearGradient(-rOuter, -rOuter, rOuter, rOuter);
+                        rGrad.addColorStop(0, 'rgba(255, 255, 255, 0.75)');
+                        rGrad.addColorStop(0.35, 'rgba(56, 189, 248, 0.35)');
+                        rGrad.addColorStop(0.7, 'rgba(216, 180, 254, 0.35)');
+                        rGrad.addColorStop(1, 'rgba(255, 255, 255, 0.75)');
+                        ctx.fillStyle = rGrad;
+                        ctx.fill('evenodd');
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = 4.5 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+                        ctx.stroke();
+                        ctx.restore();
+                    });
+                    break;
+                }
+
+                // ====================================================================
+                // 10.17 3D Glass Curve — Sculpted double-curved glass ribbon arch
+                // ====================================================================
+                case 'bg_glass_17': {
+                    ctx.save();
+                    const cy = height * 0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(0, cy - height * 0.15);
+                    ctx.bezierCurveTo(width * 0.35, cy - height * 0.45, width * 0.65, cy + height * 0.45, width, cy + height * 0.15);
+                    ctx.lineTo(width, cy + height * 0.35);
+                    ctx.bezierCurveTo(width * 0.65, cy + height * 0.65, width * 0.35, cy - height * 0.25, 0, cy + height * 0.05);
+                    ctx.closePath();
+
+                    const cGrad = ctx.createLinearGradient(0, cy - height * 0.3, width, cy + height * 0.3);
+                    cGrad.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
+                    cGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.38)');
+                    cGrad.addColorStop(1, 'rgba(168, 85, 247, 0.45)');
+                    ctx.fillStyle = cGrad;
+                    ctx.fill();
+
+                    ctx.lineWidth = 4 * scale;
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.stroke();
+                    ctx.restore();
+                    break;
+                }
+
+                // ====================================================================
+                // 10.18 3D Glass Plates — Multiple horizontal glass louvers in perspective
+                // ====================================================================
+                case 'bg_glass_18': {
+                    const plates = 4;
+                    for (let p = 0; p < plates; p++) {
+                        ctx.save();
+                        const py = height * (0.2 + p * 0.18);
+                        const pw = width * (0.75 - p * 0.06) * scale;
+                        const ph = height * 0.16 * scale;
+
+                        ctx.shadowColor = 'rgba(5, 12, 35, 0.4)';
+                        ctx.shadowBlur = 25;
+                        ctx.shadowOffsetY = 15;
+
+                        ctx.beginPath();
+                        ctx.roundRect((width - pw) / 2, py, pw, ph, 16 * scale);
+
+                        const pGrad = ctx.createLinearGradient((width - pw) / 2, py, (width + pw) / 2, py + ph);
+                        pGrad.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+                        pGrad.addColorStop(0.5, 'rgba(96, 165, 250, 0.28)');
+                        pGrad.addColorStop(1, 'rgba(192, 132, 252, 0.4)');
+                        ctx.fillStyle = pGrad;
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = 3.5 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 10.19 3D Glass Mountains — Crystalline mountain peaks with sharp facets
+                // ====================================================================
+                case 'bg_glass_19': {
+                    const peaks = [
+                        { x: 0.3, y: 0.38, w: 0.35 },
+                        { x: 0.52, y: 0.28, w: 0.4 },
+                        { x: 0.72, y: 0.35, w: 0.36 }
+                    ];
+                    peaks.forEach(pk => {
+                        ctx.save();
+                        const px = width * pk.x;
+                        const py = height * pk.y;
+                        const pw = width * pk.w * scale;
+
+                        // Left Peak Face
+                        ctx.beginPath();
+                        ctx.moveTo(px, py);
+                        ctx.lineTo(px - pw / 2, height);
+                        ctx.lineTo(px, height);
+                        ctx.closePath();
+                        const lGrad = ctx.createLinearGradient(px - pw / 2, py, px, height);
+                        lGrad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                        lGrad.addColorStop(1, 'rgba(37, 99, 235, 0.35)');
+                        ctx.fillStyle = lGrad;
+                        ctx.fill();
+                        ctx.lineWidth = 3 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.stroke();
+
+                        // Right Peak Face
+                        ctx.beginPath();
+                        ctx.moveTo(px, py);
+                        ctx.lineTo(px, height);
+                        ctx.lineTo(px + pw / 2, height);
+                        ctx.closePath();
+                        const rGrad = ctx.createLinearGradient(px, py, px + pw / 2, height);
+                        rGrad.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+                        rGrad.addColorStop(1, 'rgba(168, 85, 247, 0.4)');
+                        ctx.fillStyle = rGrad;
+                        ctx.fill();
+                        ctx.stroke();
+
+                        ctx.restore();
+                    });
+                    break;
+                }
+
+                // ====================================================================
+                // 10.20 3D Glass Fluid — Undulating electric blue & magenta fluid ribbons
+                // ====================================================================
+                case 'bg_glass_20': {
+                    const fluidRibbons = 3;
+                    for (let f = 0; f < fluidRibbons; f++) {
+                        ctx.save();
+                        const fy = height * (0.3 + f * 0.18);
+                        ctx.beginPath();
+                        ctx.moveTo(0, fy);
+                        ctx.bezierCurveTo(width * 0.3, fy - height * 0.35, width * 0.6, fy + height * 0.4, width, fy - height * 0.1);
+                        ctx.lineTo(width, fy + height * 0.2);
+                        ctx.bezierCurveTo(width * 0.6, fy + height * 0.6, width * 0.3, fy - height * 0.15, 0, fy + height * 0.2);
+                        ctx.closePath();
+
+                        const fGrad = ctx.createLinearGradient(0, fy - height * 0.2, width, fy + height * 0.4);
+                        if (f % 2 === 0) {
+                            fGrad.addColorStop(0, 'rgba(56, 189, 248, 0.55)');
+                            fGrad.addColorStop(0.5, 'rgba(236, 72, 153, 0.45)');
+                            fGrad.addColorStop(1, 'rgba(168, 85, 247, 0.55)');
+                        } else {
+                            fGrad.addColorStop(0, 'rgba(192, 132, 252, 0.5)');
+                            fGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.4)');
+                            fGrad.addColorStop(1, 'rgba(244, 114, 182, 0.55)');
+                        }
+                        ctx.fillStyle = fGrad;
+                        ctx.fill();
+
+                        ctx.lineWidth = 4 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 10.21 3D Layered Diamond — Concentric stepped 3D rhombus diamonds
+                // ====================================================================
+                case 'bg_glass_21': {
+                    const diamonds = 4;
+                    for (let d = diamonds; d >= 1; d--) {
+                        ctx.save();
+                        const ds = Math.min(width, height) * (0.12 + d * 0.1) * scale;
+                        ctx.translate(width * 0.5, height * 0.5);
+                        ctx.rotate(Math.PI / 4);
+
+                        ctx.shadowColor = 'rgba(5, 12, 35, 0.4)';
+                        ctx.shadowBlur = 25;
+                        ctx.shadowOffsetY = 15;
+
+                        ctx.beginPath();
+                        ctx.roundRect(-ds / 2, -ds / 2, ds, ds, ds * 0.08);
+
+                        const dGrad = ctx.createLinearGradient(-ds / 2, -ds / 2, ds / 2, ds / 2);
+                        dGrad.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+                        dGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.25)');
+                        dGrad.addColorStop(1, 'rgba(168, 85, 247, 0.45)');
+                        ctx.fillStyle = dGrad;
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = 3.5 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 10.22 3D Glass Flow — S-curve glass ribbon with deep shadow gradients
+                // ====================================================================
+                case 'bg_glass_22': {
+                    const ribbons = 5;
+                    for (let i = 0; i < ribbons; i++) {
+                        ctx.save();
+                        const ry = height * (0.18 + i * 0.15);
+                        ctx.beginPath();
+                        ctx.moveTo(0, ry);
+                        ctx.bezierCurveTo(width * 0.28, ry - height * 0.25, width * 0.72, ry + height * 0.32, width, ry);
+                        ctx.lineTo(width, height);
+                        ctx.lineTo(0, height);
+                        ctx.closePath();
+
+                        const rGrad = ctx.createLinearGradient(0, ry - height * 0.2, width, ry + height * 0.3);
+                        rGrad.addColorStop(0, 'rgba(216, 180, 254, 0.45)');
+                        rGrad.addColorStop(0.4, 'rgba(56, 189, 248, 0.35)');
+                        rGrad.addColorStop(1, 'rgba(30, 58, 138, 0.65)');
+                        ctx.fillStyle = rGrad;
+                        ctx.fill();
+
+                        ctx.lineWidth = 3.5 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 10.23 3D Transparent Balls — Foreground macro glass marbles with caustics
+                // ====================================================================
+                case 'bg_glass_23': {
+                    const orbCount = 16;
+                    for (let i = 0; i < orbCount; i++) {
+                        ctx.save();
+                        const ox = width * (0.1 + (i % 4) * 0.26 + (Math.sin(i * 1.7) * 0.05));
+                        const oy = height * (0.15 + Math.floor(i / 4) * 0.22 + (Math.cos(i * 1.3) * 0.05));
+                        const or = Math.min(width, height) * (0.06 + (i % 3) * 0.035) * scale;
+
+                        ctx.shadowColor = 'rgba(5, 12, 35, 0.45)';
+                        ctx.shadowBlur = or * 0.4;
+                        ctx.shadowOffsetY = or * 0.25;
+
+                        ctx.beginPath();
+                        ctx.arc(ox, oy, or, 0, Math.PI * 2);
+                        const oGrad = ctx.createRadialGradient(ox - or * 0.35, oy - or * 0.35, or * 0.05, ox, oy, or);
+                        oGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+                        oGrad.addColorStop(0.28, 'rgba(147, 197, 253, 0.45)');
+                        oGrad.addColorStop(0.7, 'rgba(216, 180, 254, 0.25)');
+                        oGrad.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
+                        ctx.fillStyle = oGrad;
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = Math.max(1.5, or * 0.04);
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 10.24 3D Glass Bevel — Monolithic diagonal beveled glass slab
+                // ====================================================================
+                case 'bg_glass_24': {
+                    ctx.save();
+                    const cx = width * 0.5;
+                    const cy = height * 0.5;
+                    const bw = Math.min(width, height) * 0.55 * scale;
+                    const bh = Math.hypot(width, height) * 1.1;
+
+                    ctx.translate(cx, cy);
+                    ctx.rotate(-0.55);
+
+                    ctx.shadowColor = 'rgba(5, 12, 35, 0.6)';
+                    ctx.shadowBlur = 45;
+                    ctx.shadowOffsetY = 25;
+
+                    ctx.beginPath();
+                    ctx.rect(-bw / 2, -bh / 2, bw, bh);
+
+                    const bGrad = ctx.createLinearGradient(-bw / 2, 0, bw / 2, 0);
+                    bGrad.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
+                    bGrad.addColorStop(0.2, 'rgba(147, 197, 253, 0.3)');
+                    bGrad.addColorStop(0.8, 'rgba(56, 189, 248, 0.2)');
+                    bGrad.addColorStop(1, 'rgba(255, 255, 255, 0.55)');
+                    ctx.fillStyle = bGrad;
+                    ctx.fill();
+
+                    ctx.shadowColor = 'transparent';
+                    ctx.lineWidth = 5 * scale;
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+                    ctx.stroke();
+                    ctx.restore();
+                    break;
+                }
+
+                // ====================================================================
+                // 10.25 3D Soft Glass — Atmospheric undulating frosted glass folds
+                // ====================================================================
+                case 'bg_glass_25':
+                default: {
+                    const folds = 5;
+                    for (let f = 0; f < folds; f++) {
+                        ctx.save();
+                        const fy = height * (0.15 + f * 0.18);
+                        ctx.beginPath();
+                        ctx.moveTo(0, fy);
+                        ctx.bezierCurveTo(width * 0.35, fy - height * 0.22, width * 0.7, fy + height * 0.28, width, fy);
+                        ctx.lineTo(width, height);
+                        ctx.lineTo(0, height);
+                        ctx.closePath();
+
+                        const sGrad = ctx.createLinearGradient(0, fy - height * 0.2, width, fy + height * 0.3);
+                        sGrad.addColorStop(0, 'rgba(244, 114, 182, 0.32)');
+                        sGrad.addColorStop(0.5, 'rgba(192, 132, 252, 0.3)');
+                        sGrad.addColorStop(1, 'rgba(56, 189, 248, 0.38)');
+                        ctx.fillStyle = sGrad;
+                        ctx.fill();
+
+                        ctx.lineWidth = 3 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
                         ctx.stroke();
                         ctx.restore();
                     }
@@ -13344,6 +14344,7 @@
 
             appendBatchLog(`Loaded ${importedFiles.length} images from "${sourceLabel}" -> ${totalTriplets} Left+Center+Right triplets queued.`);
             state.tripletCleanBase = true;
+            state.glassShapeEnable = false;
             syncUIFromState();
             await loadTripletPreview(0);
             showToast('3-Panel Images Placed', `${importedFiles.length} images loaded. Placed in 3-panel measurement (33.3% | 33.3% | 33.3%). Customize layout or switch to Studio Fusion.`);

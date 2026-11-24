@@ -5432,51 +5432,6 @@
                                     gCtx.fillRect(0, 0, workW, workH);
 
                                     gCtx.globalCompositeOperation = 'source-over';
-
-                // Professional Clarity & Micro-Contrast Enhancement Filter
-                const clarityLevel = (state.clarity !== undefined ? state.clarity : 45) / 100;
-                if (clarityLevel > 0) {
-                    const cW = Math.round(width * 0.5);
-                    const cH = Math.round(height * 0.5);
-                    const cBuf = document.createElement('canvas');
-                    cBuf.width = cW; cBuf.height = cH;
-                    const cCtx = cBuf.getContext('2d');
-                    cCtx.drawImage(gradeBuf, 0, 0, cW, cH);
-                    
-                    gCtx.save();
-                    gCtx.globalAlpha = clarityLevel * 0.35;
-                    gCtx.globalCompositeOperation = 'overlay';
-                    gCtx.drawImage(cBuf, 0, 0, width, height);
-                    gCtx.restore();
-                    disposeCanvas(cBuf);
-                }
-
-                // Professional Smart Vibrance Boost
-                const vibranceLevel = (state.vibrance !== undefined ? state.vibrance : 35) / 100;
-                if (vibranceLevel > 0) {
-                    gCtx.save();
-                    gCtx.globalAlpha = vibranceLevel * 0.28;
-                    gCtx.globalCompositeOperation = 'soft-light';
-                    gCtx.drawImage(gradeBuf, 0, 0);
-                    gCtx.restore();
-                }
-
-                // Professional Studio Vignette Falloff
-                const vigLevel = (state.studioVignette !== undefined ? state.studioVignette : 25) / 100;
-                if (vigLevel > 0) {
-                    gCtx.save();
-                    gCtx.globalCompositeOperation = 'multiply';
-                    const vGrad = gCtx.createRadialGradient(
-                        width * 0.5, height * 0.5, width * 0.30,
-                        width * 0.5, height * 0.5, width * 0.72
-                    );
-                    vGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-                    vGrad.addColorStop(0.65, `rgba(220, 220, 225, ${1 - vigLevel * 0.25})`);
-                    vGrad.addColorStop(1, `rgba(18, 22, 35, ${1 - vigLevel * 0.65})`);
-                    gCtx.fillStyle = vGrad;
-                    gCtx.fillRect(0, 0, width, height);
-                    gCtx.restore();
-                }
                                     defineShapePath();
                                     gCtx.lineWidth = Math.max(2.5, localUnit * 0.006);
                                     gCtx.strokeStyle = `rgba(255, 255, 255, ${0.92 * baseNorm})`;

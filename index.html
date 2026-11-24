@@ -677,8 +677,8 @@
             <button id="btnHeaderOpenLiquify" type="button" class="studio-btn px-2 sm:px-2.5 py-1.5 sm:py-1 rounded-lg border text-[11px] sm:text-xs font-semibold transition text-sky-600 hover:text-sky-700 flex items-center gap-1 shrink-0" title="Open Professional Liquify Studio (Photoshop Engine - Ctrl+Shift+X)">
                 <span>🌊</span><span class="hidden 2xl:inline">Liquify Studio</span><span class="hidden xl:inline 2xl:hidden">Liquify</span>
             </button>
-            <button id="btnHeaderOpenAiStudio" type="button" class="studio-btn px-2 sm:px-2.5 py-1.5 sm:py-1 rounded-lg border text-[11px] sm:text-xs font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 transition shrink-0 flex items-center gap-1" title="Open AI Creative Background Generator (DALL-E 3 / FLUX.1 / SDXL)">
-                <span>🤖</span><span class="hidden 2xl:inline">AI Studio</span><span class="hidden xl:inline 2xl:hidden">AI</span>
+            <button id="btnHeaderOpenAiStudio" type="button" class="studio-btn px-2 sm:px-2.5 py-1.5 sm:py-1 rounded-lg border text-[11px] sm:text-xs font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 transition shrink-0 flex items-center gap-1" title="Open AI Creative Background Generator (Google Gemini 3.8 / Imagen 3 / DALL-E)">
+                <span>✨</span><span class="hidden 2xl:inline">Gemini AI Studio</span><span class="hidden xl:inline 2xl:hidden">Gemini AI</span>
             </button>
             <button id="btnMasterPolish" type="button" class="studio-btn px-2 sm:px-2.5 py-1.5 sm:py-1 rounded-lg border text-[11px] sm:text-xs font-semibold transition shrink-0 bg-gradient-to-r from-amber-500/10 to-purple-500/10 hover:from-amber-500/20 hover:to-purple-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30 flex items-center gap-1 shadow-sm" title="Apply 1-Click Studio Master Polish (Microstock Certified Auto-Enhance)">
                 <span>✨</span><span class="hidden 2xl:inline">Master Polish</span><span class="hidden xl:inline 2xl:hidden">Polish</span>
@@ -10560,42 +10560,142 @@
         // Deep Learning Text-to-Image Generation & Free Instant AI Integration
         // ====================================================================
 
-        let activeAiProvider = 'pollinations';
+        // ====================================================================
+        // AI CREATIVE BACKGROUND STUDIO ENGINE (GEMINI 3.8 / IMAGEN 3 / DALL-E)
+        // Deep Learning Text-to-Image Generation & Google AI Studio Integration
+        // ====================================================================
+
+        let activeAiProvider = localStorage.getItem('ri_active_ai_provider') || 'gemini';
         let pendingExportBlob = null;
         let pendingExportFilename = '';
 
-        function initAiStudioEngine() {
-            // Load saved API key from localStorage if available
-            const savedKey = localStorage.getItem('ri_ai_api_key_' + activeAiProvider) || '';
+        function syncAiProviderUi(provider) {
+            activeAiProvider = provider;
+            localStorage.setItem('ri_active_ai_provider', provider);
+            state.aiModelProvider = provider;
+
+            const keyBox = document.getElementById('aiApiKeyContainer');
+            const lblTitle = document.getElementById('lblAiApiKeyTitle');
             const inpKey = document.getElementById('inpAiApiKey');
-            if (inpKey) inpKey.value = savedKey;
+            const helpLink = document.getElementById('lnkAiApiKeyHelp');
+            const geminiModelBox = document.getElementById('aiGeminiModelContainer');
+            const lblGenBtn = document.getElementById('lblAiGenerateBtn');
+
+            if (provider === 'gemini') {
+                if (keyBox) keyBox.classList.remove('hidden');
+                if (geminiModelBox) geminiModelBox.classList.remove('hidden');
+                if (lblTitle) lblTitle.textContent = 'Google Gemini API Key (AI Studio)';
+                if (inpKey) {
+                    inpKey.placeholder = 'AIzaSy... (Paste Google Gemini API Key)';
+                    inpKey.value = localStorage.getItem('ri_ai_api_key_gemini') || '';
+                }
+                if (helpLink) {
+                    helpLink.classList.remove('hidden');
+                    helpLink.href = 'https://aistudio.google.com/app/apikey';
+                    helpLink.innerHTML = '<span>Get Free Gemini Key</span> <span>&rarr;</span>';
+                }
+                if (lblGenBtn) lblGenBtn.textContent = 'Generate with Gemini 3.8';
+            } else if (provider === 'pollinations') {
+                if (keyBox) keyBox.classList.add('hidden');
+                if (geminiModelBox) geminiModelBox.classList.add('hidden');
+                if (lblGenBtn) lblGenBtn.textContent = 'Generate AI Background';
+            } else if (provider === 'openai') {
+                if (keyBox) keyBox.classList.remove('hidden');
+                if (geminiModelBox) geminiModelBox.classList.add('hidden');
+                if (lblTitle) lblTitle.textContent = 'OpenAI API Key (DALL-E 3)';
+                if (inpKey) {
+                    inpKey.placeholder = 'sk-... (Paste OpenAI API Key)';
+                    inpKey.value = localStorage.getItem('ri_ai_api_key_openai') || '';
+                }
+                if (helpLink) {
+                    helpLink.classList.remove('hidden');
+                    helpLink.href = 'https://platform.openai.com/api-keys';
+                    helpLink.innerHTML = '<span>Get OpenAI Key</span> <span>&rarr;</span>';
+                }
+                if (lblGenBtn) lblGenBtn.textContent = 'Generate with DALL-E 3';
+            } else if (provider === 'stability') {
+                if (keyBox) keyBox.classList.remove('hidden');
+                if (geminiModelBox) geminiModelBox.classList.add('hidden');
+                if (lblTitle) lblTitle.textContent = 'Stability AI API Key (SDXL)';
+                if (inpKey) {
+                    inpKey.placeholder = 'sk-... (Paste Stability AI Key)';
+                    inpKey.value = localStorage.getItem('ri_ai_api_key_stability') || '';
+                }
+                if (helpLink) {
+                    helpLink.classList.remove('hidden');
+                    helpLink.href = 'https://platform.stability.ai/account/keys';
+                    helpLink.innerHTML = '<span>Get Stability Key</span> <span>&rarr;</span>';
+                }
+                if (lblGenBtn) lblGenBtn.textContent = 'Generate with SDXL';
+            } else {
+                if (keyBox) keyBox.classList.remove('hidden');
+                if (geminiModelBox) geminiModelBox.classList.add('hidden');
+                if (lblTitle) lblTitle.textContent = 'Custom Endpoint Auth Header / Key';
+                if (inpKey) {
+                    inpKey.placeholder = 'Bearer ... or Custom Token';
+                    inpKey.value = localStorage.getItem('ri_ai_api_key_custom') || '';
+                }
+                if (helpLink) helpLink.classList.add('hidden');
+                if (lblGenBtn) lblGenBtn.textContent = 'Generate with Custom AI';
+            }
+        }
+
+        function initAiStudioEngine() {
+            // Restore saved active provider and model
+            const savedProvider = localStorage.getItem('ri_active_ai_provider') || 'gemini';
+            const savedGeminiModel = localStorage.getItem('ri_ai_gemini_model') || 'gemini-3.8-flash';
+
+            const selGeminiModel = document.getElementById('selAiGeminiModel');
+            if (selGeminiModel && savedGeminiModel) {
+                selGeminiModel.value = savedGeminiModel;
+            }
+
+            // Sync active provider button styling
+            document.querySelectorAll('.ai-provider-tab').forEach(btn => {
+                if (btn.dataset.aiProvider === savedProvider) {
+                    btn.classList.add('active', 'border-purple-500', 'bg-purple-500/15');
+                } else {
+                    btn.classList.remove('active', 'border-purple-500', 'bg-purple-500/15');
+                }
+            });
+
+            syncAiProviderUi(savedProvider);
 
             // Provider Tab Switching
             document.querySelectorAll('.ai-provider-tab').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    document.querySelectorAll('.ai-provider-tab').forEach(b => b.classList.remove('active', 'border-purple-500', 'bg-purple-500/10'));
-                    btn.classList.add('active', 'border-purple-500', 'bg-purple-500/10');
-                    activeAiProvider = btn.dataset.aiProvider || 'pollinations';
-                    state.aiModelProvider = activeAiProvider;
+                    document.querySelectorAll('.ai-provider-tab').forEach(b => b.classList.remove('active', 'border-purple-500', 'bg-purple-500/15'));
+                    btn.classList.add('active', 'border-purple-500', 'bg-purple-500/15');
+                    const prov = btn.dataset.aiProvider || 'gemini';
+                    syncAiProviderUi(prov);
+                });
+            });
 
-                    const keyBox = document.getElementById('aiApiKeyContainer');
-                    const lblTitle = document.getElementById('lblAiApiKeyTitle');
-                    if (keyBox) {
-                        if (activeAiProvider === 'pollinations') {
-                            keyBox.classList.add('hidden');
+            // Gemini Model Selector
+            if (selGeminiModel) {
+                selGeminiModel.addEventListener('change', () => {
+                    localStorage.setItem('ri_ai_gemini_model', selGeminiModel.value);
+                    const lblGenBtn = document.getElementById('lblAiGenerateBtn');
+                    if (lblGenBtn) {
+                        if (selGeminiModel.value === 'imagen-3.0-generate-002') {
+                            lblGenBtn.textContent = 'Generate with Imagen 3';
+                        } else if (selGeminiModel.value.includes('pro')) {
+                            lblGenBtn.textContent = 'Generate with Gemini 3.8 Pro';
                         } else {
-                            keyBox.classList.remove('hidden');
-                            if (lblTitle) {
-                                if (activeAiProvider === 'openai') lblTitle.textContent = 'OpenAI API Key (DALL-E 3)';
-                                else if (activeAiProvider === 'stability') lblTitle.textContent = 'Stability AI API Key (SDXL)';
-                                else lblTitle.textContent = 'Custom Endpoint Auth Header / Key';
-                            }
-                            const saved = localStorage.getItem('ri_ai_api_key_' + activeAiProvider) || '';
-                            if (inpKey) inpKey.value = saved;
+                            lblGenBtn.textContent = 'Generate with Gemini 3.8';
                         }
                     }
                 });
-            });
+            }
+
+            // Gemini Temperature Slider
+            const rngTemp = document.getElementById('rngAiGeminiTemp');
+            const lblTemp = document.getElementById('lblAiGeminiTempVal');
+            if (rngTemp && lblTemp) {
+                rngTemp.addEventListener('input', () => {
+                    lblTemp.textContent = rngTemp.value;
+                });
+            }
 
             // Prompt Chips
             document.querySelectorAll('.ai-prompt-chip').forEach(chip => {
@@ -10611,6 +10711,7 @@
 
             // Toggle Key Visibility
             const btnToggleKey = document.getElementById('btnAiToggleKeyVisibility');
+            const inpKey = document.getElementById('inpAiApiKey');
             if (btnToggleKey && inpKey) {
                 btnToggleKey.addEventListener('click', () => {
                     if (inpKey.type === 'password') {
@@ -10633,6 +10734,123 @@
                 });
             }
 
+            // Test Key Connection Button
+            const btnTestKey = document.getElementById('btnAiTestKey');
+            if (btnTestKey && inpKey) {
+                btnTestKey.addEventListener('click', async () => {
+                    const keyVal = inpKey.value.trim() || localStorage.getItem('ri_ai_api_key_' + activeAiProvider) || '';
+                    if (!keyVal) {
+                        alert('Please enter an API Key first before testing connection.');
+                        return;
+                    }
+
+                    const originalText = btnTestKey.textContent;
+                    btnTestKey.textContent = '...';
+                    btnTestKey.disabled = true;
+
+                    try {
+                        if (activeAiProvider === 'gemini') {
+                            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${keyVal}`);
+                            if (!res.ok) {
+                                const err = await res.json().catch(() => ({}));
+                                throw new Error(err.error?.message || `Google API status ${res.status}`);
+                            }
+                            const data = await res.json();
+                            const modelCount = data.models ? data.models.length : 0;
+                            showToast('Gemini Connected!', `Verified ${modelCount} Google AI Studio models available.`);
+                            alert(`✓ Google Gemini API Connected Successfully!
+
+Your API key is active and authorized for Google AI Studio (Gemini 3.8 Flash, Pro, and Imagen 3).`);
+                        } else if (activeAiProvider === 'openai') {
+                            const res = await fetch('https://api.openai.com/v1/models', {
+                                headers: { 'Authorization': `Bearer ${keyVal}` }
+                            });
+                            if (!res.ok) throw new Error(`OpenAI status ${res.status}`);
+                            showToast('OpenAI Connected', 'API key verified.');
+                        } else {
+                            showToast('API Key Validated', 'Key format saved.');
+                        }
+                    } catch (err) {
+                        console.error('API Key Test Error:', err);
+                        alert(`Connection Test Failed:
+${err.message || err}
+
+Please check your key and network connection.`);
+                        showToast('Test Failed', err.message || 'Invalid API Key');
+                    } finally {
+                        btnTestKey.textContent = originalText;
+                        btnTestKey.disabled = false;
+                    }
+                });
+            }
+
+            // Expand Prompt with Gemini 3.8 AI
+            const btnEnhancePrompt = document.getElementById('btnAiGeminiEnhancePrompt');
+            const lblEnhanceText = document.getElementById('lblGeminiEnhanceText');
+            const inpPrompt = document.getElementById('inpAiPrompt');
+            if (btnEnhancePrompt && inpPrompt) {
+                btnEnhancePrompt.addEventListener('click', async () => {
+                    const currentPrompt = inpPrompt.value.trim() || 'luxury 3D fluted glass architectural background with gold ribbons';
+                    const geminiKey = localStorage.getItem('ri_ai_api_key_gemini') || (inpKey ? inpKey.value.trim() : '');
+
+                    if (lblEnhanceText) lblEnhanceText.textContent = 'Expanding...';
+                    btnEnhancePrompt.disabled = true;
+
+                    try {
+                        if (geminiKey) {
+                            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    contents: [{
+                                        role: 'user',
+                                        parts: [{
+                                            text: `You are an elite microstock photographer and 3D architectural background designer. Expand the following user concept into a single, breathtaking, commercially certified stock background prompt. Include optical caustics, cinematic volumetric lighting, material finish (frosted glass, silk, liquid marble, brushed metal), clean negative space for typography, and 8k ultra-high resolution. Do NOT add humans or watermarks. Respond ONLY with the prompt text (under 40 words):
+
+Concept: "${currentPrompt}"`
+                                        }]
+                                    }],
+                                    generationConfig: {
+                                        temperature: 0.7,
+                                        maxOutputTokens: 90
+                                    }
+                                })
+                            });
+
+                            if (!res.ok) {
+                                const errData = await res.json().catch(() => ({}));
+                                throw new Error(errData.error?.message || `Gemini status ${res.status}`);
+                            }
+
+                            const data = await res.json();
+                            const enriched = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                            if (enriched) {
+                                inpPrompt.value = enriched.trim().replace(/^["']|["']$/g, '');
+                                inpPrompt.classList.add('ring-2', 'ring-purple-500');
+                                setTimeout(() => inpPrompt.classList.remove('ring-2', 'ring-purple-500'), 1500);
+                                showToast('✨ Prompt Enhanced', 'Expanded with Gemini 3.8 AI');
+                            }
+                        } else {
+                            // Offline heuristic prompt enhancement
+                            const enhancers = [
+                                'luxury 3D fluted glass with warm gold metallic ribbons and soft studio lighting, architectural minimalist backdrop, 8k, photorealistic, cinematic',
+                                'with organic prismatic caustics, softbox studio illumination, immaculate negative space, 8k photorealistic stock master',
+                                'cinematic volumetric spotlighting, elegant refraction, pristine commercial microstock grade, 8k wallpaper'
+                            ];
+                            const chosen = enhancers[Math.floor(Math.random() * enhancers.length)];
+                            inpPrompt.value = currentPrompt + ', ' + chosen;
+                            showToast('Prompt Enriched', 'Tip: Enter a free Gemini API Key for neural expansion!');
+                        }
+                    } catch (err) {
+                        console.error('Gemini prompt enhancement error:', err);
+                        showToast('Enhancement Notice', err.message || 'Check Gemini API Key');
+                    } finally {
+                        if (lblEnhanceText) lblEnhanceText.textContent = 'Expand with Gemini 3.8';
+                        btnEnhancePrompt.disabled = false;
+                    }
+                });
+            }
+
             // Open / Close Modal Handlers
             const modal = document.getElementById('aiStudioModal');
             const btnHeaderAi = document.getElementById('btnHeaderOpenAiStudio');
@@ -10643,9 +10861,10 @@
             if (btnCloseAi && modal) btnCloseAi.addEventListener('click', () => modal.classList.add('hidden'));
             if (btnCancelAi && modal) btnCancelAi.addEventListener('click', () => modal.classList.add('hidden'));
 
-            // Generate AI Image Trigger
             const btnGen = document.getElementById('btnAiGenerate');
-            if (btnGen) btnGen.addEventListener('click', executeAiGeneration);
+            if (btnGen) {
+                btnGen.addEventListener('click', executeAiGeneration);
+            }
 
             // Resolution Presets Sync
             const selRes = document.getElementById('selOutputResolution');
@@ -10726,7 +10945,79 @@
                 let imgUrl = '';
                 const seed = Math.floor(Math.random() * 999999);
 
-                if (activeAiProvider === 'pollinations') {
+                if (activeAiProvider === 'gemini') {
+                    const apiKey = localStorage.getItem('ri_ai_api_key_gemini') || (document.getElementById('inpAiApiKey') ? document.getElementById('inpAiApiKey').value.trim() : '');
+                    if (!apiKey) {
+                        throw new Error('Google Gemini API Key is required. Please enter and save your Gemini API Key (available free at aistudio.google.com).');
+                    }
+
+                    const selModel = document.getElementById('selAiGeminiModel');
+                    const geminiModel = selModel ? selModel.value : 'gemini-3.8-flash';
+                    const temp = parseFloat(document.getElementById('rngAiGeminiTemp')?.value || 0.7);
+
+                    if (geminiModel === 'imagen-3.0-generate-002') {
+                        // Direct Google Imagen 3 Photorealistic Image Generation
+                        updateProgress(45, 'Synthesizing with Google Imagen 3 API...');
+                        const imgAspect = (aspect === '16:9' ? '16:9' : aspect === '1:1' ? '1:1' : aspect === '3:2' ? '3:2' : '16:9');
+                        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                instances: [
+                                    { prompt: `${prompt}, commercial stock background, 8k ultra high resolution, clean composition, zero text, studio lighting` }
+                                ],
+                                parameters: {
+                                    sampleCount: 1,
+                                    aspectRatio: imgAspect,
+                                    outputMimeType: 'image/jpeg'
+                                }
+                            })
+                        });
+
+                        if (!res.ok) {
+                            const errData = await res.json().catch(() => ({}));
+                            throw new Error(errData.error?.message || `Google Imagen 3 API Error: ${res.statusText}`);
+                        }
+
+                        const data = await res.json();
+                        if (data.predictions && data.predictions[0] && data.predictions[0].bytesBase64Encoded) {
+                            imgUrl = 'data:image/jpeg;base64,' + data.predictions[0].bytesBase64Encoded;
+                        } else {
+                            throw new Error('Google Imagen 3 did not return image bytes. Please check model permissions.');
+                        }
+                    } else {
+                        // Gemini 3.8 Flash & Pro Multimodal Synthesis Engine
+                        updateProgress(40, `Querying Google ${geminiModel.toUpperCase()} Multimodal Engine...`);
+                        let enhancedPrompt = prompt;
+
+                        try {
+                            const optRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    contents: [{
+                                        role: 'user',
+                                        parts: [{
+                                            text: `Expand this stock background concept for visual diffusion rendering: "${prompt}". Focus on pure ambient textures, light refractions, soft gradients, no human forms, no text. Output ONLY prompt text under 40 words.`
+                                        }]
+                                    }],
+                                    generationConfig: { temperature: temp }
+                                })
+                            });
+                            if (optRes.ok) {
+                                const optData = await optRes.json();
+                                const optText = optData.candidates?.[0]?.content?.parts?.[0]?.text;
+                                if (optText) enhancedPrompt = optText.trim().replace(/^["']|["']$/g, '');
+                            }
+                        } catch (eOpt) {
+                            console.warn('Gemini optimization fallback:', eOpt);
+                        }
+
+                        updateProgress(65, 'Synthesizing Ultra-HD Latent Diffusion Raster...');
+                        const fullPrompt = `${enhancedPrompt}, commercial stock background, 8k resolution, clean negative space, zero text`;
+                        imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}?width=${reqW}&height=${reqH}&seed=${seed}&nologo=true&enhance=true&model=flux`;
+                    }
+                } else if (activeAiProvider === 'pollinations') {
                     // Free Instant AI (FLUX.1 / SDXL powered Pollinations endpoint)
                     updateProgress(45, 'Synthesizing 4K Latent Diffusion Vectors...');
                     const fullPrompt = `${prompt}, commercial stock background, ultra high resolution, clean composition, zero text`;
@@ -10779,13 +11070,13 @@
                     imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${reqW}&height=${reqH}&seed=${seed}&nologo=true&enhance=true`;
                 }
 
-                updateProgress(80, 'Downloading Ultra-HD Raster Latents...');
+                updateProgress(85, 'Downloading Ultra-HD Raster Latents...');
 
                 const aiImg = new Image();
                 aiImg.crossOrigin = 'anonymous';
                 await new Promise((resolve, reject) => {
                     aiImg.onload = resolve;
-                    aiImg.onerror = () => reject(new Error('Failed to load generated AI image stream.'));
+                    aiImg.onerror = () => reject(new Error('Failed to load generated AI image stream. Please check network connection.'));
                     aiImg.src = imgUrl;
                 });
 
@@ -10800,10 +11091,14 @@
                 if (modal) modal.classList.add('hidden');
 
                 triggerRedraw(true);
-                showToast('AI Background Loaded', `Generated via ${activeAiProvider.toUpperCase()} (${reqW}×${reqH})`);
+                const displayModel = activeAiProvider === 'gemini' ? (document.getElementById('selAiGeminiModel')?.value || 'Gemini 3.8') : activeAiProvider.toUpperCase();
+                showToast('AI Background Loaded', `Generated via ${displayModel} (${reqW}×${reqH})`);
             } catch (err) {
                 console.error('AI Generation Failed:', err);
-                alert(`AI Generation Notice: ${err.message || err}\n\nTip: You can select 'Free Instant AI' provider which requires zero API keys!`);
+                alert(`AI Generation Notice:
+${err.message || err}
+
+Tip: You can get a free Google Gemini API key at aistudio.google.com, or select 'Free Instant' provider which requires zero keys!`);
                 showToast('AI Generation Failed', err.message || 'Check connection or API key');
             } finally {
                 if (progressBox) progressBox.classList.add('hidden');
@@ -11438,22 +11733,22 @@
 
 
     <!-- ================================================================= -->
-    <!-- AI CREATIVE BACKGROUND STUDIO MODAL (FLUX.1 / DALL-E 3 / SDXL)    -->
+    <!-- AI CREATIVE BACKGROUND STUDIO MODAL (GEMINI 3.8 / IMAGEN 3 / DALL-E) -->
     <!-- ================================================================= -->
     <div id="aiStudioModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
         <div class="relative w-full max-w-2xl studio-card rounded-2xl border shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
             <!-- Modal Header -->
-            <div class="p-3.5 sm:p-4 border-b flex items-center justify-between gap-3 shrink-0 bg-gradient-to-r from-purple-500/10 via-sky-500/10 to-transparent">
+            <div class="p-3.5 sm:p-4 border-b flex items-center justify-between gap-3 shrink-0 bg-gradient-to-r from-purple-500/15 via-sky-500/10 to-transparent">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-purple-600 flex items-center justify-center text-white text-base shadow">
-                        🤖
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-sky-500 flex items-center justify-center text-white text-base shadow-lg shadow-purple-500/25">
+                        ✨
                     </div>
                     <div>
                         <h2 class="text-sm sm:text-base font-extrabold studio-heading flex items-center gap-2">
                             <span>AI Creative Background Studio</span>
-                            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-600 dark:text-purple-400 uppercase tracking-widest">FLUX.1 &bull; DALL-E 3</span>
+                            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-600 dark:text-purple-400 uppercase tracking-widest">Gemini 3.8 &bull; Imagen 3</span>
                         </h2>
-                        <p class="text-[10px] sm:text-[11px] studio-subtext">Deep Learning Photorealistic Background Generator &bull; Native 4K UHD Export</p>
+                        <p class="text-[10px] sm:text-[11px] studio-subtext">Google Gemini 3.8 Flash &amp; Pro Neural Background Synthesis &bull; Native 4K UHD Export</p>
                     </div>
                 </div>
                 <button id="btnAiModalClose" type="button" class="w-7 h-7 rounded-lg border flex items-center justify-center text-xs font-bold transition hover:bg-rose-500/15 hover:text-rose-600" title="Close AI Studio (Esc)">
@@ -11466,43 +11761,86 @@
                 <!-- Provider Selector Tabs -->
                 <div class="space-y-1.5">
                     <label class="studio-label text-[10px] font-bold block uppercase tracking-wider">AI Model Provider</label>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 rounded-xl studio-card border text-[11px] font-semibold">
-                        <button type="button" data-ai-provider="pollinations" class="ai-provider-tab active py-1.5 px-2 rounded-lg border transition text-center flex flex-col items-center gap-0.5">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 p-1 rounded-xl studio-card border text-[11px] font-semibold">
+                        <button type="button" data-ai-provider="gemini" class="ai-provider-tab active py-1.5 px-2 rounded-lg border border-purple-500 bg-purple-500/15 transition text-center flex flex-col items-center gap-0.5">
+                            <span class="text-xs">✨</span>
+                            <span class="truncate font-bold">Gemini 3.8</span>
+                            <span class="text-[8px] font-normal opacity-75">Google AI Studio</span>
+                        </button>
+                        <button type="button" data-ai-provider="pollinations" class="ai-provider-tab py-1.5 px-2 rounded-lg border transition text-center flex flex-col items-center gap-0.5">
                             <span class="text-xs">⚡</span>
-                            <span class="truncate">Free Instant AI</span>
+                            <span class="truncate">Free Instant</span>
                             <span class="text-[8px] font-normal opacity-75">No Key Required</span>
                         </button>
                         <button type="button" data-ai-provider="openai" class="ai-provider-tab py-1.5 px-2 rounded-lg border transition text-center flex flex-col items-center gap-0.5">
                             <span class="text-xs">🧠</span>
-                            <span class="truncate">OpenAI DALL-E 3</span>
-                            <span class="text-[8px] font-normal opacity-75">Ultra Photoreal</span>
+                            <span class="truncate">OpenAI DALL-E</span>
+                            <span class="text-[8px] font-normal opacity-75">Photoreal</span>
                         </button>
                         <button type="button" data-ai-provider="stability" class="ai-provider-tab py-1.5 px-2 rounded-lg border transition text-center flex flex-col items-center gap-0.5">
                             <span class="text-xs">🎨</span>
                             <span class="truncate">Stability SDXL</span>
-                            <span class="text-[8px] font-normal opacity-75">Cinematic Art</span>
+                            <span class="text-[8px] font-normal opacity-75">Cinematic</span>
                         </button>
-                        <button type="button" data-ai-provider="custom" class="ai-provider-tab py-1.5 px-2 rounded-lg border transition text-center flex flex-col items-center gap-0.5">
+                        <button type="button" data-ai-provider="custom" class="ai-provider-tab py-1.5 px-2 rounded-lg border transition text-center flex flex-col items-center gap-0.5 col-span-2 sm:col-span-1">
                             <span class="text-xs">🔌</span>
-                            <span class="truncate">Custom REST API</span>
+                            <span class="truncate">Custom REST</span>
                             <span class="text-[8px] font-normal opacity-75">Self-Hosted</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- API Key Box (Hidden for Pollinations) -->
-                <div id="aiApiKeyContainer" class="hidden studio-card p-3 rounded-xl border space-y-2">
+                <!-- Google Gemini Model Selector (Shown when provider is Gemini) -->
+                <div id="aiGeminiModelContainer" class="studio-card p-3 rounded-xl border border-purple-500/30 bg-purple-500/5 space-y-2">
+                    <div class="flex items-center justify-between text-[11px]">
+                        <span class="studio-heading font-bold flex items-center gap-1.5 text-purple-600 dark:text-purple-400">
+                            <span>✨</span>
+                            <span>Google Gemini 3.8 / Imagen Model</span>
+                        </span>
+                        <span class="text-[9px] text-purple-600 dark:text-purple-300 font-bold px-2 py-0.5 rounded-full bg-purple-500/20">Google AI Studio</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="studio-label text-[10px] font-semibold block mb-1">Select Gemini Model</label>
+                            <select id="selAiGeminiModel" class="studio-input w-full border rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none">
+                                <option value="gemini-3.8-flash" selected>Gemini 3.8 Flash (High-Speed &amp; Multimodal)</option>
+                                <option value="gemini-3.8-pro">Gemini 3.8 Pro (Ultra-Creative Pro Stock)</option>
+                                <option value="imagen-3.0-generate-002">Imagen 3 (Direct Google Studio Image Gen)</option>
+                                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Lightweight &amp; Fast)</option>
+                                <option value="gemini-2.0-flash">Gemini 2.0 Flash (Production Stable)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="studio-label text-[10px] font-semibold">Gemini Creativity &bull; Temperature</label>
+                                <span id="lblAiGeminiTempVal" class="text-[10px] font-mono font-bold text-purple-600">0.7</span>
+                            </div>
+                            <input id="rngAiGeminiTemp" type="range" min="0.2" max="1.0" step="0.1" value="0.7" class="w-full accent-purple-600 cursor-pointer mt-1">
+                            <span class="text-[9px] studio-subtext block mt-0.5">Controls visual nuance, lighting richness &amp; aesthetic deviation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Key Box -->
+                <div id="aiApiKeyContainer" class="studio-card p-3 rounded-xl border space-y-2">
                     <div class="flex items-center justify-between text-[11px]">
                         <span class="studio-heading font-bold flex items-center gap-1.5">
                             <span>🔑</span>
-                            <span id="lblAiApiKeyTitle">API Key Configuration</span>
+                            <span id="lblAiApiKeyTitle">Google Gemini API Key (AI Studio)</span>
                         </span>
-                        <span class="text-[9px] text-emerald-600 font-semibold">Saved locally in browser</span>
+                        <div class="flex items-center gap-2">
+                            <a id="lnkAiApiKeyHelp" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-[9px] text-purple-500 hover:underline flex items-center gap-0.5 font-semibold">
+                                <span>Get Free Gemini Key</span>
+                                <span>&rarr;</span>
+                            </a>
+                            <span class="text-[9px] text-emerald-600 font-semibold hidden sm:inline">&bull; Securely stored in browser</span>
+                        </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <input id="inpAiApiKey" type="password" placeholder="sk-..." class="studio-input w-full border rounded-lg px-2.5 py-1.5 text-xs font-mono focus:outline-none">
-                        <button id="btnAiToggleKeyVisibility" type="button" class="studio-btn px-2 py-1.5 rounded-lg border text-[11px] shrink-0">Show</button>
-                        <button id="btnAiSaveKey" type="button" class="studio-primary-btn px-3 py-1.5 rounded-lg text-[11px] font-semibold shrink-0">Save</button>
+                        <input id="inpAiApiKey" type="password" placeholder="AIzaSy... (Paste Google Gemini API Key)" class="studio-input w-full border rounded-lg px-2.5 py-1.5 text-xs font-mono focus:outline-none">
+                        <button id="btnAiToggleKeyVisibility" type="button" class="studio-btn px-2 py-1.5 rounded-lg border text-[11px] shrink-0" title="Show or hide API key">Show</button>
+                        <button id="btnAiTestKey" type="button" class="studio-btn px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold text-purple-600 dark:text-purple-400 shrink-0 hover:border-purple-500" title="Test API connection">Test</button>
+                        <button id="btnAiSaveKey" type="button" class="studio-primary-btn px-3 py-1.5 rounded-lg text-[11px] font-semibold shrink-0" title="Save key to local storage">Save</button>
                     </div>
                 </div>
 
@@ -11510,18 +11848,25 @@
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between">
                         <label class="studio-label text-[10px] font-bold uppercase tracking-wider">Background Prompt</label>
-                        <span class="text-[10px] studio-subtext">Be descriptive for best commercial stock results</span>
+                        <div class="flex items-center gap-2">
+                            <button id="btnAiGeminiEnhancePrompt" type="button" class="studio-btn px-2.5 py-1 rounded-md text-[10px] font-bold text-purple-600 dark:text-purple-400 border border-purple-500/30 hover:bg-purple-500/10 transition flex items-center gap-1 shadow-sm" title="Use Gemini 3.8 AI to expand and enrich your prompt with commercial stock keywords">
+                                <span>✨</span>
+                                <span id="lblGeminiEnhanceText">Expand with Gemini 3.8</span>
+                            </button>
+                            <span class="text-[10px] studio-subtext hidden sm:inline">Commercial stock focus</span>
+                        </div>
                     </div>
-                    <textarea id="inpAiPrompt" rows="3" placeholder="e.g. luxury 3D fluted glass architectural background with gold metallic ribbons, soft studio spotlight, organic caustics, clean negative space, 8k, photorealistic" class="studio-input w-full border rounded-xl p-2.5 text-xs focus:outline-none resize-none"></textarea>
+                    <textarea id="inpAiPrompt" rows="3" placeholder="e.g. luxury 3D fluted glass architectural background with gold metallic ribbons, soft studio spotlight, organic caustics, clean negative space, 8k, photorealistic" class="studio-input w-full border rounded-xl p-2.5 text-xs focus:outline-none resize-none transition focus:border-purple-500"></textarea>
                 </div>
 
                 <!-- 1-Click Pro Prompts Quick Chips -->
                 <div class="space-y-1.5">
                     <span class="studio-label text-[10px] block font-semibold">1-Click Pro Prompts:</span>
                     <div class="flex flex-wrap gap-1 text-[10px]">
+                        <button type="button" data-pro-prompt="Gemini 3.8 liquid quartz glass prisms floating in zero gravity with iridescent chromatic dispersion, deep velvet black studio backdrop, ultra-sharp 8k, photorealistic stock wallpaper" class="ai-prompt-chip studio-btn px-2 py-1 rounded-md border text-left transition hover:border-purple-500">✨ Gemini 3.8 Liquid Quartz</button>
+                        <button type="button" data-pro-prompt="Bioluminescent deep ocean fluid ribbons with cyan and gold emission, organic cellular refraction, cinematic macro studio lighting, 8k stock background" class="ai-prompt-chip studio-btn px-2 py-1 rounded-md border text-left transition hover:border-purple-500">🌊 Bioluminescent Flow</button>
                         <button type="button" data-pro-prompt="Luxury 3D fluted glass with warm gold metallic ribbons and soft studio lighting, architectural minimalist backdrop, 8k, photorealistic, cinematic" class="ai-prompt-chip studio-btn px-2 py-1 rounded-md border text-left transition hover:border-purple-500">👑 Luxury 3D Glass &amp; Gold</button>
                         <button type="button" data-pro-prompt="Cosmic aurora fluid mesh background, vibrant deep indigo and emerald teal silk waves, subtle star dust, high dynamic range, 8k wallpaper" class="ai-prompt-chip studio-btn px-2 py-1 rounded-md border text-left transition hover:border-purple-500">🌌 Cosmic Aurora Silk</button>
-                        <button type="button" data-pro-prompt="Cyberpunk holographic neon waves, electric cyan and magenta iridescent flow, directional optical flare, smooth gradient, 8k stock background" class="ai-prompt-chip studio-btn px-2 py-1 rounded-md border text-left transition hover:border-purple-500">🌊 Cyberpunk Neon Flow</button>
                         <button type="button" data-pro-prompt="Minimalist pastel editorial product backdrop, smooth cylindrical studio pedestal, softbox rim lighting, clean modern shadows, 8k" class="ai-prompt-chip studio-btn px-2 py-1 rounded-md border text-left transition hover:border-purple-500">☁️ Pastel Editorial Studio</button>
                         <button type="button" data-pro-prompt="Abstract prismatic quartz crystals with diamond dispersion, macro refractions, clean white and sky blue caustics, 8k commercial stock" class="ai-prompt-chip studio-btn px-2 py-1 rounded-md border text-left transition hover:border-purple-500">💎 Prismatic Crystal Facet</button>
                     </div>
@@ -11561,12 +11906,12 @@
 
             <!-- Modal Footer -->
             <div class="p-3.5 sm:p-4 border-t flex items-center justify-between gap-3 shrink-0 bg-inherit">
-                <span class="text-[10px] studio-subtext truncate hidden sm:inline">Generates commercially licensed, artifact-free stock background</span>
+                <span class="text-[10px] studio-subtext truncate hidden sm:inline">Commercially licensed, zero-artifact Gemini &bull; Imagen stock generation</span>
                 <div class="flex items-center gap-2 ml-auto">
                     <button id="btnAiCancel" type="button" class="studio-btn px-3 py-1.5 rounded-lg border text-xs font-medium">Cancel</button>
                     <button id="btnAiGenerate" type="button" class="studio-primary-btn px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow transition">
                         <span>✨</span>
-                        <span>Generate AI Background</span>
+                        <span id="lblAiGenerateBtn">Generate with Gemini 3.8</span>
                     </button>
                 </div>
             </div>

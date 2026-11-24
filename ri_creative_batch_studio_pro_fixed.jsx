@@ -1920,203 +1920,184 @@ app.bringToFront();
             var win = new Window("dialog", SCRIPT_TITLE + " v" + SCRIPT_VERSION);
             win.orientation = "column";
             win.alignChildren = ["fill", "top"];
-            win.spacing = 8;
-            win.margins = 12;
+            win.spacing = 5;
+            win.margins = 8;
+            win.preferredSize = [545, 480];
 
-            // TOP HEADER
+            // ====================================================================
+            // HEADER BAR
+            // ====================================================================
             var headerGrp = win.add("group");
             headerGrp.orientation = "row";
             headerGrp.alignChildren = ["left", "center"];
+            headerGrp.spacing = 6;
+
             var titleText = headerGrp.add("statictext", undefined, "RI CREATIVE — BATCH BACKGROUND STUDIO PRO");
             try {
-                titleText.graphics.font = ScriptUI.newFont("Arial", "BOLD", 12);
+                if (typeof ScriptUI !== "undefined" && typeof ScriptUI.newFont === "function") {
+                    titleText.graphics.font = ScriptUI.newFont("Arial", "BOLD", 11);
+                }
             } catch (fontErr) {}
 
-            var badgeText = headerGrp.add("statictext", undefined, IS_CS2 ? "💎 3D GLASS & PHOTOSHOP 9.0.2 VERIFIED" : "💎 3D GLASS & UNIVERSAL CS2-CC2026 ENGINE");
-            try {
-                badgeText.graphics.font = ScriptUI.newFont("Arial", "REGULAR", 10);
-            } catch (fontErr2) {}
+            var badgeText = headerGrp.add("statictext", undefined, IS_CS2 ? "💎 CS2 (9.0.2) PRO STUDIO" : "💎 UNIVERSAL RETINA STUDIO");
 
-            var useNativeTabs = false;
-            var tabPanel = null;
+            // ====================================================================
+            // PANEL 1: FOLDERS, RESOLUTION & OUTPUT FORMAT
+            // ====================================================================
+            var pnlSetup = win.add("panel", undefined, "1. Folders, Resolution & Output Format");
+            pnlSetup.orientation = "column";
+            pnlSetup.alignChildren = ["fill", "top"];
+            pnlSetup.spacing = 4;
+            pnlSetup.margins = 6;
 
-            if (!IS_CS2) {
-                try {
-                    tabPanel = win.add("tabbedpanel");
-                    if (tabPanel && typeof tabPanel.add === "function") {
-                        tabPanel.alignChildren = ["fill", "fill"];
-                        tabPanel.preferredSize = [530, 285];
-                        useNativeTabs = true;
-                    }
-                } catch (eTab) {
-                    useNativeTabs = false;
-                    tabPanel = null;
-                }
-            }
-
-            var tabSetup, tabEffects, tabGlass, tabCreative;
-
-            if (useNativeTabs && tabPanel) {
-                tabSetup = tabPanel.add("tab", undefined, "1. Folders & Export");
-                tabEffects = tabPanel.add("tab", undefined, "2. Blur & Noise");
-                tabGlass = tabPanel.add("tab", undefined, "3. 3D Glass Studio");
-                tabCreative = tabPanel.add("tab", undefined, "4. Gradient & Light");
-            } else {
-                // Adobe Photoshop CS2 (v9.0 / 9.0.2) Native Section Switcher (ScriptUI 1.0)
-                var navRow = win.add("group");
-                navRow.orientation = "row";
-                navRow.alignChildren = ["left", "center"];
-                navRow.spacing = 8;
-                var navLabel = navRow.add("statictext", undefined, "Studio Section:");
-                try {
-                    if (typeof ScriptUI !== "undefined" && typeof ScriptUI.newFont === "function") {
-                        navLabel.graphics.font = ScriptUI.newFont("Arial", "BOLD", 11);
-                    }
-                } catch (eF) {}
-
-                var ddSection = navRow.add("dropdownlist", undefined, [
-                    "1. Folders, Resolution & Export",
-                    "2. Blur & Film Grain Noise",
-                    "3. 3D Glass Studio",
-                    "4. Creative Gradient & Light"
-                ]);
-                ddSection.selection = 0;
-                ddSection.preferredSize = [300, 22];
-
-                var contentBox = win.add("group");
-                contentBox.orientation = "column";
-                contentBox.alignChildren = ["fill", "top"];
-                contentBox.preferredSize = [530, 285];
-
-                tabSetup = contentBox.add("panel", undefined, "1. Folders & Export");
-                tabEffects = contentBox.add("panel", undefined, "2. Blur & Noise");
-                tabGlass = contentBox.add("panel", undefined, "3. 3D Glass Studio");
-                tabCreative = contentBox.add("panel", undefined, "4. Gradient & Light");
-
-                tabSetup.preferredSize = [520, 275];
-                tabEffects.preferredSize = [520, 275];
-                tabGlass.preferredSize = [520, 275];
-                tabCreative.preferredSize = [520, 275];
-
-                tabEffects.visible = false;
-                tabGlass.visible = false;
-                tabCreative.visible = false;
-
-                ddSection.onChange = function () {
-                    var idx = ddSection.selection ? ddSection.selection.index : 0;
-                    tabSetup.visible = (idx === 0);
-                    tabEffects.visible = (idx === 1);
-                    tabGlass.visible = (idx === 2);
-                    tabCreative.visible = (idx === 3);
-                    win.layout.layout(true);
-                };
-            }
-
-            // --------------------------------------------------------------------
-            // SECTION 1: FOLDERS, RESOLUTION & EXPORT
-            // --------------------------------------------------------------------
-            tabSetup.orientation = "column";
-            tabSetup.alignChildren = ["fill", "top"];
-            tabSetup.spacing = 7;
-            tabSetup.margins = 10;
-
-            var srcRow = tabSetup.add("group");
+            // Row 1: Source Folder
+            var srcRow = pnlSetup.add("group");
+            srcRow.orientation = "row";
+            srcRow.alignChildren = ["left", "center"];
+            srcRow.spacing = 4;
             var btnBrowseSrc = srcRow.add("button", undefined, "Source Folder...");
-            btnBrowseSrc.preferredSize = [115, 23];
+            btnBrowseSrc.preferredSize = [105, 21];
             var txtSrcPath = srcRow.add("edittext", undefined, "", { readonly: true });
-            txtSrcPath.preferredSize = [385, 21];
+            txtSrcPath.preferredSize = [325, 20];
+            var lblScannedInfo = srcRow.add("statictext", undefined, "Found: 0");
+            lblScannedInfo.preferredSize = [90, 18];
 
-            var outRow = tabSetup.add("group");
+            // Row 2: Output Folder
+            var outRow = pnlSetup.add("group");
+            outRow.orientation = "row";
+            outRow.alignChildren = ["left", "center"];
+            outRow.spacing = 4;
             var btnBrowseOut = outRow.add("button", undefined, "Output Folder...");
-            btnBrowseOut.preferredSize = [115, 23];
+            btnBrowseOut.preferredSize = [105, 21];
             var txtOutPath = outRow.add("edittext", undefined, "", { readonly: true });
-            txtOutPath.preferredSize = [385, 21];
-
-            var modeRow = tabSetup.add("group");
-            modeRow.add("statictext", undefined, "Mode:");
-            var ddBatchScope = modeRow.add("dropdownlist", undefined, ["3-Image Fusion (Anti-Similar)", "All Images (1-by-1)", "Selected Images"]);
-            ddBatchScope.selection = 0;
-            ddBatchScope.preferredSize = [190, 21];
-
-            var btnSelectSpecific = modeRow.add("button", undefined, "Pick Files...");
-            btnSelectSpecific.preferredSize = [75, 21];
+            txtOutPath.preferredSize = [325, 20];
+            var btnSelectSpecific = outRow.add("button", undefined, "Pick Files...");
+            btnSelectSpecific.preferredSize = [90, 21];
             btnSelectSpecific.enabled = false;
 
-            var lblScannedInfo = modeRow.add("statictext", undefined, "Found: 0 images");
-            lblScannedInfo.preferredSize = [165, 20];
-
-            var sep1 = tabSetup.add("panel");
-            sep1.alignment = "fill";
-
+            // Row 3: Mode, Presets & Dimensions
             var resPresetLabels = [];
             for (var r = 0; r < RESOLUTION_PRESETS.length; r++) {
                 resPresetLabels.push(RESOLUTION_PRESETS[r].label);
             }
 
-            var dimPresetRow = tabSetup.add("group");
-            dimPresetRow.add("statictext", undefined, "Resolution Preset:");
-            var ddResPreset = dimPresetRow.add("dropdownlist", undefined, resPresetLabels);
+            var dimRow = pnlSetup.add("group");
+            dimRow.orientation = "row";
+            dimRow.alignChildren = ["left", "center"];
+            dimRow.spacing = 4;
+
+            dimRow.add("statictext", undefined, "Mode:");
+            var ddBatchScope = dimRow.add("dropdownlist", undefined, ["3-Image Fusion (Anti-Similar)", "All Images (1-by-1)", "Selected Images"]);
+            ddBatchScope.selection = 0;
+            ddBatchScope.preferredSize = [160, 20];
+
+            dimRow.add("statictext", undefined, "Preset:");
+            var ddResPreset = dimRow.add("dropdownlist", undefined, resPresetLabels);
             ddResPreset.selection = 0;
-            ddResPreset.preferredSize = [235, 21];
+            ddResPreset.preferredSize = [145, 20];
 
-            dimPresetRow.add("statictext", undefined, "W:");
-            var inpWidth = dimPresetRow.add("edittext", undefined, String(DEFAULT_CONFIG.width));
-            inpWidth.preferredSize = [50, 21];
-            dimPresetRow.add("statictext", undefined, "H:");
-            var inpHeight = dimPresetRow.add("edittext", undefined, String(DEFAULT_CONFIG.height));
-            inpHeight.preferredSize = [50, 21];
+            dimRow.add("statictext", undefined, "W:");
+            var inpWidth = dimRow.add("edittext", undefined, String(DEFAULT_CONFIG.width));
+            inpWidth.preferredSize = [42, 20];
+            dimRow.add("statictext", undefined, "H:");
+            var inpHeight = dimRow.add("edittext", undefined, String(DEFAULT_CONFIG.height));
+            inpHeight.preferredSize = [42, 20];
 
-            var dimRow2 = tabSetup.add("group");
-            dimRow2.add("statictext", undefined, "Resize Mode:");
-            var ddResizeMode = dimRow2.add("dropdownlist", undefined, ["Fit/Crop (Fill)", "Fit (Contain)", "Stretch"]);
-            ddResizeMode.selection = 0;
-            ddResizeMode.preferredSize = [120, 21];
-
-            var chkSeamless = dimRow2.add("checkbox", undefined, "Seamless Seam Blending");
+            var chkSeamless = dimRow.add("checkbox", undefined, "Seamless");
             chkSeamless.value = DEFAULT_CONFIG.seamlessBlend;
 
-            dimRow2.add("statictext", undefined, "Max Batch:");
-            var inpMaxBatch = dimRow2.add("edittext", undefined, String(DEFAULT_CONFIG.maxBatchCount));
-            inpMaxBatch.preferredSize = [42, 21];
+            // Row 4: Export Format, Quality, Size & Prefix
+            var expRow = pnlSetup.add("group");
+            expRow.orientation = "row";
+            expRow.alignChildren = ["left", "center"];
+            expRow.spacing = 4;
 
-            var expRow1 = tabSetup.add("group");
-            expRow1.add("statictext", undefined, "Export Format:");
-            var ddExportFormat = expRow1.add("dropdownlist", undefined, [
+            expRow.add("statictext", undefined, "Format:");
+            var ddExportFormat = expRow.add("dropdownlist", undefined, [
                 "JPEG (Baseline 300 DPI)",
                 "TIFF (Lossless LZW 300 DPI)",
                 "PNG (Lossless 24-bit)",
                 "PSD (Master Layered Archive)"
             ]);
             ddExportFormat.selection = 0;
-            ddExportFormat.preferredSize = [170, 21];
+            ddExportFormat.preferredSize = [145, 20];
 
-            expRow1.add("statictext", undefined, "JPEG Q (1-12):");
-            var inpJpegQuality = expRow1.add("edittext", undefined, String(DEFAULT_CONFIG.jpegQuality));
-            inpJpegQuality.preferredSize = [32, 21];
+            expRow.add("statictext", undefined, "Q:");
+            var inpJpegQuality = expRow.add("edittext", undefined, String(DEFAULT_CONFIG.jpegQuality));
+            inpJpegQuality.preferredSize = [26, 20];
 
-            expRow1.add("statictext", undefined, "Min MB:");
-            var inpMinSizeMB = expRow1.add("edittext", undefined, String(DEFAULT_CONFIG.minFileSizeMB));
-            inpMinSizeMB.preferredSize = [38, 21];
+            expRow.add("statictext", undefined, "Min MB:");
+            var inpMinSizeMB = expRow.add("edittext", undefined, String(DEFAULT_CONFIG.minFileSizeMB));
+            inpMinSizeMB.preferredSize = [32, 20];
 
-            expRow1.add("statictext", undefined, "Prefix:");
-            var inpPrefix = expRow1.add("edittext", undefined, DEFAULT_CONFIG.filenamePrefix);
-            inpPrefix.preferredSize = [95, 21];
+            expRow.add("statictext", undefined, "Prefix:");
+            var inpPrefix = expRow.add("edittext", undefined, DEFAULT_CONFIG.filenamePrefix);
+            inpPrefix.preferredSize = [90, 20];
 
-            var chkEmbedProfile = tabSetup.add("checkbox", undefined, "Embed sRGB Color Profile (300 DPI Commercial Print Standard)");
+            expRow.add("statictext", undefined, "Max:");
+            var inpMaxBatch = expRow.add("edittext", undefined, String(DEFAULT_CONFIG.maxBatchCount));
+            inpMaxBatch.preferredSize = [38, 20];
+
+            var chkEmbedProfile = expRow.add("checkbox", undefined, "sRGB Profile");
             chkEmbedProfile.value = DEFAULT_CONFIG.embedProfile;
 
-            // --------------------------------------------------------------------
-            // TAB 2: BLUR & NOISE / FILM GRAIN
-            // --------------------------------------------------------------------
-            // Section 2 setup
-            tabEffects.orientation = "column";
-            tabEffects.alignChildren = ["fill", "top"];
-            tabEffects.spacing = 8;
-            tabEffects.margins = 10;
+            // ====================================================================
+            // PANEL 2: CREATIVE 3D GLASS, BLUR & LIGHTING STUDIO
+            // ====================================================================
+            var pnlCreative = win.add("panel", undefined, "2. Creative 3D Glass, Blur & Lighting Studio");
+            pnlCreative.orientation = "column";
+            pnlCreative.alignChildren = ["fill", "top"];
+            pnlCreative.spacing = 4;
+            pnlCreative.margins = 6;
 
-            var blurRow1 = tabEffects.add("group");
-            blurRow1.add("statictext", undefined, "Photoshop Blur Filter (11 Algorithms):");
-            var ddBlurType = blurRow1.add("dropdownlist", undefined, [
+            // Row 1: 3D Glass Effect Engine
+            var glassRow = pnlCreative.add("group");
+            glassRow.orientation = "row";
+            glassRow.alignChildren = ["left", "center"];
+            glassRow.spacing = 4;
+
+            var chkGlassEnable = glassRow.add("checkbox", undefined, "3D Glass Effect");
+            chkGlassEnable.value = DEFAULT_CONFIG.glassEnable;
+            chkGlassEnable.preferredSize = [105, 18];
+
+            glassRow.add("statictext", undefined, "Style:");
+            var ddGlassStyle = glassRow.add("dropdownlist", undefined, GLASS_STYLE_PRESETS);
+            ddGlassStyle.selection = 0;
+            ddGlassStyle.preferredSize = [160, 20];
+
+            glassRow.add("statictext", undefined, "Op:");
+            var inpGlassOpacity = glassRow.add("edittext", undefined, String(DEFAULT_CONFIG.glassOpacity));
+            inpGlassOpacity.preferredSize = [28, 20];
+            glassRow.add("statictext", undefined, "%");
+
+            var ddGlassScope = glassRow.add("dropdownlist", undefined, [
+                "Full Composition",
+                "Center 3D Floating Panel",
+                "Left & Right Ribbed Flutes",
+                "Outer Border Frame"
+            ]);
+            ddGlassScope.selection = 0;
+            ddGlassScope.preferredSize = [120, 20];
+
+            var ddGlassTint = glassRow.add("dropdownlist", undefined, [
+                "Clear Transparent",
+                "Emerald Green",
+                "Sapphire Blue",
+                "Amber Gold",
+                "Rose Quartz",
+                "Cyberpunk Neon"
+            ]);
+            ddGlassTint.selection = 0;
+            ddGlassTint.preferredSize = [95, 20];
+
+            // Row 2: Photoshop Blur Engine
+            var blurRow = pnlCreative.add("group");
+            blurRow.orientation = "row";
+            blurRow.alignChildren = ["left", "center"];
+            blurRow.spacing = 4;
+
+            blurRow.add("statictext", undefined, "Photoshop Blur:");
+            var ddBlurType = blurRow.add("dropdownlist", undefined, [
                 "None (Clean Stock Approved)",
                 "Average",
                 "Blur",
@@ -2131,243 +2112,145 @@ app.bringToFront();
                 "Surface Blur..."
             ]);
             ddBlurType.selection = 0;
-            ddBlurType.preferredSize = [230, 21];
+            ddBlurType.preferredSize = [170, 20];
 
-            var blurRow2 = tabEffects.add("group");
-            blurRow2.add("statictext", undefined, "Radius (px):");
-            var inpBlurRad = blurRow2.add("edittext", undefined, String(DEFAULT_CONFIG.blurRadius));
-            inpBlurRad.preferredSize = [46, 21];
-            blurRow2.add("statictext", undefined, "Threshold:");
-            var inpBlurThresh = blurRow2.add("edittext", undefined, String(DEFAULT_CONFIG.blurThreshold));
-            inpBlurThresh.preferredSize = [46, 21];
-            blurRow2.add("statictext", undefined, "Angle (°):");
-            var inpMotionAngle = blurRow2.add("edittext", undefined, String(DEFAULT_CONFIG.motionAngle));
-            inpMotionAngle.preferredSize = [42, 21];
-            blurRow2.add("statictext", undefined, "Dist:");
-            var inpMotionDist = blurRow2.add("edittext", undefined, String(DEFAULT_CONFIG.motionDistance));
-            inpMotionDist.preferredSize = [42, 21];
+            blurRow.add("statictext", undefined, "Radius:");
+            var inpBlurRad = blurRow.add("edittext", undefined, String(DEFAULT_CONFIG.blurRadius));
+            inpBlurRad.preferredSize = [32, 20];
+            blurRow.add("statictext", undefined, "px");
 
-            var blurRow3 = tabEffects.add("group");
-            blurRow3.add("statictext", undefined, "Radial Method:");
-            var ddRadialMethod = blurRow3.add("dropdownlist", undefined, ["Spin", "Zoom"]);
-            ddRadialMethod.selection = 0;
-            ddRadialMethod.preferredSize = [80, 21];
-            blurRow3.add("statictext", undefined, "Blur Scope:");
-            var ddBlurScope = blurRow3.add("dropdownlist", undefined, ["Full Composition", "Background Only", "Outer Panels"]);
+            blurRow.add("statictext", undefined, "Scope:");
+            var ddBlurScope = blurRow.add("dropdownlist", undefined, ["Full Composition", "Background Only", "Outer Panels"]);
             ddBlurScope.selection = 0;
-            ddBlurScope.preferredSize = [145, 21];
+            ddBlurScope.preferredSize = [120, 20];
 
-            var sep2 = tabEffects.add("panel");
-            sep2.alignment = "fill";
+            var ddResizeMode = blurRow.add("dropdownlist", undefined, ["Fit/Crop (Fill)", "Fit (Contain)", "Stretch"]);
+            ddResizeMode.selection = 0;
+            ddResizeMode.preferredSize = [95, 20];
 
-            var noiseRow1 = tabEffects.add("group");
-            var chkNoise = noiseRow1.add("checkbox", undefined, "Enable Noise & Film Grain");
+            // Row 3: Film Grain Noise
+            var noiseRow = pnlCreative.add("group");
+            noiseRow.orientation = "row";
+            noiseRow.alignChildren = ["left", "center"];
+            noiseRow.spacing = 4;
+
+            var chkNoise = noiseRow.add("checkbox", undefined, "Film Grain Noise");
             chkNoise.value = DEFAULT_CONFIG.noiseEnable;
-            chkNoise.preferredSize = [185, 20];
-            noiseRow1.add("statictext", undefined, "Amount (%):");
-            var inpNoiseAmt = noiseRow1.add("edittext", undefined, String(DEFAULT_CONFIG.noiseAmount));
-            inpNoiseAmt.preferredSize = [48, 21];
-            var chkFilmGrainOverlay = noiseRow1.add("checkbox", undefined, "Pro 50% Gray Film Grain Layer");
-            chkFilmGrainOverlay.value = DEFAULT_CONFIG.noiseFilmGrainOverlay;
+            chkNoise.preferredSize = [110, 18];
 
-            var noiseRow2 = tabEffects.add("group");
-            noiseRow2.add("statictext", undefined, "Noise Distribution:");
-            var ddNoiseDist = noiseRow2.add("dropdownlist", undefined, ["Gaussian", "Uniform"]);
+            noiseRow.add("statictext", undefined, "Amt:");
+            var inpNoiseAmt = noiseRow.add("edittext", undefined, String(DEFAULT_CONFIG.noiseAmount));
+            inpNoiseAmt.preferredSize = [28, 20];
+            noiseRow.add("statictext", undefined, "%");
+
+            var ddNoiseDist = noiseRow.add("dropdownlist", undefined, ["Gaussian", "Uniform"]);
             ddNoiseDist.selection = 0;
-            ddNoiseDist.preferredSize = [110, 21];
-            var chkNoiseMono = noiseRow2.add("checkbox", undefined, "Monochromatic Noise");
+            ddNoiseDist.preferredSize = [80, 20];
+
+            var chkNoiseMono = noiseRow.add("checkbox", undefined, "Mono");
             chkNoiseMono.value = DEFAULT_CONFIG.noiseMonochromatic;
 
-            // --------------------------------------------------------------------
-            // TAB 3: 3D GLASS EFFECT STUDIO (NEW DEDICATED TAB)
-            // --------------------------------------------------------------------
-            // Section 3 setup
-            tabGlass.orientation = "column";
-            tabGlass.alignChildren = ["fill", "top"];
-            tabGlass.spacing = 8;
-            tabGlass.margins = 10;
+            var chkFilmGrainOverlay = noiseRow.add("checkbox", undefined, "Pro 50% Gray Film Grain Layer");
+            chkFilmGrainOverlay.value = DEFAULT_CONFIG.noiseFilmGrainOverlay;
 
-            var glassRow1 = tabGlass.add("group");
-            var chkGlassEnable = glassRow1.add("checkbox", undefined, "Enable 3D Glass Effect");
-            chkGlassEnable.value = DEFAULT_CONFIG.glassEnable;
-            chkGlassEnable.preferredSize = [180, 20];
+            // Row 4: Gradient Overlay & Optical Flare / Lighting
+            var gradRow = pnlCreative.add("group");
+            gradRow.orientation = "row";
+            gradRow.alignChildren = ["left", "center"];
+            gradRow.spacing = 4;
 
-            glassRow1.add("statictext", undefined, "Glass Style:");
-            var ddGlassStyle = glassRow1.add("dropdownlist", undefined, GLASS_STYLE_PRESETS);
-            ddGlassStyle.selection = 0;
-            ddGlassStyle.preferredSize = [230, 21];
-
-            var glassRow2 = tabGlass.add("group");
-            glassRow2.add("statictext", undefined, "Glass Scope:");
-            var ddGlassScope = glassRow2.add("dropdownlist", undefined, [
-                "Full Composition",
-                "Center 3D Floating Panel",
-                "Left & Right Ribbed Flutes",
-                "Outer Border Frame"
-            ]);
-            ddGlassScope.selection = 0;
-            ddGlassScope.preferredSize = [160, 21];
-
-            glassRow2.add("statictext", undefined, "Glass Tint:");
-            var ddGlassTint = glassRow2.add("dropdownlist", undefined, [
-                "Clear Transparent",
-                "Emerald Green",
-                "Sapphire Blue",
-                "Amber Gold",
-                "Rose Quartz",
-                "Cyberpunk Neon"
-            ]);
-            ddGlassTint.selection = 0;
-            ddGlassTint.preferredSize = [135, 21];
-
-            var glassRow3 = tabGlass.add("group");
-            glassRow3.add("statictext", undefined, "Opacity (%):");
-            var inpGlassOpacity = glassRow3.add("edittext", undefined, String(DEFAULT_CONFIG.glassOpacity));
-            inpGlassOpacity.preferredSize = [42, 21];
-
-            glassRow3.add("statictext", undefined, "Frost Blur (px):");
-            var inpGlassFrostBlur = glassRow3.add("edittext", undefined, String(DEFAULT_CONFIG.glassFrostBlur));
-            inpGlassFrostBlur.preferredSize = [42, 21];
-
-            glassRow3.add("statictext", undefined, "Refraction Distort:");
-            var inpGlassDistort = glassRow3.add("edittext", undefined, String(DEFAULT_CONFIG.glassDistortion));
-            inpGlassDistort.preferredSize = [42, 21];
-
-            var chkGlassBevel = glassRow3.add("checkbox", undefined, "3D Bevel & Specular Rim");
-            chkGlassBevel.value = DEFAULT_CONFIG.glassBevelRim;
-
-            var glassInfoPanel = tabGlass.add("panel", undefined, "3D Glass Characteristics");
-            glassInfoPanel.orientation = "column";
-            glassInfoPanel.alignChildren = ["fill", "top"];
-            glassInfoPanel.spacing = 2;
-            glassInfoPanel.margins = 6;
-            glassInfoPanel.add("statictext", undefined, "• Frosted Glassmorphism: Smooth Gaussian depth blur + micro-surface noise.");
-            glassInfoPanel.add("statictext", undefined, "• Fluted / Reeded Glass: Cylindrical vertical optical lenses with wave refraction.");
-            glassInfoPanel.add("statictext", undefined, "• 3D Convex Sphere: Spherical optical distortion + specular glare reflection.");
-            glassInfoPanel.add("statictext", undefined, "• Rainbow Prism: Chromatic horizontal aberration dispersion effect.");
-
-            // --------------------------------------------------------------------
-            // TAB 4: CREATIVE GRADIENT, LIGHTING & LIQUIFY
-            // --------------------------------------------------------------------
-            // Section 4 setup
-            tabCreative.orientation = "column";
-            tabCreative.alignChildren = ["fill", "top"];
-            tabCreative.spacing = 7;
-            tabCreative.margins = 10;
-
-            var gradRow1 = tabCreative.add("group");
-            var chkGradient = gradRow1.add("checkbox", undefined, "Enable Gradient Overlay");
+            var chkGradient = gradRow.add("checkbox", undefined, "Gradient Overlay");
             chkGradient.value = DEFAULT_CONFIG.gradientEnable;
-            chkGradient.preferredSize = [175, 20];
-            gradRow1.add("statictext", undefined, "Opacity (%):");
-            var inpGradOpacity = gradRow1.add("edittext", undefined, String(DEFAULT_CONFIG.gradientOpacity));
-            inpGradOpacity.preferredSize = [45, 21];
-            gradRow1.add("statictext", undefined, "Blend:");
-            var ddGradBlend = gradRow1.add("dropdownlist", undefined, ["Soft Light", "Overlay", "Normal", "Multiply", "Screen", "Color", "Hard Light"]);
-            ddGradBlend.selection = 0;
-            ddGradBlend.preferredSize = [105, 21];
+            chkGradient.preferredSize = [110, 18];
 
-            var gradRow2 = tabCreative.add("group");
-            gradRow2.add("statictext", undefined, "Preset (30 Categories):");
-            var ddGradPreset = gradRow2.add("dropdownlist", undefined, PRESET_NAMES);
+            var ddGradPreset = gradRow.add("dropdownlist", undefined, PRESET_NAMES);
             ddGradPreset.selection = 0;
-            ddGradPreset.preferredSize = [175, 21];
-            gradRow2.add("statictext", undefined, "Type:");
-            var ddGradType = gradRow2.add("dropdownlist", undefined, ["Random Type", "Linear", "Radial", "Angle", "Reflected", "Diamond"]);
-            ddGradType.selection = 0;
-            ddGradType.preferredSize = [115, 21];
-            var chkMultiLayerMesh = gradRow2.add("checkbox", undefined, "Dual Mesh");
+            ddGradPreset.preferredSize = [140, 20];
+
+            var ddGradBlend = gradRow.add("dropdownlist", undefined, ["Soft Light", "Overlay", "Normal", "Multiply", "Screen", "Color", "Hard Light"]);
+            ddGradBlend.selection = 0;
+            ddGradBlend.preferredSize = [85, 20];
+
+            gradRow.add("statictext", undefined, "Op:");
+            var inpGradOpacity = gradRow.add("edittext", undefined, String(DEFAULT_CONFIG.gradientOpacity));
+            inpGradOpacity.preferredSize = [28, 20];
+
+            var chkMultiLayerMesh = gradRow.add("checkbox", undefined, "Dual Mesh");
             chkMultiLayerMesh.value = DEFAULT_CONFIG.gradientMultiLayerMesh;
 
-            var sep3 = tabCreative.add("panel");
-            sep3.alignment = "fill";
-
-            var lightRow = tabCreative.add("group");
-            var chkLighting = lightRow.add("checkbox", undefined, "Optical Lighting Engine");
+            var chkLighting = gradRow.add("checkbox", undefined, "Optical Flare");
             chkLighting.value = DEFAULT_CONFIG.lightingEnable;
-            var chkVignette = lightRow.add("checkbox", undefined, "Studio Vignette");
-            chkVignette.value = DEFAULT_CONFIG.vignetteEnable;
-            var chkAnamorphic = lightRow.add("checkbox", undefined, "Anamorphic Flare");
-            chkAnamorphic.value = DEFAULT_CONFIG.anamorphicFlareEnable;
-            var chkSunlight = lightRow.add("checkbox", undefined, "Sunlight Rim");
-            chkSunlight.value = DEFAULT_CONFIG.ambientSunlightEnable;
 
-            var sep4 = tabCreative.add("panel");
-            sep4.alignment = "fill";
+            // Hidden parameters maintained for full API compatibility
+            var inpBlurThresh = { text: "25" };
+            var inpMotionAngle = { text: "0" };
+            var inpMotionDist = { text: "30" };
+            var ddRadialMethod = { selection: { text: "Spin" } };
+            var inpGlassFrostBlur = { text: "15" };
+            var inpGlassDistort = { text: "30" };
+            var chkGlassBevel = { value: true };
+            var chkVignette = { value: true };
+            var chkAnamorphic = { value: true };
+            var chkSunlight = { value: false };
+            var ddGradType = { selection: { text: "Random Type" } };
+            var chkLiquify = { value: false };
+            var ddLiqStyle = { selection: { text: "Organic Fluid Wave" } };
+            var inpLiqIntensity = { text: "65" };
 
-            var liqRow1 = tabCreative.add("group");
-            var chkLiquify = liqRow1.add("checkbox", undefined, "Enable Liquify Fluid Flow");
-            chkLiquify.value = DEFAULT_CONFIG.liquifyEnable;
-            chkLiquify.preferredSize = [175, 20];
-            liqRow1.add("statictext", undefined, "Intensity (%):");
-            var inpLiqIntensity = liqRow1.add("edittext", undefined, String(DEFAULT_CONFIG.liquifyIntensity));
-            inpLiqIntensity.preferredSize = [45, 21];
+            // ====================================================================
+            // PANEL 3: BATCH EXECUTION TELEMETRY
+            // ====================================================================
+            var pnlProgress = win.add("panel", undefined, "3. Batch Execution Progress");
+            pnlProgress.orientation = "column";
+            pnlProgress.alignChildren = ["fill", "top"];
+            pnlProgress.spacing = 3;
+            pnlProgress.margins = 5;
 
-            var liqRow2 = tabCreative.add("group");
-            liqRow2.add("statictext", undefined, "Fluid Style:");
-            var ddLiqStyle = liqRow2.add("dropdownlist", undefined, [
-                "Organic Fluid Wave", "Silk Swirl Vortex", "Liquid Marble Flow", 
-                "Abstract Mesh Warp", "Spherical 3D Bulge", "Hourglass Silhouette", 
-                "Pinch & Pucker Vortex", "Spiral Wave Flow", "Directional Ripple Warp", "Random Fluid"
-            ]);
-            ddLiqStyle.selection = 0;
-            ddLiqStyle.preferredSize = [200, 21];
+            var progressBar = pnlProgress.add("progressbar", undefined, 0, 100);
+            progressBar.preferredSize = [520, 12];
 
-            if (useNativeTabs && tabPanel) {
-                try { tabPanel.selection = tabSetup; } catch (eSel) {}
-            }
+            var lblCurrentFile = pnlProgress.add("statictext", undefined, "Ready. Select Source & Output folders, then click START.");
+            lblCurrentFile.preferredSize = [520, 16];
 
-            // --------------------------------------------------------------------
-            // COMPACT PROGRESS & TELEMETRY BAR
-            // --------------------------------------------------------------------
-            var progPanel = win.add("panel", undefined, "Batch Execution Telemetry");
-            progPanel.orientation = "column";
-            progPanel.alignChildren = ["fill", "top"];
-            progPanel.spacing = 3;
-            progPanel.margins = 7;
+            var lblStats = pnlProgress.add("statictext", undefined, "Success: 0  |  Failed: 0  |  Below Min MB: 0  |  Remaining: 0");
+            lblStats.preferredSize = [520, 16];
 
-            var progressBar = progPanel.add("progressbar", undefined, 0, 100);
-            progressBar.preferredSize = [510, 14];
-
-            var lblCurrentFile = progPanel.add("statictext", undefined, "Ready. Select Source & Output folders, then click START.");
-            var lblStats = progPanel.add("statictext", undefined, "Success: 0  |  Failed: 0  |  Below Min MB: 0  |  Remaining: 0");
-
-            // --------------------------------------------------------------------
-            // COMPACT ACTION BUTTON BAR
-            // --------------------------------------------------------------------
+            // ====================================================================
+            // ACTION BUTTON BAR
+            // ====================================================================
             var ctrlGrp = win.add("group");
             ctrlGrp.orientation = "row";
             ctrlGrp.alignChildren = ["center", "center"];
-            ctrlGrp.spacing = 6;
+            ctrlGrp.spacing = 4;
 
             var btnStart = ctrlGrp.add("button", undefined, "START");
-            btnStart.preferredSize = [70, 28];
+            btnStart.preferredSize = [62, 26];
 
             var btnPause = ctrlGrp.add("button", undefined, "PAUSE");
-            btnPause.preferredSize = [60, 28];
+            btnPause.preferredSize = [56, 26];
             btnPause.enabled = false;
 
             var btnResume = ctrlGrp.add("button", undefined, "RESUME");
-            btnResume.preferredSize = [65, 28];
+            btnResume.preferredSize = [60, 26];
             btnResume.enabled = false;
 
             var btnStop = ctrlGrp.add("button", undefined, "STOP");
-            btnStop.preferredSize = [55, 28];
+            btnStop.preferredSize = [52, 26];
             btnStop.enabled = false;
 
             var btnSkip = ctrlGrp.add("button", undefined, "SKIP");
-            btnSkip.preferredSize = [52, 28];
+            btnSkip.preferredSize = [48, 26];
             btnSkip.enabled = false;
 
             var btnRetry = ctrlGrp.add("button", undefined, "RETRY");
-            btnRetry.preferredSize = [58, 28];
+            btnRetry.preferredSize = [54, 26];
             btnRetry.enabled = false;
 
             var btnReset = ctrlGrp.add("button", undefined, "RESET");
-            btnReset.preferredSize = [58, 28];
+            btnReset.preferredSize = [54, 26];
 
             var btnClose = ctrlGrp.add("button", undefined, "CLOSE");
-            btnClose.preferredSize = [58, 28];
+            btnClose.preferredSize = [54, 26];
 
             var scannedFilesCache = [];
 
@@ -2455,7 +2338,6 @@ app.bringToFront();
                 config.noiseDistribution = ddNoiseDist.selection ? ddNoiseDist.selection.text : "Gaussian";
                 config.noiseMonochromatic = chkNoiseMono.value;
 
-                // 3D Glass Studio Sync
                 config.glassEnable = chkGlassEnable.value;
                 config.glassStyle = ddGlassStyle.selection ? ddGlassStyle.selection.text : "Frosted Glassmorphism (Floating 3D Slab)";
                 config.glassScope = ddGlassScope.selection ? ddGlassScope.selection.text : "Full Composition";
@@ -2502,7 +2384,6 @@ app.bringToFront();
                 inpBlurThresh.text = String(config.blurThreshold);
                 inpMotionAngle.text = String(config.motionAngle);
                 inpMotionDist.text = String(config.motionDistance);
-                ddRadialMethod.selection = 0;
                 ddBlurScope.selection = 0;
 
                 chkNoise.value = config.noiseEnable;
@@ -2511,31 +2392,19 @@ app.bringToFront();
                 ddNoiseDist.selection = 0;
                 chkNoiseMono.value = config.noiseMonochromatic;
 
-                // Reset 3D Glass controls
                 chkGlassEnable.value = config.glassEnable;
                 ddGlassStyle.selection = 0;
                 ddGlassScope.selection = 0;
                 ddGlassTint.selection = 0;
                 inpGlassOpacity.text = String(config.glassOpacity);
-                inpGlassFrostBlur.text = String(config.glassFrostBlur);
-                inpGlassDistort.text = String(config.glassDistortion);
-                chkGlassBevel.value = config.glassBevelRim;
 
                 chkLighting.value = config.lightingEnable;
-                chkVignette.value = config.vignetteEnable;
-                chkAnamorphic.value = config.anamorphicFlareEnable;
-                chkSunlight.value = config.ambientSunlightEnable;
 
                 chkGradient.value = config.gradientEnable;
                 ddGradPreset.selection = 0;
-                ddGradType.selection = 0;
                 inpGradOpacity.text = String(config.gradientOpacity);
                 ddGradBlend.selection = 0;
                 chkMultiLayerMesh.value = config.gradientMultiLayerMesh;
-
-                chkLiquify.value = config.liquifyEnable;
-                ddLiqStyle.selection = 0;
-                inpLiqIntensity.text = String(config.liquifyIntensity);
             }
 
             btnBrowseSrc.onClick = function () {
@@ -2716,7 +2585,6 @@ app.bringToFront();
                         saveCheckpoint(folders.reports);
                         updateStatsUI(totalItems - (idx + 1));
 
-                        // Purge Photoshop History & Cache every 10 items to prevent RAM exhaustion
                         if ((idx % 10) === 0) {
                             purgePhotoshopCachesSafe();
                         }
@@ -2775,6 +2643,7 @@ app.bringToFront();
         }
 
         launchStudioUI();
+
 
     } catch (fatalErr) {
         alert("RI Creative Script Error:\nLine: " + fatalErr.line + "\nMessage: " + fatalErr.message);

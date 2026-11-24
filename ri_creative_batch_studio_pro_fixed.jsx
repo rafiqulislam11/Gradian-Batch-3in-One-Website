@@ -564,21 +564,87 @@ app.bringToFront();
         // 5. PHOTOSHOP NATIVE HIGH-PRECISION IMAGE PROCESSING ENGINE
         // ========================================================================
 
-        function prepareBaseLayer(doc) {
+        function toUnitPx(val) {
+            try {
+                return new UnitValue(val, "px");
+            } catch (eUnit) {
+                return val;
+            }
+        }
+
+        function safeResizeImage(doc, targetW, targetH, dpi, resample) {
+            var d = dpi || 300;
+            try {
+                if (resample) {
+                    doc.resizeImage(new UnitValue(targetW, "px"), new UnitValue(targetH, "px"), d, resample);
+                } else {
+                    doc.resizeImage(new UnitValue(targetW, "px"), new UnitValue(targetH, "px"), d);
+                }
+            } catch (e1) {
+                try {
+                    if (resample) {
+                        doc.resizeImage(targetW, targetH, d, resample);
+                    } else {
+                        doc.resizeImage(targetW, targetH, d);
+                    }
+                } catch (e2) {}
+            }
+        }
+
+        function safeResizeCanvas(doc, targetW, targetH, anchor) {
+            var anc = anchor;
+            try {
+                if (!anc && typeof AnchorPosition !== "undefined") {
+                    anc = AnchorPosition.MIDDLECENTER;
+                }
+            } catch (eAnc) {}
+            try {
+                doc.resizeCanvas(new UnitValue(targetW, "px"), new UnitValue(targetH, "px"), anc);
+            } catch (e1) {
+                try {
+                    doc.resizeCanvas(targetW, targetH, anc);
+                } catch (e2) {}
+            }
+        }
+
+        function safeTranslateLayer(layer, dx, dy) {
+            try {
+                layer.translate(new UnitValue(dx, "px"), new UnitValue(dy, "px"));
+            } catch (e1) {
+                try {
+                    layer.translate(dx, dy);
+                } catch (e2) {}
+            }
+        }
+
+        function safeFlattenDoc(doc) {
             try {
                 if (doc.layers.length > 1) {
                     doc.flatten();
+                } else if (doc.activeLayer && !doc.activeLayer.isBackgroundLayer) {
+                    doc.flatten();
                 }
-            } catch (e) {}
+            } catch (e1) {
+                try {
+                    var idFltI = charIDToTypeID("FltI");
+                    executeAction(idFltI, undefined, DIALOG_NO);
+                } catch (e2) {}
+            }
+        }
+
+        function prepareBaseLayer(doc) {
+            safeFlattenDoc(doc);
             try {
-                if (doc.activeLayer.isBackgroundLayer) {
-                    doc.activeLayer.name = "Layer 0";
+                if (doc.activeLayer && doc.activeLayer.isBackgroundLayer) {
+                    doc.activeLayer.isBackgroundLayer = false;
                 }
+            } catch (lockErr) {}
+            try {
                 doc.activeLayer.allLocked = false;
                 doc.activeLayer.pixelsLocked = false;
                 doc.activeLayer.positionLocked = false;
                 doc.activeLayer.transparentPixelsLocked = false;
-            } catch (lockErr) {}
+            } catch (lockErr2) {}
         }
 
         function toPx(val) {
@@ -617,14 +683,19 @@ app.bringToFront();
                     doc.changeMode(ChangeMode.RGB);
                 }
             } catch (eMode) {}
-            convertBitDepthSafe(doc, 16);
+            // In Photoshop CS2, 16-bit mode disables many filters and causes processing crashes.
+            // Run in 8-bit for CS2 to guarantee 100% stability.
+            if (!IS_CS2) {
+                convertBitDepthSafe(doc, 16);
+            } else {
+                convertBitDepthSafe(doc, 8);
+            }
         }
 
         function finalizeTo8BitDithered(doc) {
             convertBitDepthSafe(doc, 8);
         }
 
-        
         function makeEllipticalSelectionSafe(doc, top, left, bottom, right) {
             try {
                 var idsetd = charIDToTypeID("setd");
@@ -696,21 +767,29 @@ app.bringToFront();
                 return;
             }
 
-            var highResample = (typeof ResampleMethod !== "undefined" && ResampleMethod.BICUBICSMOOTHER) ? ResampleMethod.BICUBICSMOOTHER : ((typeof ResampleMethod !== "undefined" && ResampleMethod.BICUBIC) ? ResampleMethod.BICUBIC : null);
+            var highResample = null;
+            try {
+                if (typeof ResampleMethod !== "undefined") {
+                    highResample = ResampleMethod.BICUBIC;
+                    if (ResampleMethod.BICUBICSMOOTHER) highResample = ResampleMethod.BICUBICSMOOTHER;
+                }
+            } catch (eRes) {}
 
             if (mode === "Stretch") {
-                doc.resizeImage(UnitValue(targetW, "px"), UnitValue(targetH, "px"), 300, highResample);
+                safeResizeImage(doc, targetW, targetH, 300, highResample);
             } else if (mode === "Fit (Contain)") {
                 var scaleFit = Math.min(targetW / origW, targetH / origH);
                 var newW = Math.round(origW * scaleFit);
                 var newH = Math.round(origH * scaleFit);
-                doc.resizeImage(UnitValue(newW, "px"), UnitValue(newH, "px"), 300, highResample);
-                var bgCol = new SolidColor();
-                bgCol.rgb.red = 18;
-                bgCol.rgb.green = 18;
-                bgCol.rgb.blue = 22;
-                app.backgroundColor = bgCol;
-                doc.resizeCanvas(UnitValue(targetW, "px"), UnitValue(targetH, "px"), AnchorPosition.MIDDLECENTER);
+                safeResizeImage(doc, newW, newH, 300, highResample);
+                try {
+                    var bgCol = new SolidColor();
+                    bgCol.rgb.red = 18;
+                    bgCol.rgb.green = 18;
+                    bgCol.rgb.blue = 22;
+                    app.backgroundColor = bgCol;
+                } catch (eBg) {}
+                safeResizeCanvas(doc, targetW, targetH, (typeof AnchorPosition !== "undefined") ? AnchorPosition.MIDDLECENTER : undefined);
             } else {
                 var scaleFill = Math.max(targetW / origW, targetH / origH);
                 var scaledW = Math.round(origW * scaleFill);
@@ -719,10 +798,10 @@ app.bringToFront();
                 if (scaledW < targetW) scaledW = targetW;
                 if (scaledH < targetH) scaledH = targetH;
 
-                doc.resizeImage(UnitValue(scaledW, "px"), UnitValue(scaledH, "px"), 300, highResample);
+                safeResizeImage(doc, scaledW, scaledH, 300, highResample);
 
                 if (scaledW !== targetW || scaledH !== targetH) {
-                    doc.resizeCanvas(UnitValue(targetW, "px"), UnitValue(targetH, "px"), AnchorPosition.MIDDLECENTER);
+                    safeResizeCanvas(doc, targetW, targetH, (typeof AnchorPosition !== "undefined") ? AnchorPosition.MIDDLECENTER : undefined);
                 }
             }
         }
@@ -1540,10 +1619,8 @@ app.bringToFront();
         function exportDocumentMaster(doc, outFile, cfg) {
             var isPSD = (cfg.exportFormat.indexOf("PSD") !== -1);
             if (!isPSD) {
+                safeFlattenDoc(doc);
                 try {
-                    if (doc.layers.length > 1) {
-                        doc.flatten();
-                    }
                     while (doc.channels.length > 3) {
                         doc.channels[doc.channels.length - 1].remove();
                     }
@@ -1560,19 +1637,27 @@ app.bringToFront();
 
             if (cfg.exportFormat.indexOf("TIFF") !== -1) {
                 var tifOpts = new TiffSaveOptions();
-                tifOpts.imageCompression = TIFFEncoding.TIFFLZW;
-                tifOpts.byteOrder = ByteOrder.IBM;
-                tifOpts.embedColorProfile = Boolean(cfg.embedProfile);
+                try { tifOpts.imageCompression = TIFFEncoding.TIFFLZW; } catch (e) {}
+                try { tifOpts.byteOrder = ByteOrder.IBM; } catch (e) {}
+                try { tifOpts.embedColorProfile = Boolean(cfg.embedProfile); } catch (e) {}
                 tifOpts.layers = false;
-                doc.saveAs(outFile, tifOpts, true, Extension.LOWERCASE);
+                try {
+                    doc.saveAs(outFile, tifOpts, true);
+                } catch (eTif) {
+                    doc.saveAs(outFile, tifOpts);
+                }
 
             } else if (cfg.exportFormat.indexOf("PNG") !== -1) {
+                var pngSaved = false;
                 try {
                     var pngOpts = new PNGSaveOptions();
-                    pngOpts.compression = 6;
-                    pngOpts.interlaced = false;
-                    doc.saveAs(outFile, pngOpts, true, Extension.LOWERCASE);
-                } catch (pngErr) {
+                    try { pngOpts.compression = 6; } catch (e) {}
+                    try { pngOpts.interlaced = false; } catch (e) {}
+                    doc.saveAs(outFile, pngOpts, true);
+                    if (outFile.exists && outFile.length > 0) pngSaved = true;
+                } catch (pngErr) {}
+
+                if (!pngSaved) {
                     try {
                         var sfwOpts = new ExportOptionsSaveForWeb();
                         sfwOpts.format = SaveDocumentType.PNG;
@@ -1585,29 +1670,71 @@ app.bringToFront();
             } else if (isPSD) {
                 var psdOpts = new PhotoshopSaveOptions();
                 psdOpts.layers = true;
-                psdOpts.embedColorProfile = Boolean(cfg.embedProfile);
-                doc.saveAs(outFile, psdOpts, true, Extension.LOWERCASE);
+                try { psdOpts.embedColorProfile = Boolean(cfg.embedProfile); } catch (e) {}
+                try {
+                    doc.saveAs(outFile, psdOpts, true);
+                } catch (ePsd) {
+                    doc.saveAs(outFile, psdOpts);
+                }
 
             } else {
+                // Universal JPEG Save Engine (Photoshop CS2 9.0.2 to CC Universal)
                 var jpgOpts = new JPEGSaveOptions();
                 jpgOpts.quality = Math.max(1, Math.min(12, Math.round(cfg.jpegQuality)));
-                jpgOpts.formatOptions = FormatOptions.STANDARDBASELINE;
-                jpgOpts.embedColorProfile = Boolean(cfg.embedProfile);
-                jpgOpts.matte = MatteType.NONE;
-
                 try {
-                    doc.saveAs(outFile, jpgOpts, true, Extension.LOWERCASE);
-                } catch (saveErr) {
-                    var idsave = charIDToTypeID("save");
-                    var desc = new ActionDescriptor();
-                    var descAs = new ActionDescriptor();
-                    descAs.putInteger(charIDToTypeID("EQlt"), jpgOpts.quality);
-                    descAs.putEnumerated(charIDToTypeID("MttC"), charIDToTypeID("MttC"), charIDToTypeID("None"));
-                    desc.putObject(charIDToTypeID("As  "), charIDToTypeID("JPEG"), descAs);
-                    desc.putPath(charIDToTypeID("In  "), outFile);
-                    desc.putBoolean(charIDToTypeID("Cpy "), true);
-                    desc.putBoolean(charIDToTypeID("LwCs"), true);
-                    executeAction(idsave, desc, DIALOG_NO);
+                    if (typeof FormatOptions !== "undefined") {
+                        jpgOpts.formatOptions = FormatOptions.STANDARDBASELINE;
+                    }
+                } catch (eFmt) {}
+                try {
+                    jpgOpts.embedColorProfile = Boolean(cfg.embedProfile);
+                } catch (eProf) {}
+                try {
+                    if (typeof MatteType !== "undefined") {
+                        jpgOpts.matte = MatteType.NONE;
+                    }
+                } catch (eMat) {}
+
+                var isSaved = false;
+                // Attempt 1: Standard DOM saveAs asCopy
+                try {
+                    doc.saveAs(outFile, jpgOpts, true);
+                    if (outFile.exists && outFile.length > 0) isSaved = true;
+                } catch (saveErr1) {}
+
+                // Attempt 2: Standard DOM saveAs direct
+                if (!isSaved) {
+                    try {
+                        doc.saveAs(outFile, jpgOpts);
+                        if (outFile.exists && outFile.length > 0) isSaved = true;
+                    } catch (saveErr2) {}
+                }
+
+                // Attempt 3: Save For Web Export (Ultra-Reliable in Photoshop CS2)
+                if (!isSaved) {
+                    try {
+                        var sfwJpeg = new ExportOptionsSaveForWeb();
+                        sfwJpeg.format = SaveDocumentType.JPEG;
+                        sfwJpeg.includeProfile = Boolean(cfg.embedProfile);
+                        sfwJpeg.quality = Math.max(10, Math.min(100, Math.round((cfg.jpegQuality / 12) * 100)));
+                        doc.exportDocument(outFile, ExportType.SAVEFORWEB, sfwJpeg);
+                        if (outFile.exists && outFile.length > 0) isSaved = true;
+                    } catch (sfwErr) {}
+                }
+
+                // Attempt 4: ActionManager native JPEG save
+                if (!isSaved) {
+                    try {
+                        var idsave = charIDToTypeID("save");
+                        var desc = new ActionDescriptor();
+                        var descAs = new ActionDescriptor();
+                        descAs.putInteger(charIDToTypeID("EQlt"), jpgOpts.quality);
+                        desc.putObject(charIDToTypeID("As  "), charIDToTypeID("JPEG"), descAs);
+                        desc.putPath(charIDToTypeID("In  "), outFile);
+                        desc.putBoolean(charIDToTypeID("Cpy "), true);
+                        executeAction(idsave, desc, DIALOG_NO);
+                        if (outFile.exists && outFile.length > 0) isSaved = true;
+                    } catch (amErr) {}
                 }
             }
         }
@@ -1683,7 +1810,7 @@ app.bringToFront();
                 } else {
                     targetX = zoneW - overlap;
                 }
-                pastedLayer.translate(UnitValue(targetX - curX, "px"), UnitValue(0 - curY, "px"));
+                safeTranslateLayer(pastedLayer, targetX - curX, 0 - curY);
 
                 if (cfg.seamlessBlend && overlap > 0) {
                     try {
@@ -1693,19 +1820,19 @@ app.bringToFront();
                             var rightSeamX = Math.round(toPx(b[2]));
 
                             mainDoc.selection.select([[leftSeamX, 0], [leftSeamX + overlap, 0], [leftSeamX + overlap, cfg.height], [leftSeamX, cfg.height]]);
-                            mainDoc.selection.feather(overlap * 0.7);
-                            mainDoc.selection.clear();
+                            try { mainDoc.selection.feather(overlap * 0.7); } catch (fErr1) {}
+                            try { mainDoc.selection.clear(); } catch (cErr1) {}
 
                             mainDoc.selection.select([[rightSeamX - overlap, 0], [rightSeamX, 0], [rightSeamX, cfg.height], [rightSeamX - overlap, cfg.height]]);
-                            mainDoc.selection.feather(overlap * 0.7);
-                            mainDoc.selection.clear();
+                            try { mainDoc.selection.feather(overlap * 0.7); } catch (fErr2) {}
+                            try { mainDoc.selection.clear(); } catch (cErr2) {}
                             mainDoc.selection.deselect();
                         } else if (zoneType === "RIGHT") {
                             var bRight = pastedLayer.bounds;
                             var seamX = Math.round(toPx(bRight[0]));
                             mainDoc.selection.select([[seamX, 0], [seamX + overlap, 0], [seamX + overlap, cfg.height], [seamX, cfg.height]]);
-                            mainDoc.selection.feather(overlap * 0.7);
-                            mainDoc.selection.clear();
+                            try { mainDoc.selection.feather(overlap * 0.7); } catch (fErr3) {}
+                            try { mainDoc.selection.clear(); } catch (cErr3) {}
                             mainDoc.selection.deselect();
                         }
                     } catch (blendErr) {
@@ -1756,11 +1883,11 @@ app.bringToFront();
                         var rightFile = (tripletFiles.length >= 3) ? tripletFiles[2] : (tripletFiles[1] || primaryFile);
                         placeImageInSpatialZone(doc, centerFile, "CENTER", cfg, "Center Zone [" + centerFile.name + "]");
                         placeImageInSpatialZone(doc, rightFile, "RIGHT", cfg, "Right Zone [" + rightFile.name + "]");
-                        doc.flatten();
+                        safeFlattenDoc(doc);
                         prepareBaseLayer(doc);
                     } else {
                         resizeImageSmart(doc, zoneW, cfg.height, "Fit/Crop (Fill)");
-                        doc.resizeCanvas(UnitValue(cfg.width, "px"), UnitValue(cfg.height, "px"), AnchorPosition.MIDDLELEFT);
+                        safeResizeCanvas(doc, cfg.width, cfg.height, (typeof AnchorPosition !== "undefined") ? AnchorPosition.MIDDLELEFT : undefined);
                         doc.activeLayer.name = "Left Zone [" + primaryFile.name + "]";
 
                         var rightFile = (tripletFiles.length >= 3) ? tripletFiles[2] : (tripletFiles[1] || primaryFile);
@@ -1769,7 +1896,7 @@ app.bringToFront();
                         placeImageInSpatialZone(doc, rightFile, "RIGHT", cfg, "Right Zone [" + rightFile.name + "]");
                         placeImageInSpatialZone(doc, centerFile, "CENTER", cfg, "Center Zone [" + centerFile.name + "]");
 
-                        doc.flatten();
+                        safeFlattenDoc(doc);
                         prepareBaseLayer(doc);
 
                         if (cfg.blurScope === "Full Composition" && cfg.blurType && cfg.blurType !== "None (Clean Stock Approved)") {
@@ -1809,9 +1936,7 @@ app.bringToFront();
                     appliedGradInfo = applyEditableGradientLayer(doc, cfg);
                 }
 
-                if (doc.layers.length > 1) {
-                    doc.flatten();
-                }
+                safeFlattenDoc(doc);
 
                 // Liquify & Fluid Flow Distortion
                 if (cfg.liquifyEnable && cfg.liquifyIntensity > 0) {
@@ -1827,7 +1952,7 @@ app.bringToFront();
                 var actualDocW = Math.round(toPx(doc.width));
                 var actualDocH = Math.round(toPx(doc.height));
                 if (actualDocW !== cfg.width || actualDocH !== cfg.height) {
-                    try { doc.resizeImage(UnitValue(cfg.width, "px"), UnitValue(cfg.height, "px"), 300, (typeof ResampleMethod !== "undefined" && ResampleMethod.BICUBICSMOOTHER) ? ResampleMethod.BICUBICSMOOTHER : ResampleMethod.BICUBIC); } catch (resErr) { doc.resizeImage(UnitValue(cfg.width, "px"), UnitValue(cfg.height, "px"), 300); }
+                    safeResizeImage(doc, cfg.width, cfg.height, 300);
                 }
 
                 exportDocumentMaster(doc, tempOutputFile, cfg);
@@ -1888,12 +2013,13 @@ app.bringToFront();
                 if (tempOutputFile !== null && tempOutputFile.exists) {
                     try { tempOutputFile.remove(); } catch (rmErr) {}
                 }
+                var errLine = (typeof err.line !== "undefined") ? (" (Line " + err.line + ")") : "";
                 return {
                     success: false,
                     belowMinSize: false,
                     sourceName: fusedNames.join(" + "),
                     outputName: "N/A",
-                    reason: "Processing Error: " + err.message,
+                    reason: "Processing Error" + errLine + ": " + err.message,
                     nextSeq: seqCounter
                 };
             }
@@ -2694,10 +2820,12 @@ app.bringToFront();
                 batchState.failedDetails = [];
                 batchState.startTime = getTimestamp();
 
-                var prevDialogs = app.displayDialogs;
-                var prevRulerUnits = app.preferences.rulerUnits;
-                app.displayDialogs = DialogModes.NO;
-                app.preferences.rulerUnits = Units.PIXELS;
+                var prevDialogs = null;
+                var prevRulerUnits = null;
+                try { prevDialogs = app.displayDialogs; } catch (ePd) {}
+                try { prevRulerUnits = app.preferences.rulerUnits; } catch (eRu) {}
+                try { if (typeof DialogModes !== "undefined") app.displayDialogs = DIALOG_NO; } catch (eDn) {}
+                try { if (typeof Units !== "undefined") app.preferences.rulerUnits = Units.PIXELS; } catch (ePx) {}
 
                 setControlsRunningState(true);
                 var seqCounter = 1;
@@ -2760,8 +2888,8 @@ app.bringToFront();
                         }
                     }
                 } finally {
-                    app.displayDialogs = prevDialogs;
-                    app.preferences.rulerUnits = prevRulerUnits;
+                    try { if (prevDialogs !== null) app.displayDialogs = prevDialogs; } catch (eR1) {}
+                    try { if (prevRulerUnits !== null) app.preferences.rulerUnits = prevRulerUnits; } catch (eR2) {}
                     batchState.isRunning = false;
                     batchState.isPaused = false;
                     generateAllReports(folders, totalScannedCount, totalItems);

@@ -940,6 +940,35 @@ app.bringToFront();
             }
         }
 
+        function smoothVortexCenterCore(doc, coreRadiusPx) {
+            try {
+                if (!doc || !doc.activeLayer) return;
+                var w = Math.round(toPx(doc.width));
+                var h = Math.round(toPx(doc.height));
+                var cx = Math.round(w / 2);
+                var cy = Math.round(h / 2);
+                // Adaptive center singularity de-aliasing (smooths away infinite-frequency Nyquist collisions)
+                var r = coreRadiusPx || Math.max(16, Math.round(Math.min(w, h) * 0.024));
+                var top = cy - r;
+                var left = cx - r;
+                var bottom = cy + r;
+                var right = cx + r;
+
+                makeEllipticalSelectionSafe(doc, top, left, bottom, right);
+                try {
+                    doc.selection.feather(Math.max(4, Math.round(r * 0.65)));
+                } catch (eF) {}
+
+                try {
+                    doc.activeLayer.applyGaussianBlur(Math.max(2, Math.round(r * 0.22)));
+                } catch (eGb) {}
+
+                doc.selection.deselect();
+            } catch (eCore) {
+                try { doc.selection.deselect(); } catch (eDes) {}
+            }
+        }
+
         function finalizeTo8BitDithered(doc) {
             convertBitDepthSafe(doc, 8);
         }
@@ -1708,6 +1737,7 @@ app.bringToFront();
                     doc.selection.deselect();
                     spiralArt.applyTwirl(120);
                     spiralArt.applyZigZag(40, 6, ZigZagType.AROUNDCENTER);
+                    smoothVortexCenterCore(doc);
                     spiralArt.blendMode = BlendMode.SCREEN;
                     spiralArt.opacity = opacity;
 
@@ -1859,6 +1889,7 @@ app.bringToFront();
                         if (style.indexOf("Fluid") !== -1 || style.indexOf("Flow") !== -1) {
                             uniArt.applyTwirl(65);
                             uniArt.applyZigZag(Math.round(distortion * 0.6), 5, ZigZagType.AROUNDCENTER);
+                            smoothVortexCenterCore(doc);
                         } else if (style.indexOf("Bevel") !== -1) {
                             uniArt.applyRipple(Math.round(distortion * 0.8), RippleSize.LARGE);
                         } else {
@@ -2854,6 +2885,8 @@ app.bringToFront();
                     doc.activeLayer.applyTwirl(Math.round(75 * norm));
                 } catch (fallbackErr) {}
             }
+            // De-alias center core singularity (eliminates torn/pixelated spiral eye on 100% zoom)
+            smoothVortexCenterCore(doc);
         }
 
         // ====================================================================

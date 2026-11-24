@@ -12048,15 +12048,16 @@
                         }
                     } else if (gType === 'spiral_vortex') {
                         const maxRadius = Math.hypot(width, height) * 0.6;
+                        const minR = Math.max(12, Math.min(width, height) * 0.018);
                         const arms = 6;
                         for (let a = 0; a < arms; a++) {
                             const startAng = (a * 2 * Math.PI) / arms;
                             targetCtx.beginPath();
-                            for (let r = 5; r < maxRadius; r += 5) {
+                            for (let r = minR; r < maxRadius; r += 5) {
                                 const ang = startAng + (r / maxRadius) * Math.PI * 6;
                                 const sx = width * 0.5 + Math.cos(ang) * r;
                                 const sy = height * 0.5 + Math.sin(ang) * r;
-                                if (r === 5) targetCtx.moveTo(sx, sy);
+                                if (r === minR) targetCtx.moveTo(sx, sy);
                                 else targetCtx.lineTo(sx, sy);
                             }
                             targetCtx.stroke();

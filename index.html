@@ -9338,28 +9338,42 @@
                 // 10.09 3D Glass Stripes — Tubular diagonal glass bars with neon glow
                 // ====================================================================
                 case 'bg_glass_9': {
-                    const stripes = 8;
-                    const sH = (height * 1.5) / stripes;
+                    const stripes = Math.max(6, Math.min(22, Math.round(10 * (opts.density ? opts.density / 100 : 1.0))));
+                    const sH = (height * 1.8) / stripes;
                     ctx.save();
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
                     ctx.translate(width / 2, height / 2);
-                    ctx.rotate(-0.35);
+                    ctx.rotate(rotRad !== 0 ? rotRad : -0.35);
                     ctx.translate(-width / 2, -height / 2);
 
-                    for (let i = -2; i < stripes + 2; i++) {
+                    for (let i = -3; i < stripes + 3; i++) {
                         const sy = i * sH;
-                        ctx.beginPath();
-                        ctx.roundRect(-width * 0.2, sy, width * 1.4, sH * 0.55, sH * 0.25);
+                        const barH = sH * 0.72;
 
-                        const stGrad = ctx.createLinearGradient(0, sy, 0, sy + sH * 0.55);
-                        stGrad.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
-                        stGrad.addColorStop(0.3, 'rgba(147, 197, 253, 0.3)');
-                        stGrad.addColorStop(0.7, 'rgba(192, 132, 252, 0.25)');
-                        stGrad.addColorStop(1, 'rgba(255, 255, 255, 0.55)');
+                        // 1. Deep ambient shadow crevice between tubes (gives true 3D pop & clean depth)
+                        ctx.fillStyle = 'rgba(0, 6, 20, 0.45)';
+                        ctx.fillRect(-width * 0.3, sy + barH, width * 1.6, sH * 0.28);
+
+                        // 2. Realistic 3D cylindrical tube refraction & specular body
+                        ctx.beginPath();
+                        ctx.roundRect(-width * 0.3, sy, width * 1.6, barH, barH * 0.45);
+
+                        const stGrad = ctx.createLinearGradient(0, sy, 0, sy + barH);
+                        stGrad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+                        stGrad.addColorStop(0.18, 'rgba(255, 255, 255, 0.45)');
+                        stGrad.addColorStop(0.45, 'rgba(255, 255, 255, 0.10)');
+                        stGrad.addColorStop(0.78, 'rgba(10, 25, 45, 0.30)');
+                        stGrad.addColorStop(1.0, 'rgba(5, 12, 25, 0.60)');
                         ctx.fillStyle = stGrad;
                         ctx.fill();
 
-                        ctx.lineWidth = 3 * scale;
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                        // 3. Razor-sharp apex highlight line (Apple/Architectural Digest fluted glass standard)
+                        ctx.beginPath();
+                        ctx.moveTo(-width * 0.3, sy + barH * 0.14);
+                        ctx.lineTo(width * 1.3, sy + barH * 0.14);
+                        ctx.lineWidth = Math.max(1.0, 1.8 * scale);
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
                         ctx.stroke();
                     }
                     ctx.restore();
@@ -11448,8 +11462,8 @@
                             }
                         } else if (effDir === 'hd2d' || effDir === 'crosswave' || effDir === 'scurve') {
                             try {
-                                const simW = workW >= 3000 ? 1800 : Math.max(720, Math.round(workW));
-                                const simH = Math.max(360, Math.round(simW * (workH / workW)));
+                                const simW = Math.min(4096, Math.max(720, Math.round(workW)));
+                                const simH = Math.round(simW * (workH / workW));
                                 const srcSim = document.createElement('canvas');
                                 srcSim.width = simW;
                                 srcSim.height = simH;
@@ -11543,28 +11557,41 @@
                                             const v = (x - y) / (cellPx * 1.3);
                                             const fx = (u - Math.floor(u)) * 2.0 - 1.0;
                                             const fy = (v - Math.floor(v)) * 2.0 - 1.0;
-                                            dx = (fx >= 0 ? 1 : -1) * refractAmp * 1.1;
-                                            dy = (fy >= 0 ? 1 : -1) * refractAmp * 1.1;
-                                            shade = (-fx * 0.32 - fy * 0.32) * shadeAmp;
-                                            spec = (fx < -0.5 && fy < -0.5 ? 0.45 : 0) * 60 * shadeAmp;
+                                            // Continuous subpixel facet gradient (eliminates 1-bit diagonal staircase tearing)
+                                            const edgeSlopeX = Math.tanh(fx * 12.0);
+                                            const edgeSlopeY = Math.tanh(fy * 12.0);
+                                            dx = edgeSlopeX * refractAmp * 1.1;
+                                            dy = edgeSlopeY * refractAmp * 1.1;
+                                            shade = (-edgeSlopeX * 0.32 - edgeSlopeY * 0.32) * shadeAmp;
+                                            // Smooth radial apex specular glint (eliminates square block corners)
+                                            const apexDist = Math.hypot(fx + 0.65, fy + 0.65);
+                                            spec = Math.pow(Math.max(0, 1.0 - apexDist * 1.75), 3) * 58 * shadeAmp;
                                         } else if (styleNum === 44) {
                                             const dist = Math.hypot(x - cx, y - cy);
+                                            const coreR = Math.max(10, simW * 0.018);
+                                            const coreF = Math.min(1.0, dist / coreR);
+                                            const smoothCore = coreF * coreF * (3.0 - 2.0 * coreF);
                                             const u = dist / (cellPx * 0.95);
                                             const phase = (u - Math.floor(u)) * 2.0 - 1.0;
                                             const ang = Math.atan2(y - cy, x - cx);
-                                            dx = Math.cos(ang) * phase * refractAmp * 1.4;
-                                            dy = Math.sin(ang) * phase * refractAmp * 1.4;
-                                            shade = (Math.cos(phase * Math.PI * 0.5) * 0.35 - Math.abs(phase) * 0.5) * shadeAmp;
-                                            spec = Math.pow(Math.max(0, 1.0 - Math.abs(phase) * 2.4), 3) * 58 * shadeAmp;
+                                            dx = Math.cos(ang) * phase * refractAmp * 1.4 * smoothCore;
+                                            dy = Math.sin(ang) * phase * refractAmp * 1.4 * smoothCore;
+                                            shade = (Math.cos(phase * Math.PI * 0.5) * 0.35 - Math.abs(phase) * 0.5) * shadeAmp * smoothCore;
+                                            spec = Math.pow(Math.max(0, 1.0 - Math.abs(phase) * 2.4), 3) * 58 * shadeAmp * smoothCore;
                                         } else if (styleNum === 45) {
                                             const dist = Math.hypot(x - cx, y - cy);
-                                            const ang = Math.atan2(y - cy, x - cx) + (dist / (simW * 0.14)) * Math.PI + seedVal;
+                                            // Smooth center core to eliminate singularity collapse & center tearing
+                                            const coreR = Math.max(16, simW * 0.035);
+                                            const coreF = Math.min(1.0, dist / coreR);
+                                            const smoothCore = coreF * coreF * (3.0 - 2.0 * coreF);
+                                            const ang = Math.atan2(y - cy, x - cx) + ((dist * smoothCore) / (simW * 0.14)) * Math.PI + seedVal;
                                             const u = (ang / (Math.PI * 2)) * Math.max(18, numLines * 0.45);
                                             const phase = (u - Math.floor(u)) * 2.0 - 1.0;
-                                            dx = -Math.sin(ang) * phase * refractAmp * 1.5;
-                                            dy = Math.cos(ang) * phase * refractAmp * 1.5;
-                                            shade = (Math.cos(phase * Math.PI * 0.5) * 0.36 - Math.abs(phase) * 0.52) * shadeAmp;
-                                            spec = Math.pow(Math.max(0, 1.0 - Math.abs(phase) * 2.5), 3) * 58 * shadeAmp;
+                                            const smoothPhase = Math.sin(phase * Math.PI * 0.5);
+                                            dx = -Math.sin(ang) * smoothPhase * refractAmp * 1.5 * smoothCore;
+                                            dy = Math.cos(ang) * smoothPhase * refractAmp * 1.5 * smoothCore;
+                                            shade = (Math.cos(phase * Math.PI * 0.5) * 0.36 - Math.abs(phase) * 0.52) * shadeAmp * smoothCore;
+                                            spec = Math.pow(Math.max(0, 1.0 - Math.abs(phase) * 2.5), 3) * 58 * shadeAmp * smoothCore;
                                         } else if (styleNum === 46) {
                                             const n1 = Math.sin(x / (cellPx * 0.75) + seedVal) * Math.cos(y / (cellPx * 0.75) - seedVal);
                                             const n2 = Math.sin((x + y) / (cellPx * 1.1) + seedVal * 1.4);
@@ -11614,15 +11641,18 @@
                                             spec = Math.pow(Math.max(0, phase), 4) * 58 * shadeAmp;
                                         } else if (styleNum === 50) {
                                             const rad = Math.hypot(x - cx, y - cy);
+                                            const coreR = Math.max(12, simW * 0.022);
+                                            const coreF = Math.min(1.0, rad / coreR);
+                                            const smoothCore = coreF * coreF * (3.0 - 2.0 * coreF);
                                             const ang = Math.atan2(y - cy, x - cx);
                                             const sectors = 12;
                                             const sym = Math.abs(((ang + Math.PI) % (Math.PI / sectors)) - Math.PI / (sectors * 2));
                                             const u = (rad * Math.cos(sym)) / (cellPx * 0.85);
                                             const phase = (u - Math.floor(u)) * 2.0 - 1.0;
-                                            dx = Math.cos(sym * 2) * phase * refractAmp * 1.35;
-                                            dy = Math.sin(sym * 2) * phase * refractAmp * 1.35;
-                                            shade = (Math.cos(phase * Math.PI * 0.5) * 0.35 - Math.abs(phase) * 0.5) * shadeAmp;
-                                            spec = Math.pow(Math.max(0, 1 - Math.abs(phase) * 2.4), 3) * 62 * shadeAmp;
+                                            dx = Math.cos(sym * 2) * phase * refractAmp * 1.35 * smoothCore;
+                                            dy = Math.sin(sym * 2) * phase * refractAmp * 1.35 * smoothCore;
+                                            shade = (Math.cos(phase * Math.PI * 0.5) * 0.35 - Math.abs(phase) * 0.5) * shadeAmp * smoothCore;
+                                            spec = Math.pow(Math.max(0, 1 - Math.abs(phase) * 2.4), 3) * 62 * shadeAmp * smoothCore;
                                         } else {
                                             const bubbleWarp = styleNum === 32 ? 0.22 : 0.08;
                                             const gx = (x / cellPx) + Math.sin(ny * Math.PI * 2.5 + seedVal) * bubbleWarp;
@@ -11770,6 +11800,8 @@
                             diagCanvas.width = diagSize;
                             diagCanvas.height = diagSize;
                             const dCtx = diagCanvas.getContext('2d');
+                            dCtx.imageSmoothingEnabled = true;
+                            dCtx.imageSmoothingQuality = 'high';
                             dCtx.translate(diagSize / 2, diagSize / 2);
                             dCtx.rotate(Math.PI / 4);
                             dCtx.drawImage(glassSrc, -workW / 2, -workH / 2);
@@ -11780,6 +11812,8 @@
                             diagOut.width = diagSize;
                             diagOut.height = diagSize;
                             const doCtx = diagOut.getContext('2d');
+                            doCtx.imageSmoothingEnabled = true;
+                            doCtx.imageSmoothingQuality = 'high';
 
                             for (let i = 0; i < numLines; i++) {
                                 const dx = i * dRibW;
@@ -11787,17 +11821,19 @@
                                 const sX = Math.sin(i * 0.8 + state.seed) * dMaxShift * zigMod;
                                 const srcW = Math.max(2, dRibW / lensStretch);
                                 const clampX = Math.max(0, Math.min(diagSize - srcW, dx + (dRibW - srcW) * 0.5 + sX));
-                                doCtx.drawImage(diagCanvas, clampX, 0, srcW, diagSize, dx, 0, dRibW + 2.0, diagSize);
+                                doCtx.drawImage(diagCanvas, clampX, 0, srcW, diagSize, dx, 0, dRibW + 1.0, diagSize);
                                 if (baseNorm > 0) {
                                     const gBevel = doCtx.createLinearGradient(dx, 0, dx + dRibW, 0);
-                                    gBevel.addColorStop(0, `rgba(255,255,255,${Math.min(0.6, baseNorm * 0.3 * lightBoost)})`);
+                                    gBevel.addColorStop(0, `rgba(255,255,255,${Math.min(0.65, baseNorm * 0.35 * lightBoost)})`);
                                     gBevel.addColorStop(0.5, 'rgba(255,255,255,0)');
-                                    gBevel.addColorStop(1, `rgba(10,15,28,${Math.min(0.6, baseNorm * 0.3 * lightBoost)})`);
+                                    gBevel.addColorStop(1, `rgba(5,10,22,${Math.min(0.65, baseNorm * 0.38 * lightBoost)})`);
                                     doCtx.fillStyle = gBevel;
-                                    doCtx.fillRect(dx, 0, dRibW + 1.0, diagSize);
+                                    doCtx.fillRect(dx, 0, dRibW + 0.5, diagSize);
                                 }
                             }
                             gCtx.save();
+                            gCtx.imageSmoothingEnabled = true;
+                            gCtx.imageSmoothingQuality = 'high';
                             gCtx.translate(workW / 2, workH / 2);
                             gCtx.rotate(-Math.PI / 4);
                             gCtx.drawImage(diagOut, -diagSize / 2, -diagSize / 2);
@@ -16512,6 +16548,53 @@ false 3 colorimage
             });
         }
 
+        // Commercial Microstock Unsharp Mask Polish for Razor-Sharp 4K/8K Edge Definition
+        function applyCanvasMicrostockSharpen(targetCtx, w, h, strength = 0.22) {
+            try {
+                if (!targetCtx || w < 2 || h < 2 || strength <= 0) return;
+                const imgData = targetCtx.getImageData(0, 0, w, h);
+                const data = imgData.data;
+                const copy = new Uint8ClampedArray(data);
+                const s = Math.min(0.6, Math.max(0.05, strength));
+                const centerWeight = 1.0 + 4.0 * s;
+                const rowStride = w * 4;
+
+                for (let y = 1; y < h - 1; y++) {
+                    let idx = y * rowStride + 4;
+                    for (let x = 1; x < w - 1; x++) {
+                        // R
+                        const upR = copy[idx - rowStride];
+                        const downR = copy[idx + rowStride];
+                        const leftR = copy[idx - 4];
+                        const rightR = copy[idx + 4];
+                        const curR = copy[idx];
+                        data[idx] = Math.min(255, Math.max(0, curR * centerWeight - s * (upR + downR + leftR + rightR)));
+
+                        // G
+                        const upG = copy[idx - rowStride + 1];
+                        const downG = copy[idx + rowStride + 1];
+                        const leftG = copy[idx - 4 + 1];
+                        const rightG = copy[idx + 4 + 1];
+                        const curG = copy[idx + 1];
+                        data[idx + 1] = Math.min(255, Math.max(0, curG * centerWeight - s * (upG + downG + leftG + rightG)));
+
+                        // B
+                        const upB = copy[idx - rowStride + 2];
+                        const downB = copy[idx + rowStride + 2];
+                        const leftB = copy[idx - 4 + 2];
+                        const rightB = copy[idx + 4 + 2];
+                        const curB = copy[idx + 2];
+                        data[idx + 2] = Math.min(255, Math.max(0, curB * centerWeight - s * (upB + downB + leftB + rightB)));
+
+                        idx += 4;
+                    }
+                }
+                targetCtx.putImageData(imgData, 0, 0);
+            } catch (e) {
+                console.warn('Canvas sharpen skipped:', e);
+            }
+        }
+
         // High-Quality Perceptual TPDF Anti-Banding Dither (Zero-Noise Banding Prevention)
         function applyAntiBandingDither(targetCtx, w, h) {
             const ditherTile = document.createElement('canvas');
@@ -16647,12 +16730,17 @@ false 3 colorimage
             const minBytes = Math.round(effectiveMinMB * 1024 * 1024);
             const maxBytes = Math.max(minBytes + 2048 * 1024, (maxMB || 30) * 1024 * 1024);
 
-            // Apply Anti-Banding Perceptual Dithering (No artificial noise artifacts)
+            // Apply Microstock Sharpening & Anti-Banding Dithering
             if (mimeType !== 'image/svg+xml' && mimeType !== 'application/postscript') {
+                if (w >= 1200) {
+                    applyCanvasMicrostockSharpen(targetCtx, w, h, 0.22);
+                }
                 applyAntiBandingDither(targetCtx, w, h);
             }
 
-            let quality = Math.max(0.7, Math.min(1.0, baseQuality / 100));
+            // For 4K commercial exports, force quality = 1.0 to guarantee 4:4:4 Chroma Subsampling
+            // (Chromium/Skia uses 4:2:0 subsampling when quality < 1.0, which halves color resolution and tears green/magenta diagonal lines)
+            let quality = (is4KOrAbove || baseQuality >= 95) ? 1.0 : Math.max(0.7, Math.min(1.0, baseQuality / 100));
             let blob = await exportCanvasToBlob(targetCanvas, mimeType, quality);
 
             if (mimeType === 'image/jpeg') {

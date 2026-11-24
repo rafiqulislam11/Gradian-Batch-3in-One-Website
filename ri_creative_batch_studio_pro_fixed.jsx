@@ -3137,6 +3137,13 @@ app.bringToFront();
                         doc.channels[doc.channels.length - 1].remove();
                     }
                 } catch (cleanErr) {}
+
+                // Commercial Microstock Crisp Edge Polish (Shutterstock / Adobe Stock / Freepik Grade)
+                try {
+                    if (doc.activeLayer && typeof doc.activeLayer.applyUnsharpMask === "function") {
+                        doc.activeLayer.applyUnsharpMask(50, 0.8, 0);
+                    }
+                } catch (usmErr) {}
             }
 
             try {

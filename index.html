@@ -1715,6 +1715,7 @@
                                     <option value="vertical">Cascading Vertical (90&deg;)</option>
                                     <option value="organic_swirl">Organic Dynamic Swirl</option>
                                     <option value="layered_curves">Multi-Tiered Arcs</option>
+                                    <option value="custom_rot">Custom Angle (Rotation System)</option>
                                 </select>
                             </div>
                         </div>
@@ -1809,13 +1810,64 @@
                             </div>
                         </div>
 
-                        <!-- Rotation -->
-                        <div>
-                            <div class="flex justify-between text-[9px] mb-0.5">
-                                <span class="studio-subtext">Pattern Rotation</span>
-                                <span id="valFlowRotation" class="font-mono font-bold studio-accent-text">0&deg;</span>
+                        <!-- Pattern Rotation System -->
+                        <div class="p-2.5 rounded-xl bg-sky-500/5 dark:bg-sky-400/5 border border-sky-500/20 space-y-2 mt-1">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1.5">
+                                    <span id="iconFlowRotationCompass" class="text-xs inline-block transition-transform duration-150" style="transform: rotate(0deg);">🧭</span>
+                                    <span class="text-[9px] font-bold uppercase tracking-wider studio-heading">Pattern Rotation System</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span id="valFlowRotationBadge" class="text-[9px] font-mono font-bold text-sky-400 bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20">0° (Horizontal)</span>
+                                    <div class="flex items-center border rounded px-1 py-0.5 bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10">
+                                        <input id="numFlowRotation" type="number" min="0" max="360" value="0" class="w-10 bg-transparent text-[10px] font-mono text-right focus:outline-none" title="Direct Degree Input (0-360°)">
+                                        <span class="text-[10px] text-slate-400 font-bold ml-0.5">°</span>
+                                    </div>
+                                </div>
                             </div>
-                            <input id="rngFlowRotation" type="range" min="0" max="360" value="0" class="w-full">
+
+                            <!-- 360° Continuous Slider with Scale Ticks -->
+                            <div>
+                                <div class="flex justify-between text-[9px] mb-0.5">
+                                    <span class="studio-subtext">360° Angle Dial</span>
+                                    <span id="valFlowRotation" class="font-mono font-bold studio-accent-text">0°</span>
+                                </div>
+                                <input id="rngFlowRotation" type="range" min="0" max="360" value="0" class="w-full">
+                                <div class="flex justify-between text-[8px] font-mono text-slate-400 px-0.5">
+                                    <span>0°</span>
+                                    <span>45°</span>
+                                    <span>90°</span>
+                                    <span>135°</span>
+                                    <span>180°</span>
+                                    <span>225°</span>
+                                    <span>270°</span>
+                                    <span>315°</span>
+                                    <span>360°</span>
+                                </div>
+                            </div>
+
+                            <!-- Quick Preset Angle Buttons -->
+                            <div>
+                                <label class="text-[8px] font-bold uppercase tracking-wider studio-subtext block mb-1">Quick Angle Presets:</label>
+                                <div class="grid grid-cols-6 gap-1" id="gridFlowRotationPresets">
+                                    <button type="button" data-flow-rot="0" class="studio-btn active py-1 px-0.5 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="0° Horizontal Flow">0° Horiz</button>
+                                    <button type="button" data-flow-rot="32" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="32° Stock NW-SE Diagonal">32° Diag</button>
+                                    <button type="button" data-flow-rot="45" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="45° Diagonal Wave">45°</button>
+                                    <button type="button" data-flow-rot="90" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="90° Cascading Vertical">90° Vert</button>
+                                    <button type="button" data-flow-rot="180" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="180° Inverted Horizontal">180°</button>
+                                    <button type="button" data-flow-rot="270" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold text-center hover:border-sky-400 transition" title="270° Reverse Vertical">270°</button>
+                                </div>
+                            </div>
+
+                            <!-- Rotation Stepping & Mirror/Flip Actions -->
+                            <div class="grid grid-cols-6 gap-1 pt-1 border-t border-black/5 dark:border-white/5">
+                                <button type="button" id="btnFlowRotMinus90" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold truncate hover:border-sky-400 transition" title="Rotate Left 90°">↺ -90°</button>
+                                <button type="button" id="btnFlowRotPlus90" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold truncate hover:border-sky-400 transition" title="Rotate Right 90°">↻ +90°</button>
+                                <button type="button" id="btnFlowRotMinus15" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold truncate hover:border-sky-400 transition" title="Nudge Left 15°">↺ -15°</button>
+                                <button type="button" id="btnFlowRotPlus15" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold truncate hover:border-sky-400 transition" title="Nudge Right 15°">↻ +15°</button>
+                                <button type="button" id="btnFlowFlipH" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold truncate hover:border-sky-400 transition" title="Flip Horizontal (Mirror X)">⇄ Flip H</button>
+                                <button type="button" id="btnFlowFlipV" class="studio-btn py-1 px-0.5 rounded border text-[9px] font-semibold truncate hover:border-sky-400 transition" title="Flip Vertical (Invert Waves)">⇅ Flip V</button>
+                            </div>
                         </div>
                     </div>
 
@@ -3062,6 +3114,13 @@
                         </div>
                         <input id="rngGeoOpacity" type="range" min="0" max="100" value="28" class="w-full">
                     </div>
+                    <div class="col-span-2 pt-1 border-t border-black/5 dark:border-white/5">
+                        <div class="flex justify-between text-[10px] mb-0.5">
+                            <span class="studio-label">Pattern Rotation</span>
+                            <span id="valGeoRotation" class="studio-accent-text font-semibold">0°</span>
+                        </div>
+                        <input id="rngGeoRotation" type="range" min="0" max="360" value="0" class="w-full">
+                    </div>
                 </div>
             </div>
             </div>
@@ -3857,6 +3916,8 @@
             flowGrain: 10,
             flowScale: 100,
             flowRotation: 0,
+            flowFlipH: false,
+            flowFlipV: false,
             flowSeed: 12345,
             flowExportRes: '3840x2160',
             flowCustomW: 3840,
@@ -3903,6 +3964,7 @@
             geoBlend: "overlay",
             geoDensity: 24,
             geoOpacity: 28,
+            geoRotation: 0,
             lightEnable: false,
             lightFlare: 30,
             lightBokeh: 25,
@@ -5879,7 +5941,7 @@
             targetCtx.fillStyle = bgGrad;
             targetCtx.fillRect(0, 0, width, height);
 
-            // 2. Determine Primary Flow Angle
+            // 2. Determine Primary Flow Angle & 360° Rotation System
             let baseAngleDeg = 32;
             const dirMode = options.direction || preset.defaultDirection || 'diagonal_nw_se';
             if (dirMode === 'diagonal_ne_sw') baseAngleDeg = -32;
@@ -5887,14 +5949,18 @@
             else if (dirMode === 'vertical') baseAngleDeg = 90;
             else if (dirMode === 'organic_swirl') baseAngleDeg = 20;
             else if (dirMode === 'layered_curves') baseAngleDeg = 15;
+            else if (dirMode === 'custom_rot') baseAngleDeg = 0;
 
             const totalAngleRad = ((baseAngleDeg + userRotDeg) * Math.PI) / 180;
-            const diag = Math.hypot(width, height) * 1.35;
+            const diag = Math.hypot(width, height) * 1.65;
             const spanX = diag * scaleFactor;
-            const spanY = diag * 0.85 * scaleFactor;
+            const spanY = diag * 1.25 * scaleFactor;
 
             targetCtx.translate(width / 2, height / 2);
             targetCtx.rotate(totalAngleRad);
+            if (options.flipH || options.flipV) {
+                targetCtx.scale(options.flipH ? -1 : 1, options.flipV ? -1 : 1);
+            }
 
             // 3. Multi-Pass Ribbon Generation (Back-to-Front)
             const numRibbons = density;
@@ -6972,6 +7038,8 @@
                     grain: state.flowGrain,
                     scale: state.flowScale,
                     rotation: state.flowRotation,
+                    flipH: state.flowFlipH,
+                    flipV: state.flowFlipV,
                     seed: state.flowSeed
                 });
 
@@ -8793,6 +8861,8 @@
                         grain: state.flowGrain,
                         scale: state.flowScale,
                         rotation: state.flowRotation,
+                        flipH: state.flowFlipH,
+                        flipV: state.flowFlipV,
                         seed: state.flowSeed
                     });
                     targetCtx.save();
@@ -8815,6 +8885,12 @@
                     targetCtx.globalCompositeOperation = state.geoBlend || layer.blend;
                     targetCtx.strokeStyle = `rgba(255, 255, 255, 0.65)`;
                     targetCtx.lineWidth = Math.max(1.2, width * 0.0012);
+
+                    if (state.geoRotation) {
+                        targetCtx.translate(width / 2, height / 2);
+                        targetCtx.rotate((state.geoRotation * Math.PI) / 180);
+                        targetCtx.translate(-width / 2, -height / 2);
+                    }
 
                     if (gType === 'concentric') {
                         const maxR = Math.hypot(width, height) * 0.55;
@@ -9296,6 +9372,41 @@
             setTxt('valFlowGrain', (state.flowGrain || 10) + '%');
             setTxt('valFlowScale', (state.flowScale || 100) + '%');
             setTxt('valFlowRotation', (state.flowRotation || 0) + '°');
+            const numRotEl = document.getElementById('numFlowRotation');
+            if (numRotEl && document.activeElement !== numRotEl) numRotEl.value = (state.flowRotation || 0);
+            const rotCompass = document.getElementById('iconFlowRotationCompass');
+            if (rotCompass) rotCompass.style.transform = `rotate(${state.flowRotation || 0}deg)`;
+            const rotBadge = document.getElementById('valFlowRotationBadge');
+            if (rotBadge) {
+                const rotVal = ((state.flowRotation || 0) % 360 + 360) % 360;
+                let desc = `${rotVal}°`;
+                if (rotVal === 0) desc = '0° (Horizontal)';
+                else if (rotVal === 32) desc = '32° (Diag NW)';
+                else if (rotVal === 45) desc = '45° (Diagonal)';
+                else if (rotVal === 90) desc = '90° (Vertical)';
+                else if (rotVal === 180) desc = '180° (Inverted)';
+                else if (rotVal === 270) desc = '270° (Rev-Vert)';
+                rotBadge.textContent = desc;
+            }
+            document.querySelectorAll('[data-flow-rot]').forEach(btn => {
+                const btnRot = parseInt(btn.getAttribute('data-flow-rot'), 10);
+                const isActive = ((state.flowRotation || 0) % 360 + 360) % 360 === btnRot;
+                btn.classList.toggle('active', isActive);
+                btn.classList.toggle('border-sky-400', isActive);
+                btn.classList.toggle('bg-sky-500/20', isActive);
+            });
+            const flipHBtn = document.getElementById('btnFlowFlipH');
+            if (flipHBtn) {
+                flipHBtn.classList.toggle('active', !!state.flowFlipH);
+                flipHBtn.classList.toggle('border-sky-400', !!state.flowFlipH);
+                flipHBtn.classList.toggle('bg-sky-500/20', !!state.flowFlipH);
+            }
+            const flipVBtn = document.getElementById('btnFlowFlipV');
+            if (flipVBtn) {
+                flipVBtn.classList.toggle('active', !!state.flowFlipV);
+                flipVBtn.classList.toggle('border-sky-400', !!state.flowFlipV);
+                flipVBtn.classList.toggle('bg-sky-500/20', !!state.flowFlipV);
+            }
             setTxt('valGlassShapeX', (state.glassShapeX ?? 50) + '%');
             setTxt('valGlassShapeY', (state.glassShapeY ?? 50) + '%');
             setTxt('valGlassShapeScale', (state.glassShapeScale ?? 65) + '%');
@@ -9308,10 +9419,15 @@
             setTxt('valGlassShapeShadow', (state.glassShapeShadow ?? 70) + '%');
             setTxt('valGlassShapeNeon', (state.glassShapeNeon ?? 0) + '%');
             setTxt('valGlassShapeTintOpacity', (state.glassShapeTintOpacity ?? 15) + '%');
-            const shapeInfo = GLASS_SHAPES_INFO[state.glassShapeType || 'frosted'];
-            setTxt('lblActiveGlassShape', shapeInfo ? `${shapeInfo.icon} ${shapeInfo.name}` : state.glassShapeType);
+            if (state.glassShapeEnable) {
+                const shapeInfo = GLASS_SHAPES_INFO[state.glassShapeType || 'frosted'];
+                setTxt('lblActiveGlassShape', shapeInfo ? `${shapeInfo.icon} ${shapeInfo.name}` : state.glassShapeType);
+            } else {
+                setTxt('lblActiveGlassShape', 'None (Off)');
+            }
             setTxt('valGeoDensity', state.geoDensity);
             setTxt('valGeoOpacity', state.geoOpacity + '%');
+            setTxt('valGeoRotation', (state.geoRotation || 0) + '°');
             setTxt('valLightFlare', state.lightFlare + '%');
             setTxt('valLightBokeh', state.lightBokeh + '%');
             setTxt('valLightGlow', state.lightGlow + '%');
@@ -9514,6 +9630,8 @@
             setVal('rngFlowGrain', state.flowGrain || 10);
             setVal('rngFlowScale', state.flowScale || 100);
             setVal('rngFlowRotation', state.flowRotation || 0);
+            setVal('numFlowRotation', state.flowRotation || 0);
+            setVal('rngGeoRotation', state.geoRotation || 0);
             const flowModeBgBtn = document.getElementById('btnFlowModeBackground');
             const flowModeOvBtn = document.getElementById('btnFlowModeOverlay');
             if (flowModeBgBtn && flowModeOvBtn) {
@@ -10249,8 +10367,83 @@
         bindInput('rngFlowGrain', 'change', () => pushHistory());
         bindInput('rngFlowScale', 'input', (e) => { state.flowScale = parseInt(e.target.value, 10); triggerRedraw(true); });
         bindInput('rngFlowScale', 'change', () => pushHistory());
-        bindInput('rngFlowRotation', 'input', (e) => { state.flowRotation = parseInt(e.target.value, 10); triggerRedraw(true); });
+        // Pattern Rotation System Handlers
+        bindInput('rngFlowRotation', 'input', (e) => {
+            state.flowRotation = parseInt(e.target.value, 10);
+            updateLiveUiLabels();
+            triggerRedraw(true);
+        });
         bindInput('rngFlowRotation', 'change', () => pushHistory());
+
+        bindInput('numFlowRotation', 'input', (e) => {
+            let val = parseInt(e.target.value, 10);
+            if (isNaN(val)) val = 0;
+            val = ((val % 360) + 360) % 360;
+            state.flowRotation = val;
+            const rng = document.getElementById('rngFlowRotation');
+            if (rng) rng.value = val;
+            updateLiveUiLabels();
+            triggerRedraw(true);
+        });
+        bindInput('numFlowRotation', 'change', () => pushHistory());
+
+        // Quick Preset Angle Buttons (0°, 32°, 45°, 90°, 180°, 270°)
+        document.querySelectorAll('[data-flow-rot]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetRot = parseInt(btn.getAttribute('data-flow-rot'), 10);
+                state.flowRotation = targetRot;
+                syncUIFromState();
+                updateLiveUiLabels();
+                triggerRedraw();
+                if (typeof showToast === 'function') {
+                    showToast('Pattern Rotation Set', `Angle: ${targetRot}°`);
+                }
+            });
+        });
+
+        // Stepping & Transformation Controls
+        bindInput('btnFlowRotMinus90', 'click', () => {
+            state.flowRotation = ((state.flowRotation || 0) - 90 + 360) % 360;
+            syncUIFromState();
+            updateLiveUiLabels();
+            triggerRedraw();
+        });
+        bindInput('btnFlowRotPlus90', 'click', () => {
+            state.flowRotation = ((state.flowRotation || 0) + 90) % 360;
+            syncUIFromState();
+            updateLiveUiLabels();
+            triggerRedraw();
+        });
+        bindInput('btnFlowRotMinus15', 'click', () => {
+            state.flowRotation = ((state.flowRotation || 0) - 15 + 360) % 360;
+            syncUIFromState();
+            updateLiveUiLabels();
+            triggerRedraw();
+        });
+        bindInput('btnFlowRotPlus15', 'click', () => {
+            state.flowRotation = ((state.flowRotation || 0) + 15) % 360;
+            syncUIFromState();
+            updateLiveUiLabels();
+            triggerRedraw();
+        });
+        bindInput('btnFlowFlipH', 'click', () => {
+            state.flowFlipH = !state.flowFlipH;
+            syncUIFromState();
+            updateLiveUiLabels();
+            triggerRedraw();
+            if (typeof showToast === 'function') {
+                showToast('Flip Horizontal', state.flowFlipH ? 'Pattern mirrored horizontally' : 'Horizontal mirror off');
+            }
+        });
+        bindInput('btnFlowFlipV', 'click', () => {
+            state.flowFlipV = !state.flowFlipV;
+            syncUIFromState();
+            updateLiveUiLabels();
+            triggerRedraw();
+            if (typeof showToast === 'function') {
+                showToast('Flip Vertical', state.flowFlipV ? 'Waves inverted vertically' : 'Vertical inversion off');
+            }
+        });
 
         // Random Pattern Generator
         const randomizeFlowPattern = () => {
@@ -10285,6 +10478,8 @@
             state.flowGrain = pDef.grain ?? 10;
             state.flowScale = 100;
             state.flowRotation = 0;
+            state.flowFlipH = false;
+            state.flowFlipV = false;
             state.flowColorPreset = 'default';
             state.flowBgColor = pDef.bg ? pDef.bg[0] : '#090a0f';
             syncUIFromState();
@@ -10336,6 +10531,8 @@
                     grain: state.flowGrain,
                     scale: state.flowScale,
                     rotation: state.flowRotation,
+                    flipH: state.flowFlipH,
+                    flipV: state.flowFlipV,
                     seed: state.flowSeed
                 });
                 localStorage.setItem('ri_flow_custom_presets_v1', JSON.stringify(list));
@@ -10426,6 +10623,8 @@
                     grain: state.flowGrain,
                     scale: state.flowScale,
                     rotation: state.flowRotation + (idx === 0 ? 0 : (idx * 15)),
+                    flipH: state.flowFlipH,
+                    flipV: state.flowFlipV,
                     seed: candidateSeed
                 });
 
@@ -10523,6 +10722,8 @@
                 grain: state.flowGrain,
                 scale: state.flowScale,
                 rotation: state.flowRotation,
+                flipH: state.flowFlipH,
+                flipV: state.flowFlipV,
                 seed: state.flowSeed
             });
 
@@ -10596,6 +10797,8 @@
                         grain: state.flowGrain,
                         scale: state.flowScale,
                         rotation: (state.flowRotation + i * 15) % 360,
+                        flipH: state.flowFlipH,
+                        flipV: state.flowFlipV,
                         seed: vSeed
                     });
 
@@ -10647,6 +10850,8 @@
         bindInput('rngGeoDensity', 'change', () => pushHistory());
         bindInput('rngGeoOpacity', 'input', (e) => { state.geoOpacity = parseInt(e.target.value, 10); triggerRedraw(true); });
         bindInput('rngGeoOpacity', 'change', () => pushHistory());
+        bindInput('rngGeoRotation', 'input', (e) => { state.geoRotation = parseInt(e.target.value, 10); triggerRedraw(true); });
+        bindInput('rngGeoRotation', 'change', () => pushHistory());
 
         bindInput('chkLightEnable', 'change', (e) => {
             state.lightEnable = e.target.checked;

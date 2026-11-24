@@ -1937,14 +1937,84 @@ app.bringToFront();
                 badgeText.graphics.font = ScriptUI.newFont("Arial", "REGULAR", 10);
             } catch (fontErr2) {}
 
-            var tabPanel = win.add("tabbedpanel");
-            tabPanel.alignChildren = ["fill", "fill"];
-            tabPanel.preferredSize = [530, 280];
+            var useNativeTabs = false;
+            var tabPanel = null;
+
+            if (!IS_CS2) {
+                try {
+                    tabPanel = win.add("tabbedpanel");
+                    if (tabPanel && typeof tabPanel.add === "function") {
+                        tabPanel.alignChildren = ["fill", "fill"];
+                        tabPanel.preferredSize = [530, 285];
+                        useNativeTabs = true;
+                    }
+                } catch (eTab) {
+                    useNativeTabs = false;
+                    tabPanel = null;
+                }
+            }
+
+            var tabSetup, tabEffects, tabGlass, tabCreative;
+
+            if (useNativeTabs && tabPanel) {
+                tabSetup = tabPanel.add("tab", undefined, "1. Folders & Export");
+                tabEffects = tabPanel.add("tab", undefined, "2. Blur & Noise");
+                tabGlass = tabPanel.add("tab", undefined, "3. 3D Glass Studio");
+                tabCreative = tabPanel.add("tab", undefined, "4. Gradient & Light");
+            } else {
+                // Adobe Photoshop CS2 (v9.0 / 9.0.2) Native Section Switcher (ScriptUI 1.0)
+                var navRow = win.add("group");
+                navRow.orientation = "row";
+                navRow.alignChildren = ["left", "center"];
+                navRow.spacing = 8;
+                var navLabel = navRow.add("statictext", undefined, "Studio Section:");
+                try {
+                    if (typeof ScriptUI !== "undefined" && typeof ScriptUI.newFont === "function") {
+                        navLabel.graphics.font = ScriptUI.newFont("Arial", "BOLD", 11);
+                    }
+                } catch (eF) {}
+
+                var ddSection = navRow.add("dropdownlist", undefined, [
+                    "1. Folders, Resolution & Export",
+                    "2. Blur & Film Grain Noise",
+                    "3. 3D Glass Studio",
+                    "4. Creative Gradient & Light"
+                ]);
+                ddSection.selection = 0;
+                ddSection.preferredSize = [300, 22];
+
+                var contentBox = win.add("group");
+                contentBox.orientation = "column";
+                contentBox.alignChildren = ["fill", "top"];
+                contentBox.preferredSize = [530, 285];
+
+                tabSetup = contentBox.add("panel", undefined, "1. Folders & Export");
+                tabEffects = contentBox.add("panel", undefined, "2. Blur & Noise");
+                tabGlass = contentBox.add("panel", undefined, "3. 3D Glass Studio");
+                tabCreative = contentBox.add("panel", undefined, "4. Gradient & Light");
+
+                tabSetup.preferredSize = [520, 275];
+                tabEffects.preferredSize = [520, 275];
+                tabGlass.preferredSize = [520, 275];
+                tabCreative.preferredSize = [520, 275];
+
+                tabEffects.visible = false;
+                tabGlass.visible = false;
+                tabCreative.visible = false;
+
+                ddSection.onChange = function () {
+                    var idx = ddSection.selection ? ddSection.selection.index : 0;
+                    tabSetup.visible = (idx === 0);
+                    tabEffects.visible = (idx === 1);
+                    tabGlass.visible = (idx === 2);
+                    tabCreative.visible = (idx === 3);
+                    win.layout.layout(true);
+                };
+            }
 
             // --------------------------------------------------------------------
-            // TAB 1: FOLDERS, RESOLUTION & EXPORT
+            // SECTION 1: FOLDERS, RESOLUTION & EXPORT
             // --------------------------------------------------------------------
-            var tabSetup = tabPanel.add("tab", undefined, "1. Folders & Export");
             tabSetup.orientation = "column";
             tabSetup.alignChildren = ["fill", "top"];
             tabSetup.spacing = 7;
@@ -2038,7 +2108,7 @@ app.bringToFront();
             // --------------------------------------------------------------------
             // TAB 2: BLUR & NOISE / FILM GRAIN
             // --------------------------------------------------------------------
-            var tabEffects = tabPanel.add("tab", undefined, "2. Blur & Noise");
+            // Section 2 setup
             tabEffects.orientation = "column";
             tabEffects.alignChildren = ["fill", "top"];
             tabEffects.spacing = 8;
@@ -2111,7 +2181,7 @@ app.bringToFront();
             // --------------------------------------------------------------------
             // TAB 3: 3D GLASS EFFECT STUDIO (NEW DEDICATED TAB)
             // --------------------------------------------------------------------
-            var tabGlass = tabPanel.add("tab", undefined, "3. 3D Glass Studio");
+            // Section 3 setup
             tabGlass.orientation = "column";
             tabGlass.alignChildren = ["fill", "top"];
             tabGlass.spacing = 8;
@@ -2179,7 +2249,7 @@ app.bringToFront();
             // --------------------------------------------------------------------
             // TAB 4: CREATIVE GRADIENT, LIGHTING & LIQUIFY
             // --------------------------------------------------------------------
-            var tabCreative = tabPanel.add("tab", undefined, "4. Gradient & Light");
+            // Section 4 setup
             tabCreative.orientation = "column";
             tabCreative.alignChildren = ["fill", "top"];
             tabCreative.spacing = 7;
@@ -2243,7 +2313,9 @@ app.bringToFront();
             ddLiqStyle.selection = 0;
             ddLiqStyle.preferredSize = [200, 21];
 
-            tabPanel.selection = tabSetup;
+            if (useNativeTabs && tabPanel) {
+                try { tabPanel.selection = tabSetup; } catch (eSel) {}
+            }
 
             // --------------------------------------------------------------------
             // COMPACT PROGRESS & TELEMETRY BAR

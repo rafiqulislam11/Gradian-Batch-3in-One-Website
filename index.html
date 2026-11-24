@@ -131,7 +131,7 @@
             border-color: var(--accent-main);
         }
         /* --- ALL-DEVICE RESPONSIVE SUITE: MOBILE, TABLET, LAPTOP, DESKTOP (100% PRO DESKTOP) --- */
-        /* Safe Area Insets for Mobile Notches & Home Bars */
+        /* Safe Area Insets for Modern Mobile Displays, Notches & Dynamic Islands */
         :root {
             --sat: env(safe-area-inset-top, 0px);
             --sab: env(safe-area-inset-bottom, 0px);
@@ -143,24 +143,32 @@
             padding-bottom: var(--sab);
             padding-left: var(--sal);
             padding-right: var(--sar);
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Touch Device Optimizations */
-        @media (pointer: coarse) {
+        /* Touch Device & Mobile Ergonomic Enhancements */
+        @media (pointer: coarse), (max-width: 1023px) {
             input[type="range"] {
-                height: 28px;
+                height: 32px;
+                padding: 4px 0;
             }
             input[type="range"]::-webkit-slider-thumb {
-                width: 22px;
-                height: 22px;
+                width: 24px;
+                height: 24px;
                 border-radius: 50%;
+                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
             }
             .studio-btn, .tab-btn, button, select {
-                min-height: 34px;
+                min-height: 38px;
+            }
+            /* Smooth touch micro-interactions */
+            button:active:not(:disabled), .studio-btn:active:not(:disabled), .tab-btn:active:not(:disabled) {
+                transform: scale(0.97);
+                transition: transform 0.08s ease;
             }
         }
 
-        /* Desktop & Laptop Collapsible Sidebars */
+        /* Desktop & Laptop Collapsible Sidebars with Smooth Spring Physics */
         #studioSidebar, #studioRightSidebar {
             transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.25s, max-width 0.25s, padding 0.25s, opacity 0.2s;
         }
@@ -199,7 +207,7 @@
         }
 
         /* =========================================================================
-           100% PRO DESKTOP RESPONSIVE ENGINE (1024px, 1280px, 1366px, 1440px, 1600px, 1920px FHD, 2560px QHD, 3840px 4K)
+           1. DESKTOP & WORKSTATION RESPONSIVE ENGINE (>= 1024px: Laptops, FHD, 2K QHD, 4K UHD)
            ========================================================================= */
         @media (min-width: 1024px) {
             body {
@@ -232,9 +240,9 @@
             /* Left Sidebar: Tools & 8 Creative Engines */
             #studioSidebar {
                 display: block !important;
-                width: 320px !important;
+                width: 325px !important;
                 min-width: 300px !important;
-                max-width: 340px !important;
+                max-width: 350px !important;
                 flex-shrink: 0 !important;
                 border-right-width: 1px !important;
                 border-bottom-width: 0 !important;
@@ -244,9 +252,9 @@
             /* Right Sidebar: Inspector, Layers, Masks, Curves, Stock QC */
             #studioRightSidebar {
                 display: block !important;
-                width: 300px !important;
-                min-width: 280px !important;
-                max-width: 320px !important;
+                width: 310px !important;
+                min-width: 290px !important;
+                max-width: 330px !important;
                 flex-shrink: 0 !important;
                 border-left-width: 1px !important;
                 border-top-width: 0 !important;
@@ -301,8 +309,8 @@
             }
         }
 
-        /* Standard Laptop & Compact Desktop (1024px to 1535px) */
-        @media (min-width: 1024px) and (max-width: 1535px) {
+        /* Compact Laptops & Medium Screens (1024px to 1439px) */
+        @media (min-width: 1024px) and (max-width: 1439px) {
             #studioHeader {
                 padding-left: 0.75rem !important;
                 padding-right: 0.75rem !important;
@@ -324,30 +332,30 @@
             }
         }
 
-        /* Large Full HD Desktop (1920x1080) */
+        /* Full HD Desktops (1920x1080) */
         @media (min-width: 1920px) {
             #studioSidebar {
-                width: 350px !important;
-                min-width: 350px !important;
+                width: 355px !important;
+                min-width: 355px !important;
             }
             #studioRightSidebar {
-                width: 330px !important;
-                min-width: 330px !important;
+                width: 335px !important;
+                min-width: 335px !important;
             }
             #canvasTopToolbar, #canvasWrapper, #qcDiagnosticBar {
                 max-width: 1680px !important;
             }
         }
 
-        /* 2K QHD & 4K UHD Desktop (2560px+) */
+        /* 2K QHD & 4K UHD Ultra-Wide Displays (2560px+) */
         @media (min-width: 2560px) {
             #studioSidebar {
-                width: 380px !important;
-                min-width: 380px !important;
+                width: 390px !important;
+                min-width: 390px !important;
             }
             #studioRightSidebar {
-                width: 360px !important;
-                min-width: 360px !important;
+                width: 370px !important;
+                min-width: 370px !important;
             }
             #canvasTopToolbar, #canvasWrapper, #qcDiagnosticBar {
                 max-width: 2200px !important;
@@ -358,8 +366,49 @@
             }
         }
 
-        /* Mobile Viewports (< 1024px) Switcher Logic */
+        /* =========================================================================
+           2. MOBILE & TABLET RESPONSIVE SUITE (< 1024px: Phones, Phablets, iPads, Android Tablets)
+           ========================================================================= */
         @media (max-width: 1023px) {
+            /* Smooth Horizontal Scroll for Header Actions: Zero Clipping on Mobile */
+            #studioHeader {
+                height: 3.25rem !important;
+                min-height: 3.25rem !important;
+                padding: 0.25rem 0.5rem !important;
+                gap: 0.35rem !important;
+            }
+            #studioHeaderActions {
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-x !important;
+                max-width: calc(100vw - 105px) !important;
+                padding-right: 0.25rem !important;
+            }
+            #studioHeaderActions::-webkit-scrollbar {
+                display: none !important;
+            }
+            #studioHeaderActions > * {
+                flex-shrink: 0 !important;
+            }
+
+            /* Responsive 4-Tab Mobile Navigation Bar */
+            #mobileWorkspaceNav {
+                display: grid !important;
+                height: 3.25rem !important;
+                min-height: 3.25rem !important;
+                padding: 0.25rem 0.35rem !important;
+                gap: 0.25rem !important;
+            }
+            #mobileWorkspaceNav button {
+                min-height: 2.75rem !important;
+                touch-action: manipulation !important;
+                border-radius: 0.5rem !important;
+            }
+
+            /* Viewport Switching Architecture */
             body.mobile-view-preview #studioSidebar,
             body.mobile-view-preview #studioRightSidebar,
             body.mobile-view-preview #studioBottomDock {
@@ -374,7 +423,10 @@
                 display: block !important;
                 width: 100% !important;
                 height: 100% !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
                 border-right: none !important;
+                padding: 0.75rem 0.75rem 5.5rem 0.75rem !important;
             }
             body.mobile-view-layers #studioMain,
             body.mobile-view-layers #studioSidebar,
@@ -385,7 +437,10 @@
                 display: block !important;
                 width: 100% !important;
                 height: 100% !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
                 border-left: none !important;
+                padding: 0.75rem 0.75rem 5.5rem 0.75rem !important;
             }
             body.mobile-view-logs #studioMain,
             body.mobile-view-logs #studioSidebar,
@@ -394,42 +449,106 @@
             }
             body.mobile-view-logs #studioBottomDock {
                 display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
                 height: 100% !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
                 border-top: none !important;
+                padding: 0.75rem 0.75rem 3.5rem 0.75rem !important;
             }
 
-            /* Floating Picture-in-Picture (PiP) on Mobile */
+            /* Preview Mode on Mobile Viewports */
+            body.mobile-view-preview #studioMain {
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                height: 100% !important;
+                padding: 0.35rem 0.5rem !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                overflow: hidden !important;
+            }
+
+            /* Floating Picture-in-Picture (PiP) Live Thumbnail */
             body.mobile-view-tools #mobilePipPreview,
             body.mobile-view-layers #mobilePipPreview {
                 display: flex !important;
+                bottom: calc(1rem + var(--sab)) !important;
+                right: calc(1rem + var(--sar)) !important;
+            }
+
+            /* Toolbars on Mobile & Tablet */
+            #canvasTopToolbar {
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                scrollbar-width: none !important;
+                -webkit-overflow-scrolling: touch !important;
+                padding-bottom: 2px !important;
+            }
+            #canvasTopToolbar::-webkit-scrollbar {
+                display: none !important;
+            }
+            #qcDiagnosticBar {
+                padding: 0.25rem 0.5rem !important;
+                font-size: 0.625rem !important;
+                overflow-x: auto !important;
+                scrollbar-width: none !important;
+                white-space: nowrap !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            #qcDiagnosticBar::-webkit-scrollbar {
+                display: none !important;
+            }
+
+            /* Horizontal Scrollable Tabs on Mobile */
+            #leftPanelTabBarContainer {
+                overflow-x: auto !important;
+                scrollbar-width: none !important;
+                -webkit-overflow-scrolling: touch !important;
+                white-space: nowrap !important;
+                padding-bottom: 2px !important;
+            }
+            #leftPanelTabBarContainer::-webkit-scrollbar {
+                display: none !important;
             }
         }
 
-        /* Mobile Phone Screens (< 640px) Sizing & Overflow */
+        /* Mobile Phones Only (< 640px) Detailed Tweaks */
         @media (max-width: 639px) {
             #studioHeader {
                 min-height: 3rem !important;
-                padding-top: 0.35rem !important;
-                padding-bottom: 0.35rem !important;
-                padding-left: 0.5rem !important;
-                padding-right: 0.5rem !important;
+                height: 3rem !important;
+                padding: 0.2rem 0.4rem !important;
+            }
+            #studioTitle {
+                font-size: 0.75rem !important;
             }
             #canvasWrapper {
                 height: auto !important;
                 flex: 1 1 0% !important;
-                min-height: 200px !important;
+                min-height: 180px !important;
                 max-height: none !important;
                 margin-top: 0.25rem !important;
                 margin-bottom: 0.25rem !important;
+                border-radius: 0.75rem !important;
             }
             #studioMain {
-                padding: 0.5rem !important;
+                padding: 0.35rem !important;
             }
-            #qcDiagnosticBar {
-                padding: 0.35rem 0.5rem !important;
+            #btnDownloadSingle, #btnRunBatch {
+                padding: 0.35rem 0.65rem !important;
+                font-size: 0.75rem !important;
+                font-weight: 700 !important;
+            }
+            /* Dialog Modals Mobile Fit */
+            .studio-card.max-w-2xl, .studio-card.max-w-xl {
+                max-height: 90dvh !important;
+                width: 95vw !important;
+                border-radius: 1rem !important;
             }
         }
-    
+        
         /* Professional Liquify Studio Pro Styling */
         .liq-tool-btn {
             background-color: rgba(255, 255, 255, 0.04);
@@ -474,7 +593,7 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-1 sm:gap-1.5 flex-nowrap justify-end shrink-0">
+        <div id="studioHeaderActions" class="flex items-center gap-1 sm:gap-1.5 flex-nowrap justify-end shrink-0">
             <!-- Desktop / Laptop Workspace Column Collapse Toggles (Hidden on Mobile) -->
             <div class="hidden lg:flex items-center gap-1 border-r border-black/10 dark:border-white/10 pr-1.5 mr-0.5 shrink-0">
                 <button id="btnToggleLeftSidebar" type="button" class="studio-btn px-1.5 sm:px-2 py-1 rounded-lg border text-[11px] font-semibold transition" title="Toggle Left Panels (Ctrl+[)">

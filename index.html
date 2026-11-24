@@ -1724,22 +1724,92 @@
                         </div>
 
                         <!-- Optical Fluid Liquify Control -->
-                        <div class="pt-1.5 border-t border-black/10">
-                            <div class="flex justify-between text-[11px] mb-0.5">
+                        <div class="pt-2 border-t border-black/10 space-y-2">
+                            <div class="flex items-center justify-between text-[11px] mb-0.5">
                                 <label class="studio-check flex items-center gap-1.5 cursor-pointer">
                                     <input id="chkLiquifyEnable" type="checkbox">
-                                    <span>Optical Fluid Wave (Liquify)</span>
+                                    <span class="font-bold text-sky-500">Optical Fluid Wave (Liquify)</span>
                                 </label>
                                 <span id="valLiquify" class="studio-accent-text font-semibold">0%</span>
                             </div>
-                            <input id="rngLiquify" type="range" min="0" max="150" value="0" class="w-full">
-                            <button id="btnQuickLaunchLiquify" type="button"
-                                class="w-full mt-2 studio-btn py-1.5 px-2 rounded-lg text-[10px] font-bold text-sky-600 border flex items-center justify-center gap-1.5 hover:bg-sky-50 dark:hover:bg-sky-950/40 transition"
-                                title="Open Full Photoshop Liquify Studio with 24 Warp Tools">
-                                <span>🌊 Launch Full Liquify Studio Pro</span>
-                                <span
-                                    class="text-[8px] px-1 py-0.2 bg-black/5 dark:bg-white/10 rounded font-mono">Ctrl+Shift+X</span>
-                            </button>
+
+                            <!-- Warp Intensity Slider -->
+                            <div>
+                                <div class="flex justify-between text-[10px] text-slate-500 mb-0.5">
+                                    <span>Warp Intensity</span>
+                                    <span id="lblLiquifyStrength" class="font-mono text-sky-500 font-bold">0%</span>
+                                </div>
+                                <input id="rngLiquify" type="range" min="0" max="200" value="0" class="w-full">
+                            </div>
+
+                            <!-- Mode & Target Row -->
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <div>
+                                    <label class="studio-label text-[10px] block mb-0.5 font-bold">Warp Mode</label>
+                                    <select id="selLiquifyMode" class="studio-input w-full border rounded-md px-1 py-0.5 text-[10px] font-semibold">
+                                        <option value="organic_wave">🌊 Organic Wave</option>
+                                        <option value="vortex_twirl">🌀 Vortex Twirl</option>
+                                        <option value="spherical_bulge">🔮 3D Bulge Dome</option>
+                                        <option value="hourglass_body">⏳ Hourglass Taper</option>
+                                        <option value="facial_harmony">✨ Facial Harmony</option>
+                                        <option value="silk_marble">🎨 Silk Marble Flow</option>
+                                        <option value="radial_ripple">💧 Concentric Ripples</option>
+                                        <option value="perspective_tilt">📐 Perspective Tilt</option>
+                                        <option value="pucker_focus">🎯 Pucker Focus</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="studio-label text-[10px] block mb-0.5 font-bold">Target Element</label>
+                                    <select id="selLiquifyTarget" class="studio-input w-full border rounded-md px-1 py-0.5 text-[10px] font-semibold">
+                                        <option value="composite">Entire Canvas Composite</option>
+                                        <option value="panel_left">Left Panel Image</option>
+                                        <option value="panel_center">Center Panel Image</option>
+                                        <option value="panel_right">Right Panel Image</option>
+                                        <option value="background">Background &amp; Gradient</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Frequency & Angle Row -->
+                            <div class="grid grid-cols-2 gap-1.5 pt-1">
+                                <div>
+                                    <div class="flex justify-between text-[10px] text-slate-500 mb-0.5">
+                                        <span>Wave Frequency</span>
+                                        <span id="valLiquifyFreq" class="font-mono font-bold text-sky-500">3.5</span>
+                                    </div>
+                                    <input id="rngLiquifyFreq" type="range" min="0.5" max="20" step="0.5" value="3.5" class="w-full">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[10px] text-slate-500 mb-0.5">
+                                        <span>Flow Angle</span>
+                                        <span id="valLiquifyAngle" class="font-mono font-bold text-sky-500">0°</span>
+                                    </div>
+                                    <input id="rngLiquifyAngle" type="range" min="-180" max="180" step="5" value="0" class="w-full">
+                                </div>
+                            </div>
+
+                            <!-- Turbulence Slider -->
+                            <div>
+                                <div class="flex justify-between text-[10px] text-slate-500 mb-0.5">
+                                    <span>Wave Turbulence &amp; Harmonics</span>
+                                    <span id="valLiquifyTurbulence" class="font-mono font-bold text-sky-500">50%</span>
+                                </div>
+                                <input id="rngLiquifyTurbulence" type="range" min="0" max="100" value="50" class="w-full">
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex items-center gap-1.5 pt-1">
+                                <button id="btnResetLiquify" type="button"
+                                    class="studio-btn py-1 px-2 rounded-lg text-[10px] text-rose-500 border border-rose-300 dark:border-rose-900/40 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition shrink-0">
+                                    ↺ Reset
+                                </button>
+                                <button id="btnQuickLaunchLiquify" type="button"
+                                    class="flex-1 studio-btn py-1 px-2 rounded-lg text-[10px] font-bold text-sky-600 border border-sky-300 dark:border-sky-800 flex items-center justify-center gap-1 hover:bg-sky-50 dark:hover:bg-sky-950/40 transition"
+                                    title="Open Full Photoshop Liquify Studio with 24 Warp Tools">
+                                    <span>🌊 Full Liquify Studio Pro</span>
+                                    <span class="text-[8px] px-1 py-0.2 bg-black/5 dark:bg-white/10 rounded font-mono">Ctrl+Shift+X</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1794,35 +1864,55 @@
                             </select>
                         </div>
 
-                        <!-- Quick Warp Presets -->
-                        <div>
-                            <label class="studio-label text-[10px] block mb-1 font-bold">Quick Warp &amp; Distortion
-                                Presets</label>
-                            <div class="grid grid-cols-2 gap-1 text-[10px]">
-                                <button type="button" data-liquify-preset="organic_wave"
-                                    class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium">🌊
-                                    Organic Wave</button>
-                                <button type="button" data-liquify-preset="vortex_twirl"
-                                    class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium">🌀
-                                    Vortex Twirl</button>
-                                <button type="button" data-liquify-preset="spherical_bulge"
-                                    class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium">🔮 3D
-                                    Bulge Dome</button>
-                                <button type="button" data-liquify-preset="hourglass_body"
-                                    class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium">⏳
-                                    Hourglass Taper</button>
-                                <button type="button" data-liquify-preset="facial_harmony"
-                                    class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium">✨
-                                    Facial Harmony</button>
-                                <button type="button" data-liquify-preset="silk_marble"
-                                    class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium">🎨 Silk
-                                    Marble Flow</button>
-                                <button type="button" data-liquify-preset="perspective_tilt"
-                                    class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium">📐
-                                    Perspective Tilt</button>
-                                <button type="button" data-liquify-preset="pucker_focus"
-                                    class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium">🎯
-                                    Pucker Focus</button>
+                        <!-- Quick Warp Presets & Mode Selector -->
+                        <div class="space-y-2">
+                            <div>
+                                <label class="studio-label text-[10px] block mb-0.5 font-bold">Warp Mode / Style</label>
+                                <select id="selQuickLiquifyMode"
+                                    class="studio-input w-full border rounded-md px-1.5 py-1 text-[11px] font-semibold">
+                                    <option value="organic_wave">🌊 Organic Fluid Wave</option>
+                                    <option value="vortex_twirl">🌀 Vortex Twirl Flow</option>
+                                    <option value="spherical_bulge">🔮 3D Bulge Dome</option>
+                                    <option value="hourglass_body">⏳ Hourglass Taper</option>
+                                    <option value="facial_harmony">✨ Facial Harmony</option>
+                                    <option value="silk_marble">🎨 Silk Marble Flow</option>
+                                    <option value="radial_ripple">💧 Concentric Ripples</option>
+                                    <option value="perspective_tilt">📐 Perspective Tilt</option>
+                                    <option value="pucker_focus">🎯 Pucker Focus</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="studio-label text-[10px] block mb-1 font-bold">Quick Warp &amp; Distortion Presets</label>
+                                <div class="grid grid-cols-2 gap-1 text-[10px]">
+                                    <button type="button" data-liquify-preset="organic_wave"
+                                        class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium hover:border-sky-500">🌊
+                                        Organic Wave</button>
+                                    <button type="button" data-liquify-preset="vortex_twirl"
+                                        class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium hover:border-sky-500">🌀
+                                        Vortex Twirl</button>
+                                    <button type="button" data-liquify-preset="spherical_bulge"
+                                        class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium hover:border-sky-500">🔮 3D
+                                        Bulge Dome</button>
+                                    <button type="button" data-liquify-preset="hourglass_body"
+                                        class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium hover:border-sky-500">⏳
+                                        Hourglass Taper</button>
+                                    <button type="button" data-liquify-preset="facial_harmony"
+                                        class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium hover:border-sky-500">✨
+                                        Facial Harmony</button>
+                                    <button type="button" data-liquify-preset="silk_marble"
+                                        class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium hover:border-sky-500">🎨 Silk
+                                        Marble Flow</button>
+                                    <button type="button" data-liquify-preset="radial_ripple"
+                                        class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium hover:border-sky-500">💧
+                                        Concentric Ripples</button>
+                                    <button type="button" data-liquify-preset="perspective_tilt"
+                                        class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium hover:border-sky-500">📐
+                                        Perspective Tilt</button>
+                                    <button type="button" data-liquify-preset="pucker_focus"
+                                        class="studio-btn py-1 px-1.5 rounded border text-left truncate font-medium hover:border-sky-500 col-span-2">🎯
+                                        Pucker Focus</button>
+                                </div>
                             </div>
                         </div>
 
@@ -1839,10 +1929,10 @@
                             </div>
                             <div>
                                 <div class="flex justify-between text-[11px] mb-0.5">
-                                    <span class="studio-label">Wave Frequency &amp; Turbulence</span>
+                                    <span class="studio-label">Wave Frequency &amp; Density</span>
                                     <span id="valPanelLiquifyFreq" class="studio-accent-text font-semibold">3.5</span>
                                 </div>
-                                <input id="rngPanelLiquifyFreq" type="range" min="1" max="15" step="0.5" value="3.5"
+                                <input id="rngPanelLiquifyFreq" type="range" min="0.5" max="20" step="0.5" value="3.5"
                                     class="w-full">
                             </div>
                             <div>
@@ -1851,7 +1941,16 @@
                                     <span id="valPanelLiquifyAngle"
                                         class="studio-accent-text font-semibold">0&deg;</span>
                                 </div>
-                                <input id="rngPanelLiquifyAngle" type="range" min="-180" max="180" value="0"
+                                <input id="rngPanelLiquifyAngle" type="range" min="-180" max="180" step="5" value="0"
+                                    class="w-full">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[11px] mb-0.5">
+                                    <span class="studio-label">Turbulence &amp; Harmonics</span>
+                                    <span id="valPanelLiquifyTurbulence"
+                                        class="studio-accent-text font-semibold">50%</span>
+                                </div>
+                                <input id="rngPanelLiquifyTurbulence" type="range" min="0" max="100" value="50"
                                     class="w-full">
                             </div>
                         </div>
@@ -5271,6 +5370,10 @@
             panelLiquifyStrength: 0,
             panelLiquifyFreq: 3.5,
             panelLiquifyAngle: 0,
+            liquifyTurbulence: 50,
+            liquifyPhase: 0,
+            liquifyMode: "organic_wave",
+            liquifyTarget: "composite",
             liquifiedCanvas: null,
             customLiquifiedPanels: [null, null, null],
             fractalEnable: true,
@@ -6944,6 +7047,301 @@
 
 
 
+        // ====================================================================
+        // OPTICAL FLUID WAVE & REAL-TIME LIQUIFY ENGINE (WebGL GPU + 2D Fallback)
+        // ====================================================================
+        const OpticalFluidEngine = {
+            glCanvas: null,
+            gl: null,
+            glProgram: null,
+            glTexture: null,
+            glPosBuffer: null,
+            glUvBuffer: null,
+            isGlInit: false,
+            fallbackCanvas: null,
+
+            initGL() {
+                if (this.isGlInit) return !!this.gl;
+                this.isGlInit = true;
+                try {
+                    this.glCanvas = document.createElement('canvas');
+                    this.gl = this.glCanvas.getContext('webgl', { preserveDrawingBuffer: true, antialias: true }) ||
+                              this.glCanvas.getContext('experimental-webgl', { preserveDrawingBuffer: true, antialias: true });
+                } catch (e) {
+                    this.gl = null;
+                }
+                if (!this.gl) return false;
+
+                const gl = this.gl;
+                const vsSource = [
+                    'attribute vec2 a_pos;',
+                    'attribute vec2 a_uv;',
+                    'varying vec2 v_uv;',
+                    'void main() {',
+                    '    gl_Position = vec4(a_pos, 0.0, 1.0);',
+                    '    v_uv = a_uv;',
+                    '}'
+                ].join('\n');
+
+                const fsSource = [
+                    'precision mediump float;',
+                    'varying vec2 v_uv;',
+                    'uniform sampler2D u_img;',
+                    'uniform vec2 u_res;',
+                    'uniform float u_strength;',
+                    'uniform float u_freq;',
+                    'uniform float u_angle;',
+                    'uniform float u_turb;',
+                    'uniform float u_phase;',
+                    'uniform int u_mode;',
+                    'void main() {',
+                    '    vec2 p = v_uv - vec2(0.5, 0.5);',
+                    '    float aspect = u_res.x / max(1.0, u_res.y);',
+                    '    vec2 p_aspect = vec2(p.x * aspect, p.y);',
+                    '    float r = length(p_aspect);',
+                    '    float cosA = cos(u_angle);',
+                    '    float sinA = sin(u_angle);',
+                    '    vec2 p_rot = vec2(p.x * cosA - p.y * sinA, p.x * sinA + p.y * cosA);',
+                    '    vec2 disp = vec2(0.0);',
+                    '    if (u_mode == 0) {',
+                    '        float w1 = sin(p_rot.y * u_freq * 6.28318 + u_phase);',
+                    '        float w2 = cos(p_rot.x * u_freq * 4.5 + u_phase * 0.7) * (u_turb * 0.5);',
+                    '        float w3 = sin((p_rot.x + p_rot.y) * u_freq * 8.0) * 0.2;',
+                    '        float total = w1 + w2 + w3;',
+                    '        disp = vec2(-sinA, cosA) * total * (u_strength * 0.08);',
+                    '    } else if (u_mode == 1) {',
+                    '        float maxR = 0.55;',
+                    '        if (r < maxR) {',
+                    '            float factor = (1.0 - r / maxR);',
+                    '            factor = factor * factor * u_strength * (u_angle != 0.0 ? u_angle : 3.14159);',
+                    '            float theta = atan(p_aspect.y, p_aspect.x) + factor;',
+                    '            vec2 newP = vec2(cos(theta), sin(theta)) * r;',
+                    '            disp = vec2(newP.x / aspect, newP.y) - p;',
+                    '        }',
+                    '    } else if (u_mode == 2) {',
+                    '        float maxR = 0.55;',
+                    '        if (r < maxR) {',
+                    '            float d = r / maxR;',
+                    '            float bulge = sin(d * 1.57079);',
+                    '            float factor = (1.0 - bulge) * u_strength * 0.45;',
+                    '            disp = -p * factor;',
+                    '        }',
+                    '    } else if (u_mode == 3) {',
+                    '        float dy_norm = abs(p.y) / 0.5;',
+                    '        float pinch = (1.0 - clamp(dy_norm, 0.0, 1.0)) * u_strength * 0.45;',
+                    '        disp.x = -p.x * pinch;',
+                    '        disp.y = sin(p.x * u_freq * 3.14159) * (u_strength * 0.04);',
+                    '    } else if (u_mode == 4) {',
+                    '        float m1 = sin(p.x * u_freq * 6.28318 + cos(p.y * u_freq * 4.0 + u_angle));',
+                    '        float m2 = cos(p.y * u_freq * 7.0 + sin(p.x * u_freq * 5.0 - u_angle));',
+                    '        disp = vec2(m1 * 0.7 + m2 * 0.3, m2 * 0.7 - m1 * 0.3) * (u_strength * 0.06);',
+                    '    } else if (u_mode == 5) {',
+                    '        float rip = sin(r * u_freq * 25.0 - u_phase) * exp(-r * 2.5);',
+                    '        vec2 dir = r > 0.0001 ? (p_aspect / r) : vec2(0.0);',
+                    '        disp = vec2(dir.x / aspect, dir.y) * rip * (u_strength * 0.06);',
+                    '    } else if (u_mode == 6) {',
+                    '        float depth = 1.0 + (p.y * cosA - p.x * sinA) * u_strength * 0.8;',
+                    '        depth = max(0.1, depth);',
+                    '        disp = (p / depth) - p;',
+                    '    } else if (u_mode == 7) {',
+                    '        float maxR = 0.55;',
+                    '        if (r < maxR) {',
+                    '            float factor = (1.0 - r / maxR) * u_strength * 0.5;',
+                    '            disp = p * factor;',
+                    '        }',
+                    '    } else if (u_mode == 8) {',
+                    '        float symDist = length(vec2(abs(p.x) - 0.2, p.y + 0.05));',
+                    '        float factor = max(0.0, 1.0 - symDist / 0.35) * u_strength * 0.15;',
+                    '        disp = vec2(-sign(p.x) * factor * 0.25, sin(p.x * 6.28) * factor * 0.1);',
+                    '    }',
+                    '    vec2 finalUV = clamp(v_uv + disp, 0.0, 1.0);',
+                    '    gl_FragColor = texture2D(u_img, vec2(finalUV.x, 1.0 - finalUV.y));',
+                    '}'
+                ].join('\n');
+
+                function compile(t, s) {
+                    const shader = gl.createShader(t);
+                    gl.shaderSource(shader, s);
+                    gl.compileShader(shader);
+                    return shader;
+                }
+
+                const vs = compile(gl.VERTEX_SHADER, vsSource);
+                const fs = compile(gl.FRAGMENT_SHADER, fsSource);
+                const prog = gl.createProgram();
+                gl.attachShader(prog, vs);
+                gl.attachShader(prog, fs);
+                gl.linkProgram(prog);
+                if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+                    return false;
+                }
+                this.glProgram = prog;
+
+                const quadPos = new Float32Array([
+                    -1, -1,   1, -1,  -1,  1,
+                    -1,  1,   1, -1,   1,  1
+                ]);
+                this.glPosBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.glPosBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, quadPos, gl.STATIC_DRAW);
+
+                const quadUv = new Float32Array([
+                    0, 0,   1, 0,   0, 1,
+                    0, 1,   1, 0,   1, 1
+                ]);
+                this.glUvBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.glUvBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, quadUv, gl.STATIC_DRAW);
+
+                this.glTexture = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, this.glTexture);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+                return true;
+            },
+
+            applyWarp(sourceCanvas, targetCtx, width, height, st, layerAlpha = 1.0, blendMode = 'source-over') {
+                const strength = Math.max(st.liquify || 0, st.panelLiquifyStrength || 0);
+                if (strength <= 0 || !st.liquifyEnable) {
+                    targetCtx.save();
+                    targetCtx.globalAlpha = layerAlpha;
+                    targetCtx.globalCompositeOperation = blendMode;
+                    targetCtx.drawImage(sourceCanvas, 0, 0, width, height);
+                    targetCtx.restore();
+                    return;
+                }
+
+                const modeMap = {
+                    organic_wave: 0,
+                    vortex_twirl: 1,
+                    spherical_bulge: 2,
+                    hourglass_body: 3,
+                    silk_marble: 4,
+                    radial_ripple: 5,
+                    perspective_tilt: 6,
+                    pucker_focus: 7,
+                    facial_harmony: 8
+                };
+                const modeInt = modeMap[st.liquifyMode] !== undefined ? modeMap[st.liquifyMode] : 0;
+                const normStrength = (strength / 100.0) * layerAlpha;
+                const freq = st.panelLiquifyFreq || 3.5;
+                const angleRad = ((st.panelLiquifyAngle || 0) * Math.PI) / 180.0;
+                const turbNorm = (st.liquifyTurbulence !== undefined ? st.liquifyTurbulence : 50) / 100.0;
+                const phase = ((st.liquifyPhase || 0) * Math.PI) / 180.0 + (st.seed ? st.seed * 2.0 : 0.0);
+
+                if (this.initGL()) {
+                    try {
+                        const gl = this.gl;
+                        this.glCanvas.width = width;
+                        this.glCanvas.height = height;
+                        gl.viewport(0, 0, width, height);
+
+                        gl.useProgram(this.glProgram);
+
+                        gl.bindTexture(gl.TEXTURE_2D, this.glTexture);
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sourceCanvas);
+
+                        gl.uniform2f(gl.getUniformLocation(this.glProgram, 'u_res'), width, height);
+                        gl.uniform1f(gl.getUniformLocation(this.glProgram, 'u_strength'), normStrength);
+                        gl.uniform1f(gl.getUniformLocation(this.glProgram, 'u_freq'), freq);
+                        gl.uniform1f(gl.getUniformLocation(this.glProgram, 'u_angle'), angleRad);
+                        gl.uniform1f(gl.getUniformLocation(this.glProgram, 'u_turb'), turbNorm);
+                        gl.uniform1f(gl.getUniformLocation(this.glProgram, 'u_phase'), phase);
+                        gl.uniform1i(gl.getUniformLocation(this.glProgram, 'u_mode'), modeInt);
+
+                        const aPosLoc = gl.getAttribLocation(this.glProgram, 'a_pos');
+                        gl.enableVertexAttribArray(aPosLoc);
+                        gl.bindBuffer(gl.ARRAY_BUFFER, this.glPosBuffer);
+                        gl.vertexAttribPointer(aPosLoc, 2, gl.FLOAT, false, 0, 0);
+
+                        const aUvLoc = gl.getAttribLocation(this.glProgram, 'a_uv');
+                        gl.enableVertexAttribArray(aUvLoc);
+                        gl.bindBuffer(gl.ARRAY_BUFFER, this.glUvBuffer);
+                        gl.vertexAttribPointer(aUvLoc, 2, gl.FLOAT, false, 0, 0);
+
+                        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+                        targetCtx.save();
+                        targetCtx.globalAlpha = layerAlpha;
+                        targetCtx.globalCompositeOperation = blendMode;
+                        targetCtx.drawImage(this.glCanvas, 0, 0, width, height);
+                        targetCtx.restore();
+                        return;
+                    } catch (eGl) {}
+                }
+
+                this.applyWarp2D(sourceCanvas, targetCtx, width, height, normStrength, freq, angleRad, turbNorm, phase, modeInt, layerAlpha, blendMode);
+            },
+
+            applyWarp2D(sourceCanvas, targetCtx, width, height, strength, freq, angleRad, turb, phase, mode, layerAlpha, blendMode) {
+                if (!this.fallbackCanvas) {
+                    this.fallbackCanvas = document.createElement('canvas');
+                }
+                this.fallbackCanvas.width = width;
+                this.fallbackCanvas.height = height;
+                const fCtx = this.fallbackCanvas.getContext('2d');
+                fCtx.clearRect(0, 0, width, height);
+
+                const slices = 160;
+                const sliceH = Math.ceil(height / slices);
+                const ampX = strength * (width * 0.05);
+
+                for (let i = 0; i < slices; i++) {
+                    const y = i * sliceH;
+                    const progress = i / slices;
+                    let shiftX = 0;
+                    if (mode === 0 || mode === 4) {
+                        shiftX = Math.sin(progress * Math.PI * freq + phase + angleRad) * ampX +
+                                 Math.cos(progress * Math.PI * 1.6 - phase * 0.6) * (ampX * turb * 0.5);
+                    } else if (mode === 1) {
+                        const distFromMid = (progress - 0.5) * 2;
+                        shiftX = Math.sin(distFromMid * Math.PI * 0.5) * ampX * 1.5;
+                    } else if (mode === 2 || mode === 7) {
+                        const distFromMid = (progress - 0.5) * 2;
+                        const factor = Math.cos(distFromMid * Math.PI * 0.5);
+                        shiftX = (mode === 2 ? 1 : -1) * factor * ampX * 0.8;
+                    } else if (mode === 3) {
+                        const distFromMid = Math.abs(progress - 0.5) * 2;
+                        shiftX = -(1 - distFromMid) * ampX * 0.9;
+                    } else {
+                        shiftX = Math.sin(progress * Math.PI * freq + phase) * ampX;
+                    }
+
+                    fCtx.drawImage(
+                        sourceCanvas,
+                        0, y, width, sliceH,
+                        shiftX, y, width, sliceH
+                    );
+                }
+
+                targetCtx.save();
+                targetCtx.globalAlpha = layerAlpha;
+                targetCtx.globalCompositeOperation = blendMode;
+                targetCtx.drawImage(this.fallbackCanvas, 0, 0, width, height);
+                targetCtx.restore();
+            },
+
+            warpImageToCanvas(img, st) {
+                if (!img) return img;
+                const w = img.naturalWidth || img.width || 800;
+                const h = img.naturalHeight || img.height || 600;
+                const src = document.createElement('canvas');
+                src.width = w; src.height = h;
+                const sCtx = src.getContext('2d');
+                sCtx.drawImage(img, 0, 0, w, h);
+
+                const out = document.createElement('canvas');
+                out.width = w; out.height = h;
+                const oCtx = out.getContext('2d');
+                this.applyWarp(src, oCtx, w, h, st, 1.0, 'source-over');
+                disposeCanvas(src);
+                return out;
+            }
+        };
+
         function renderTripletBase(targetCtx, width, height, tripletImgs) {
             const colors = PRESETS[state.preset] || PRESETS["Aurora Gradient"];
             const c0 = colors[0];
@@ -6965,9 +7363,20 @@
                 const rawLeft = validImgs[order[0] % validImgs.length];
                 const rawCenter = validImgs[order[1] % validImgs.length] || rawLeft;
                 const rawRight = validImgs[order[2] % validImgs.length] || rawCenter || rawLeft;
-                const leftImg = (state.customLiquifiedPanels && state.customLiquifiedPanels[0]) || rawLeft;
-                const centerImg = (state.customLiquifiedPanels && state.customLiquifiedPanels[1]) || rawCenter;
-                const rightImg = (state.customLiquifiedPanels && state.customLiquifiedPanels[2]) || rawRight;
+                let leftImg = (state.customLiquifiedPanels && state.customLiquifiedPanels[0]) || rawLeft;
+                let centerImg = (state.customLiquifiedPanels && state.customLiquifiedPanels[1]) || rawCenter;
+                let rightImg = (state.customLiquifiedPanels && state.customLiquifiedPanels[2]) || rawRight;
+
+                // Real-time Panel-targeted Liquify
+                if (state.liquifyEnable && (state.liquify > 0 || state.panelLiquifyStrength > 0)) {
+                    if (state.liquifyTarget === 'panel_left' && !state.customLiquifiedPanels[0]) {
+                        leftImg = OpticalFluidEngine.warpImageToCanvas(rawLeft, state);
+                    } else if (state.liquifyTarget === 'panel_center' && !state.customLiquifiedPanels[1]) {
+                        centerImg = OpticalFluidEngine.warpImageToCanvas(rawCenter, state);
+                    } else if (state.liquifyTarget === 'panel_right' && !state.customLiquifiedPanels[2]) {
+                        rightImg = OpticalFluidEngine.warpImageToCanvas(rawRight, state);
+                    }
+                }
 
                 let split1Pct = (typeof state.tripletSplit1 === 'number') ? state.tripletSplit1 : 33.333;
                 let split2Pct = (typeof state.tripletSplit2 === 'number') ? state.tripletSplit2 : 66.667;
@@ -9926,35 +10335,17 @@
                         targetCtx.globalCompositeOperation = layer.blend || 'source-over';
                         targetCtx.drawImage(state.liquifiedCanvas, 0, 0, width, height);
                         targetCtx.restore();
-                    } else if (state.liquify > 0 || state.panelLiquifyStrength > 0) {
-                        const effStrength = Math.max(state.liquify, state.panelLiquifyStrength);
-                        const freq = state.panelLiquifyFreq || 3.5;
-                        const angleRad = ((state.panelLiquifyAngle || 0) * Math.PI) / 180;
-                        const liqBuffer = document.createElement('canvas');
-                        liqBuffer.width = width;
-                        liqBuffer.height = height;
-                        liqBuffer.getContext('2d').drawImage(targetCtx.canvas, 0, 0);
+                    } else if ((state.liquify > 0 || state.panelLiquifyStrength > 0) && (state.liquifyTarget === 'composite' || !state.liquifyTarget)) {
+                        const srcCanvas = document.createElement('canvas');
+                        srcCanvas.width = width;
+                        srcCanvas.height = height;
+                        srcCanvas.getContext('2d').drawImage(targetCtx.canvas, 0, 0);
 
-                        const ampX = (effStrength / 100) * (width * 0.05) * layerAlpha;
-                        const ampY = (effStrength / 100) * (height * 0.04) * layerAlpha;
-                        const bleedX = ampX * 2.2;
-                        const bleedY = ampY * 1.6;
-                        const slices = 120;
-                        const sliceH = Math.ceil(height / slices);
-
-                        for (let i = 0; i < slices; i++) {
-                            const y = i * sliceH;
-                            const progress = i / slices;
-                            const shiftX = Math.sin(progress * Math.PI * freq + state.seed + angleRad) * ampX +
-                                Math.cos(progress * Math.PI * 1.5 - state.seed * 0.7) * (ampX * 0.45);
-                            const shiftY = Math.sin(progress * Math.PI * (freq * 0.7) + state.seed * 1.3) * ampY;
-                            targetCtx.drawImage(
-                                liqBuffer,
-                                0, y, width, sliceH,
-                                shiftX - bleedX, y + shiftY * 0.25 - bleedY, width + bleedX * 2.0, sliceH + bleedY * 2.0 + 2
-                            );
+                        if (layerAlpha >= 0.99 && (!layer.blend || layer.blend === 'source-over')) {
+                            targetCtx.clearRect(0, 0, width, height);
                         }
-                        disposeCanvas(liqBuffer);
+                        OpticalFluidEngine.applyWarp(srcCanvas, targetCtx, width, height, state, layerAlpha, layer.blend || 'source-over');
+                        disposeCanvas(srcCanvas);
                     }
                 }
 
@@ -12294,7 +12685,16 @@
             setTxt('valGradOpacity', state.gradOpacity + '%');
             setTxt('valGradDither', state.gradDither + '%');
             setTxt('valBlurRadius', (state.blurRadius !== undefined ? state.blurRadius : 0) + ' px');
-            setTxt('valLiquify', state.liquify + '%');
+            const effLiqStr = (state.liquify || state.panelLiquifyStrength || 0);
+            setTxt('valLiquify', effLiqStr + '%');
+            setTxt('lblLiquifyStrength', effLiqStr + '%');
+            setTxt('valPanelLiquifyStrength', effLiqStr + '%');
+            setTxt('valLiquifyFreq', (state.panelLiquifyFreq || 3.5).toFixed(1));
+            setTxt('valPanelLiquifyFreq', (state.panelLiquifyFreq || 3.5).toFixed(1));
+            setTxt('valLiquifyAngle', (state.panelLiquifyAngle || 0) + '°');
+            setTxt('valPanelLiquifyAngle', (state.panelLiquifyAngle || 0) + '°');
+            setTxt('valLiquifyTurbulence', (state.liquifyTurbulence !== undefined ? state.liquifyTurbulence : 50) + '%');
+            setTxt('valPanelLiquifyTurbulence', (state.liquifyTurbulence !== undefined ? state.liquifyTurbulence : 50) + '%');
             setTxt('valNoise', state.noise + '%');
             setTxt('valOverlayOpacity', state.overlayOpacity + '%');
             setTxt('valFracOctaves', state.fracOctaves);
@@ -12563,9 +12963,23 @@
 
             setVal('selBlurShapeKernel', state.blurShapeKernel);
             setChk('chkLiquifyEnable', state.liquifyEnable);
-            setVal('rngLiquify', state.liquify);
+            setChk('chkPanelLiquifyEnable', state.liquifyEnable);
+            setVal('rngLiquify', state.liquify || state.panelLiquifyStrength || 0);
+            setVal('rngPanelLiquifyStrength', state.panelLiquifyStrength || state.liquify || 0);
+            setVal('rngLiquifyFreq', state.panelLiquifyFreq || 3.5);
+            setVal('rngPanelLiquifyFreq', state.panelLiquifyFreq || 3.5);
+            setVal('rngLiquifyAngle', state.panelLiquifyAngle || 0);
+            setVal('rngPanelLiquifyAngle', state.panelLiquifyAngle || 0);
+            setVal('rngLiquifyTurbulence', state.liquifyTurbulence !== undefined ? state.liquifyTurbulence : 50);
+            setVal('rngPanelLiquifyTurbulence', state.liquifyTurbulence !== undefined ? state.liquifyTurbulence : 50);
+            setVal('selLiquifyMode', state.liquifyMode || 'organic_wave');
+            setVal('selQuickLiquifyMode', state.liquifyMode || 'organic_wave');
+            setVal('selLiquifyTarget', state.liquifyTarget || 'composite');
+            setVal('selQuickLiquifyTarget', state.liquifyTarget || 'composite');
             const valLiq = document.getElementById('valLiquify');
-            if (valLiq) valLiq.textContent = `${state.liquify}%`;
+            if (valLiq) valLiq.textContent = `${state.liquify || state.panelLiquifyStrength || 0}%`;
+            const valPnlLiq = document.getElementById('valPanelLiquifyStrength');
+            if (valPnlLiq) valPnlLiq.textContent = `${state.panelLiquifyStrength || state.liquify || 0}%`;
 
             updateBlurParameterVisibility();
             setChk('chkFractalEnable', state.fractalEnable);
@@ -13435,20 +13849,104 @@
             pushHistory();
         });
 
+        // Two-way Synced Optical Fluid Wave Controls (Panel 2)
         bindInput('chkLiquifyEnable', 'change', (e) => {
             state.liquifyEnable = e.target.checked;
+            const chkPnl = document.getElementById('chkPanelLiquifyEnable');
+            if (chkPnl) chkPnl.checked = e.target.checked;
+            const liqLayer = state.layers ? state.layers.find(l => l.id === 'liquify') : null;
+            if (liqLayer) liqLayer.visible = e.target.checked;
             renderLayerStackUI();
             triggerRedraw();
             pushHistory();
         });
 
         bindInput('rngLiquify', 'input', (e) => {
-            state.liquify = parseInt(e.target.value, 10);
-            const lbl = document.getElementById('valLiquify');
-            if (lbl) lbl.textContent = `${state.liquify}%`;
+            const v = parseInt(e.target.value, 10);
+            state.liquify = v;
+            state.panelLiquifyStrength = v;
+            state.liquifiedCanvas = null;
+            if (v > 0 && !state.liquifyEnable) {
+                state.liquifyEnable = true;
+                const c1 = document.getElementById('chkLiquifyEnable');
+                const c2 = document.getElementById('chkPanelLiquifyEnable');
+                if (c1) c1.checked = true;
+                if (c2) c2.checked = true;
+                const liqLayer = state.layers ? state.layers.find(l => l.id === 'liquify') : null;
+                if (liqLayer) liqLayer.visible = true;
+                renderLayerStackUI();
+            }
+            setVal('rngPanelLiquifyStrength', v);
+            setTxt('valLiquify', `${v}%`);
+            setTxt('lblLiquifyStrength', `${v}%`);
+            setTxt('valPanelLiquifyStrength', `${v}%`);
             triggerRedraw(true);
         });
         bindInput('rngLiquify', 'change', () => pushHistory());
+
+        bindInput('selLiquifyMode', 'change', (e) => {
+            state.liquifyMode = e.target.value;
+            setVal('selQuickLiquifyMode', e.target.value);
+            state.liquifiedCanvas = null;
+            triggerRedraw(true);
+            pushHistory();
+        });
+
+        bindInput('selLiquifyTarget', 'change', (e) => {
+            state.liquifyTarget = e.target.value;
+            setVal('selQuickLiquifyTarget', e.target.value);
+            triggerRedraw(true);
+            pushHistory();
+        });
+
+        bindInput('rngLiquifyFreq', 'input', (e) => {
+            const f = parseFloat(e.target.value);
+            state.panelLiquifyFreq = f;
+            setVal('rngPanelLiquifyFreq', f);
+            setTxt('valLiquifyFreq', f.toFixed(1));
+            setTxt('valPanelLiquifyFreq', f.toFixed(1));
+            state.liquifiedCanvas = null;
+            triggerRedraw(true);
+        });
+        bindInput('rngLiquifyFreq', 'change', () => pushHistory());
+
+        bindInput('rngLiquifyAngle', 'input', (e) => {
+            const a = parseInt(e.target.value, 10);
+            state.panelLiquifyAngle = a;
+            setVal('rngPanelLiquifyAngle', a);
+            setTxt('valLiquifyAngle', `${a}°`);
+            setTxt('valPanelLiquifyAngle', `${a}°`);
+            state.liquifiedCanvas = null;
+            triggerRedraw(true);
+        });
+        bindInput('rngLiquifyAngle', 'change', () => pushHistory());
+
+        bindInput('rngLiquifyTurbulence', 'input', (e) => {
+            const t = parseInt(e.target.value, 10);
+            state.liquifyTurbulence = t;
+            setVal('rngPanelLiquifyTurbulence', t);
+            setTxt('valLiquifyTurbulence', `${t}%`);
+            setTxt('valPanelLiquifyTurbulence', `${t}%`);
+            state.liquifiedCanvas = null;
+            triggerRedraw(true);
+        });
+        bindInput('rngLiquifyTurbulence', 'change', () => pushHistory());
+
+        bindInput('btnResetLiquify', 'click', () => {
+            state.liquify = 0;
+            state.panelLiquifyStrength = 0;
+            state.panelLiquifyFreq = 3.5;
+            state.panelLiquifyAngle = 0;
+            state.liquifyTurbulence = 50;
+            state.liquifyMode = 'organic_wave';
+            state.liquifyTarget = 'composite';
+            state.liquifiedCanvas = null;
+            state.customLiquifiedPanels = [null, null, null];
+            syncUIFromState();
+            triggerRedraw(true);
+            pushHistory();
+            showToast('↺ Optical Fluid Liquify Reset to Default');
+        });
 
         bindInput('chkFractalEnable', 'change', (e) => {
             state.fractalEnable = e.target.checked;
@@ -17867,117 +18365,142 @@ false 3 colorimage
                 }
             });
 
-            // Panel 2.5 Quick Presets & Sliders
+            // Panel 2.5 Quick Presets & Sliders (Fully Synchronized with Panel 2)
             bindInput('chkPanelLiquifyEnable', 'change', (e) => {
                 state.liquifyEnable = e.target.checked;
                 const chkMain = document.getElementById('chkLiquifyEnable');
                 if (chkMain) chkMain.checked = e.target.checked;
-                const liqLayer = state.layers.find(l => l.id === 'liquify');
+                const liqLayer = state.layers ? state.layers.find(l => l.id === 'liquify') : null;
                 if (liqLayer) liqLayer.visible = e.target.checked;
                 renderLayerStackUI();
                 triggerRedraw();
+                pushHistory();
+            });
+
+            bindInput('selQuickLiquifyTarget', 'change', (e) => {
+                state.liquifyTarget = e.target.value;
+                setVal('selLiquifyTarget', e.target.value);
+                triggerRedraw(true);
+                pushHistory();
+            });
+
+            bindInput('selQuickLiquifyMode', 'change', (e) => {
+                state.liquifyMode = e.target.value;
+                setVal('selLiquifyMode', e.target.value);
+                state.liquifiedCanvas = null;
+                triggerRedraw(true);
+                pushHistory();
             });
 
             bindInput('rngPanelLiquifyStrength', 'input', (e) => {
-                state.panelLiquifyStrength = parseInt(e.target.value, 10);
-                const lbl = document.getElementById('valPanelLiquifyStrength');
-                if (lbl) lbl.textContent = `${state.panelLiquifyStrength}%`;
-                if (state.panelLiquifyStrength > 0 && !state.liquifyEnable) {
+                const v = parseInt(e.target.value, 10);
+                state.panelLiquifyStrength = v;
+                state.liquify = v;
+                state.liquifiedCanvas = null;
+                if (v > 0 && !state.liquifyEnable) {
                     state.liquifyEnable = true;
-                    const chk = document.getElementById('chkPanelLiquifyEnable');
-                    if (chk) chk.checked = true;
+                    const c1 = document.getElementById('chkLiquifyEnable');
+                    const c2 = document.getElementById('chkPanelLiquifyEnable');
+                    if (c1) c1.checked = true;
+                    if (c2) c2.checked = true;
+                    const liqLayer = state.layers ? state.layers.find(l => l.id === 'liquify') : null;
+                    if (liqLayer) liqLayer.visible = true;
+                    renderLayerStackUI();
                 }
-                triggerRedraw();
+                setVal('rngLiquify', v);
+                setTxt('valLiquify', `${v}%`);
+                setTxt('lblLiquifyStrength', `${v}%`);
+                setTxt('valPanelLiquifyStrength', `${v}%`);
+                triggerRedraw(true);
             });
+            bindInput('rngPanelLiquifyStrength', 'change', () => pushHistory());
 
             bindInput('rngPanelLiquifyFreq', 'input', (e) => {
-                state.panelLiquifyFreq = parseFloat(e.target.value);
-                const lbl = document.getElementById('valPanelLiquifyFreq');
-                if (lbl) lbl.textContent = state.panelLiquifyFreq;
-                triggerRedraw();
+                const f = parseFloat(e.target.value);
+                state.panelLiquifyFreq = f;
+                setVal('rngLiquifyFreq', f);
+                setTxt('valLiquifyFreq', f.toFixed(1));
+                setTxt('valPanelLiquifyFreq', f.toFixed(1));
+                state.liquifiedCanvas = null;
+                triggerRedraw(true);
             });
+            bindInput('rngPanelLiquifyFreq', 'change', () => pushHistory());
 
             bindInput('rngPanelLiquifyAngle', 'input', (e) => {
-                state.panelLiquifyAngle = parseInt(e.target.value, 10);
-                const lbl = document.getElementById('valPanelLiquifyAngle');
-                if (lbl) lbl.textContent = `${state.panelLiquifyAngle}°`;
-                triggerRedraw();
+                const a = parseInt(e.target.value, 10);
+                state.panelLiquifyAngle = a;
+                setVal('rngLiquifyAngle', a);
+                setTxt('valLiquifyAngle', `${a}°`);
+                setTxt('valPanelLiquifyAngle', `${a}°`);
+                state.liquifiedCanvas = null;
+                triggerRedraw(true);
             });
+            bindInput('rngPanelLiquifyAngle', 'change', () => pushHistory());
+
+            bindInput('rngPanelLiquifyTurbulence', 'input', (e) => {
+                const t = parseInt(e.target.value, 10);
+                state.liquifyTurbulence = t;
+                setVal('rngLiquifyTurbulence', t);
+                setTxt('valLiquifyTurbulence', `${t}%`);
+                setTxt('valPanelLiquifyTurbulence', `${t}%`);
+                state.liquifiedCanvas = null;
+                triggerRedraw(true);
+            });
+            bindInput('rngPanelLiquifyTurbulence', 'change', () => pushHistory());
 
             bindInput('btnResetPanelLiquify', 'click', () => {
+                state.liquify = 0;
                 state.panelLiquifyStrength = 0;
                 state.panelLiquifyFreq = 3.5;
                 state.panelLiquifyAngle = 0;
+                state.liquifyTurbulence = 50;
+                state.liquifyMode = 'organic_wave';
+                state.liquifyTarget = 'composite';
                 state.liquifiedCanvas = null;
                 state.customLiquifiedPanels = [null, null, null];
-                setVal('rngPanelLiquifyStrength', 0);
-                setVal('rngPanelLiquifyFreq', 3.5);
-                setVal('rngPanelLiquifyAngle', 0);
-                setTxt('valPanelLiquifyStrength', '0%');
-                setTxt('valPanelLiquifyFreq', '3.5');
-                setTxt('valPanelLiquifyAngle', '0°');
+                syncUIFromState();
                 triggerRedraw(true);
+                pushHistory();
                 showToast('↺ Liquify Reset to Default');
             });
 
             // Quick Preset Buttons in Left Panel
+            const LIQUIFY_PRESET_MAP = {
+                organic_wave: { mode: 'organic_wave', strength: 65, freq: 3.5, angle: 15, turb: 40 },
+                vortex_twirl: { mode: 'vortex_twirl', strength: 85, freq: 6.0, angle: 90, turb: 60 },
+                spherical_bulge: { mode: 'spherical_bulge', strength: 70, freq: 2.0, angle: 0, turb: 20 },
+                hourglass_body: { mode: 'hourglass_body', strength: 50, freq: 2.5, angle: -45, turb: 30 },
+                facial_harmony: { mode: 'facial_harmony', strength: 35, freq: 4.0, angle: 0, turb: 15 },
+                silk_marble: { mode: 'silk_marble', strength: 90, freq: 7.5, angle: 60, turb: 80 },
+                radial_ripple: { mode: 'radial_ripple', strength: 80, freq: 4.0, angle: 0, turb: 50 },
+                perspective_tilt: { mode: 'perspective_tilt', strength: 60, freq: 1.5, angle: -30, turb: 25 },
+                pucker_focus: { mode: 'pucker_focus', strength: 75, freq: 5.0, angle: 45, turb: 35 }
+            };
+
             document.querySelectorAll('[data-liquify-preset]').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const preset = btn.getAttribute('data-liquify-preset');
+                    const presetKey = btn.getAttribute('data-liquify-preset');
+                    const conf = LIQUIFY_PRESET_MAP[presetKey] || LIQUIFY_PRESET_MAP.organic_wave;
+
                     state.liquifyEnable = true;
-                    const chk = document.getElementById('chkPanelLiquifyEnable');
-                    if (chk) chk.checked = true;
+                    state.liquifyMode = conf.mode;
+                    state.liquify = conf.strength;
+                    state.panelLiquifyStrength = conf.strength;
+                    state.panelLiquifyFreq = conf.freq;
+                    state.panelLiquifyAngle = conf.angle;
+                    state.liquifyTurbulence = conf.turb;
+                    state.liquifiedCanvas = null;
 
-                    switch (preset) {
-                        case 'organic_wave':
-                            state.panelLiquifyStrength = 65;
-                            state.panelLiquifyFreq = 3.5;
-                            state.panelLiquifyAngle = 15;
-                            break;
-                        case 'vortex_twirl':
-                            state.panelLiquifyStrength = 85;
-                            state.panelLiquifyFreq = 6.0;
-                            state.panelLiquifyAngle = 90;
-                            break;
-                        case 'spherical_bulge':
-                            state.panelLiquifyStrength = 70;
-                            state.panelLiquifyFreq = 2.0;
-                            state.panelLiquifyAngle = 0;
-                            break;
-                        case 'hourglass_body':
-                            state.panelLiquifyStrength = 50;
-                            state.panelLiquifyFreq = 2.5;
-                            state.panelLiquifyAngle = -45;
-                            break;
-                        case 'facial_harmony':
-                            state.panelLiquifyStrength = 35;
-                            state.panelLiquifyFreq = 4.0;
-                            state.panelLiquifyAngle = 0;
-                            break;
-                        case 'silk_marble':
-                            state.panelLiquifyStrength = 90;
-                            state.panelLiquifyFreq = 7.5;
-                            state.panelLiquifyAngle = 60;
-                            break;
-                        case 'perspective_tilt':
-                            state.panelLiquifyStrength = 60;
-                            state.panelLiquifyFreq = 1.5;
-                            state.panelLiquifyAngle = -30;
-                            break;
-                        case 'pucker_focus':
-                            state.panelLiquifyStrength = 75;
-                            state.panelLiquifyFreq = 5.0;
-                            state.panelLiquifyAngle = 45;
-                            break;
-                    }
+                    const chk1 = document.getElementById('chkLiquifyEnable');
+                    const chk2 = document.getElementById('chkPanelLiquifyEnable');
+                    if (chk1) chk1.checked = true;
+                    if (chk2) chk2.checked = true;
 
-                    setVal('rngPanelLiquifyStrength', state.panelLiquifyStrength);
-                    setVal('rngPanelLiquifyFreq', state.panelLiquifyFreq);
-                    setVal('rngPanelLiquifyAngle', state.panelLiquifyAngle);
-                    setTxt('valPanelLiquifyStrength', `${state.panelLiquifyStrength}%`);
-                    setTxt('valPanelLiquifyFreq', state.panelLiquifyFreq);
-                    setTxt('valPanelLiquifyAngle', `${state.panelLiquifyAngle}°`);
+                    const liqLayer = state.layers ? state.layers.find(l => l.id === 'liquify') : null;
+                    if (liqLayer) liqLayer.visible = true;
 
+                    syncUIFromState();
+                    renderLayerStackUI();
                     triggerRedraw(true);
                     pushHistory();
                     showToast(`🌊 Applied Preset: ${btn.textContent.trim()}`);

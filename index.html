@@ -629,16 +629,30 @@
                 overflow-x: auto !important;
                 scrollbar-width: none !important;
                 -webkit-overflow-scrolling: touch !important;
-                white-space: nowrap !important;
                 padding-bottom: 2px !important;
             }
 
             #leftPanelTabBarContainer::-webkit-scrollbar {
                 display: none !important;
             }
+
+            /* Responsive Touch Stage & Canvas Pan */
+            #canvasWrapper,
+            #canvasTransformStage,
+            #previewCanvas {
+                touch-action: none !important;
+            }
+
+            /* Contain Overscroll to Prevent Accidental Mobile Pull-Down Refresh */
+            #studioSidebar,
+            #studioRightSidebar,
+            #studioBottomDock {
+                overscroll-behavior-y: contain;
+                -webkit-overflow-scrolling: touch;
+            }
         }
 
-        /* Mobile Phones Only (< 640px) Detailed Tweaks */
+        /* Mobile Phones Only (< 640px: iPhone, Galaxy, Pixel) */
         @media (max-width: 639px) {
             #studioHeader {
                 min-height: 3rem !important;
@@ -650,18 +664,84 @@
                 font-size: 0.75rem !important;
             }
 
+            #studioHeaderActions {
+                max-width: calc(100vw - 88px) !important;
+                gap: 0.25rem !important;
+            }
+
+            /* Left Sidebar Tab Navigation: Adaptive on Mobile */
+            #leftPanelTabBarContainer > div:first-child {
+                grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+                gap: 0.15rem !important;
+                padding: 0.25rem !important;
+            }
+
+            #leftPanelTabBarContainer button {
+                padding: 0.35rem 0.1rem !important;
+                min-height: 2.25rem !important;
+            }
+
+            #leftPanelTabBarContainer button span.truncate {
+                font-size: 0.6rem !important;
+                line-height: 1.1 !important;
+            }
+
+            /* Canvas Top Toolbar: Sleek Single-Row Horizontal Swipe */
+            #canvasTopToolbar {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                scrollbar-width: none !important;
+                -webkit-overflow-scrolling: touch !important;
+                gap: 0.4rem !important;
+                width: 100% !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                margin-bottom: 0.25rem !important;
+            }
+
+            #canvasTopToolbar::-webkit-scrollbar {
+                display: none !important;
+            }
+
+            #canvasTopToolbar > * {
+                flex-shrink: 0 !important;
+            }
+
+            /* Maximize Canvas Height on Mobile Viewports */
             #canvasWrapper {
                 height: auto !important;
                 flex: 1 1 0% !important;
                 min-height: 180px !important;
                 max-height: none !important;
-                margin-top: 0.25rem !important;
-                margin-bottom: 0.25rem !important;
+                margin-top: 0.15rem !important;
+                margin-bottom: 0.15rem !important;
                 border-radius: 0.75rem !important;
             }
 
             #studioMain {
-                padding: 0.35rem !important;
+                padding: 0.35rem 0.4rem !important;
+            }
+
+            /* Stock QC Diagnostic Bar: Single Horizontal Status Strip */
+            #qcDiagnosticBar {
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                scrollbar-width: none !important;
+                white-space: nowrap !important;
+                padding: 0.2rem 0.4rem !important;
+                font-size: 0.6rem !important;
+                margin-top: 0.15rem !important;
+                justify-content: flex-start !important;
+            }
+
+            #qcDiagnosticBar::-webkit-scrollbar {
+                display: none !important;
+            }
+
+            #qcDiagnosticBar > * {
+                flex-shrink: 0 !important;
             }
 
             #btnDownloadSingle,
@@ -671,12 +751,68 @@
                 font-weight: 700 !important;
             }
 
-            /* Dialog Modals Mobile Fit */
+            /* Non-Intrusive Floating PiP on Small Screens */
+            #mobilePipPreview {
+                width: 7.5rem !important;
+                bottom: calc(0.5rem + var(--sab)) !important;
+                right: calc(0.5rem + var(--sar)) !important;
+                padding: 0.35rem !important;
+                border-radius: 0.85rem !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45) !important;
+            }
+
+            /* Dialog Modals Mobile Fit (< 640px) */
             .studio-card.max-w-2xl,
-            .studio-card.max-w-xl {
-                max-height: 90dvh !important;
-                width: 95vw !important;
+            .studio-card.max-w-xl,
+            #flowVariationsModal > div,
+            #aiStudioModal > div,
+            #stockQcModal > div {
+                max-height: 92dvh !important;
+                width: 96vw !important;
+                max-width: 96vw !important;
                 border-radius: 1rem !important;
+                padding: 0.75rem !important;
+            }
+
+            /* Prevent iOS Auto-Zoom on Form Inputs */
+            input, select, textarea {
+                font-size: 14px !important;
+            }
+        }
+
+        /* Extra Compact Mobile Screens (< 380px: iPhone SE, Galaxy Fold Cover, Smart Displays) */
+        @media (max-width: 379px) {
+            #studioHeader {
+                padding: 0.15rem 0.25rem !important;
+            }
+
+            #studioTitle {
+                font-size: 0.6875rem !important;
+            }
+
+            #studioHeaderActions {
+                max-width: calc(100vw - 72px) !important;
+                gap: 0.2rem !important;
+            }
+
+            #btnDownloadSingle,
+            #btnRunBatch {
+                padding: 0.25rem 0.45rem !important;
+                font-size: 0.6875rem !important;
+            }
+
+            #mobileWorkspaceNav {
+                gap: 0.15rem !important;
+                padding: 0.15rem !important;
+            }
+
+            #mobileWorkspaceNav button {
+                font-size: 0.5625rem !important;
+                min-height: 2.4rem !important;
+            }
+
+            #mobilePipPreview {
+                width: 6.5rem !important;
             }
         }
 

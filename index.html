@@ -11462,7 +11462,7 @@
                             }
                         } else if (effDir === 'hd2d' || effDir === 'crosswave' || effDir === 'scurve') {
                             try {
-                                const simW = Math.min(4096, Math.max(720, Math.round(workW)));
+                                const simW = Math.min(8192, Math.max(720, Math.round(workW)));
                                 const simH = Math.round(simW * (workH / workW));
                                 const srcSim = document.createElement('canvas');
                                 srcSim.width = simW;
@@ -11715,6 +11715,8 @@
                                 const srcY = Math.max(0, Math.min(workH - srcH, y + (ribH - srcH) * 0.5 + shiftY));
                                 gCtx.drawImage(pass1, 0, srcY, workW, srcH, 0, y, workW, ribH + 2.0);
                             }
+                            gCtx.save();
+                            gCtx.globalCompositeOperation = 'soft-light';
                             for (let i = 0; i < numLines; i++) {
                                 const x = i * ribW;
                                 if (baseNorm > 0) {
@@ -11737,6 +11739,7 @@
                                     gCtx.fillRect(0, y, workW, ribH + 1.0);
                                 }
                             }
+                            gCtx.restore();
                             disposeCanvas(pass1);
                         } else if (effDir === 'vertical') {
                             for (let i = 0; i < numLines; i++) {
@@ -14707,10 +14710,6 @@
                         if (typeof inject300DpiToJpegBlob === 'function') {
                             blob = await inject300DpiToJpegBlob(blob);
                         }
-                        const is4K = (dims.width >= 3840 || dims.height >= 2160 || dims.width * dims.height >= 8000000);
-                        if (is4K && typeof padJpegBlobToMinSize === 'function') {
-                            blob = await padJpegBlobToMinSize(blob, Math.round(10.5 * 1024 * 1024));
-                        }
                     }
                     if (typeof triggerActualBlobDownload === 'function') {
                         triggerActualBlobDownload(blob, filename);
@@ -16722,18 +16721,17 @@ false 3 colorimage
             targetCtx.imageSmoothingEnabled = true;
             targetCtx.imageSmoothingQuality = 'high';
 
-            // 4K Microstock Standard Compliance Rule:
-            // Whatever input image is provided, if resolution is 4K or above (w >= 3840 or h >= 2160),
-            // the output file size is GUARANTEED to be strictly above 10 MB (10.5 MB minimum).
+            // Commercial Microstock Compliance (Shutterstock / Adobe Stock / Freepik):
+            // Native pixel compression with zero synthetic padding unless explicitly requested by user
             const is4KOrAbove = (w >= 3840 || h >= 2160 || w * h >= 8000000);
-            const effectiveMinMB = is4KOrAbove ? Math.max(10.5, (minMB || 0)) : Math.max(0, (minMB || 0));
-            const minBytes = Math.round(effectiveMinMB * 1024 * 1024);
+            const minBytes = minMB && minMB > 0 ? Math.round(minMB * 1024 * 1024) : 0;
             const maxBytes = Math.max(minBytes + 2048 * 1024, (maxMB || 30) * 1024 * 1024);
 
             // Apply Microstock Sharpening & Anti-Banding Dithering
             if (mimeType !== 'image/svg+xml' && mimeType !== 'application/postscript') {
                 if (w >= 1200) {
-                    applyCanvasMicrostockSharpen(targetCtx, w, h, 0.22);
+                    const dynamicStrength = w >= 6000 ? 0.32 : (w >= 3840 ? 0.26 : 0.20);
+                    applyCanvasMicrostockSharpen(targetCtx, w, h, dynamicStrength);
                 }
                 applyAntiBandingDither(targetCtx, w, h);
             }

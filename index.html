@@ -4386,9 +4386,9 @@
                             <div>
                                 <div class="flex justify-between text-[10px] mb-0.5">
                                     <span class="studio-label">Studio Vignette</span>
-                                    <span id="valLightVignette" class="studio-accent-text font-semibold">20%</span>
+                                    <span id="valLightVignette" class="studio-accent-text font-semibold">0%</span>
                                 </div>
-                                <input id="rngLightVignette" type="range" min="0" max="100" value="20" class="w-full">
+                                <input id="rngLightVignette" type="range" min="0" max="100" value="0" class="w-full">
                             </div>
                         </div>
                     </div>
@@ -5886,7 +5886,7 @@
             lightFlare: 30,
             lightBokeh: 25,
             lightGlow: 35,
-            lightVignette: 20,
+            lightVignette: 0,
             noiseEnable: true,
             textureType: "filmgrain",
             noiseBlendMode: "overlay",
@@ -14540,9 +14540,9 @@ function render100PremiumBackground(ctx, width, height, modelNum, opts) {
                         const gSurface = state.glassSurface || 'smooth';
                         const gLayering = state.glassLayering || 'single';
 
-                        const grooveLinesMap = { fine: 115, medium: 72, wide: 38, deep: 64, shallow: 84 };
+                        const grooveLinesMap = { fine: 56, medium: 38, wide: 22, deep: 32, shallow: 44 };
                         const grooveDepthMap = { fine: 0.75, medium: 1.0, wide: 1.25, deep: 1.65, shallow: 0.55 };
-                        let numLines = Math.max(8, Math.round((grooveLinesMap[gGroove] || 72) * (densityFactor / scaleFactor)));
+                        let numLines = Math.max(8, Math.round((grooveLinesMap[gGroove] || 38) * (densityFactor / scaleFactor)));
                         let depthMult = (grooveDepthMap[gGroove] || 1.0) * ({ thin: 0.6, standard: 1.0, thick: 1.45, crystal: 1.9 }[gThickness] || 1.0);
 
                         // Distinct density & refraction multipliers for all presets
@@ -14660,162 +14660,157 @@ function render100PremiumBackground(ctx, width, height, modelNum, opts) {
                                 disposeCanvas(frostCanvas);
 
                             } else if (proCatName === 'rib') {
-                                if (proSubIdx === 2) {
-                                    for (let j = 0; j < numRows; j++) {
-                                        const y = j * ribH;
-                                        const shiftY = Math.sin(j * 0.78 + state.seed) * maxShiftY;
-                                        const srcH = Math.max(2, ribH / lensStretch);
-                                        const srcY = Math.max(0, Math.min(workH - srcH, y + (ribH - srcH) * 0.5 + shiftY));
-                                        gCtx.drawImage(glassSrc, 0, srcY, workW, srcH, 0, y, workW, ribH + 2.0);
-                                        const bev = gCtx.createLinearGradient(0, y, 0, y + ribH);
-                                        bev.addColorStop(0, `rgba(255,255,255,${Math.min(0.62, baseNorm * 0.32 * lightBoost)})`);
-                                        bev.addColorStop(0.5, 'rgba(255,255,255,0)');
-                                        bev.addColorStop(1, `rgba(10,15,28,${Math.min(0.62, baseNorm * 0.34 * lightBoost)})`);
-                                        gCtx.fillStyle = bev;
-                                        gCtx.fillRect(0, y, workW, ribH + 1.0);
-                                    }
-                                } else if ([6, 7, 8, 9, 10, 11].includes(proSubIdx)) {
-                                    try {
-                                        const simW = Math.min(8192, Math.max(720, Math.round(workW)));
-                                        const simH = Math.round(simW * (workH / workW));
-                                        const srcSim = document.createElement('canvas');
-                                        srcSim.width = simW; srcSim.height = simH;
-                                        const sSimCtx = srcSim.getContext('2d');
-                                        sSimCtx.imageSmoothingEnabled = true;
-                                        sSimCtx.imageSmoothingQuality = 'high';
-                                        sSimCtx.drawImage(glassSrc, 0, 0, simW, simH);
-                                        const srcPx = sSimCtx.getImageData(0, 0, simW, simH).data;
-                                        const outSim = document.createElement('canvas');
-                                        outSim.width = simW; outSim.height = simH;
-                                        const outImg = outSim.getContext('2d').createImageData(simW, simH);
-                                        const dstPx = outImg.data;
-                                        const cell = simW / Math.max(10, numLines);
-                                        const amp = opticsNorm * cell * 1.45 * depthMult;
-                                        const shAmp = baseNorm * 0.55 * lightBoost;
+                                try {
+                                    const simW = Math.min(8192, Math.max(720, Math.round(workW)));
+                                    const simH = Math.round(simW * (workH / workW));
+                                    const srcSim = document.createElement('canvas');
+                                    srcSim.width = simW; srcSim.height = simH;
+                                    const sSimCtx = srcSim.getContext('2d');
+                                    sSimCtx.imageSmoothingEnabled = true;
+                                    sSimCtx.imageSmoothingQuality = 'high';
+                                    sSimCtx.drawImage(glassSrc, 0, 0, simW, simH);
+                                    const srcPx = sSimCtx.getImageData(0, 0, simW, simH).data;
+                                    const outSim = document.createElement('canvas');
+                                    outSim.width = simW; outSim.height = simH;
+                                    const outImg = outSim.getContext('2d').createImageData(simW, simH);
+                                    const dstPx = outImg.data;
+                                    const cell = simW / Math.max(10, numLines);
+                                    const amp = opticsNorm * cell * 1.45 * depthMult;
+                                    const shAmp = baseNorm * 0.55 * lightBoost;
 
-                                        const sampleBilinear = (fx, fy, ch) => {
-                                            const x0 = Math.max(0, Math.min(simW - 2, Math.floor(fx)));
-                                            const y0 = Math.max(0, Math.min(simH - 2, Math.floor(fy)));
-                                            const tx = Math.max(0, Math.min(1, fx - x0));
-                                            const ty = Math.max(0, Math.min(1, fy - y0));
-                                            const i00 = (y0 * simW + x0) * 4 + ch;
-                                            const i10 = i00 + 4;
-                                            const i01 = i00 + simW * 4;
-                                            const i11 = i01 + 4;
-                                            return (srcPx[i00] * (1 - tx) + srcPx[i10] * tx) * (1 - ty) +
-                                                   (srcPx[i01] * (1 - tx) + srcPx[i11] * tx) * ty;
-                                        };
+                                    const sampleBilinear = (fx, fy, ch) => {
+                                        const x0 = Math.max(0, Math.min(simW - 2, Math.floor(fx)));
+                                        const y0 = Math.max(0, Math.min(simH - 2, Math.floor(fy)));
+                                        const tx = Math.max(0, Math.min(1, fx - x0));
+                                        const ty = Math.max(0, Math.min(1, fy - y0));
+                                        const i00 = (y0 * simW + x0) * 4 + ch;
+                                        const i10 = i00 + 4;
+                                        const i01 = i00 + simW * 4;
+                                        const i11 = i01 + 4;
+                                        return (srcPx[i00] * (1 - tx) + srcPx[i10] * tx) * (1 - ty) +
+                                               (srcPx[i01] * (1 - tx) + srcPx[i11] * tx) * ty;
+                                    };
 
-                                        for (let y = 0; y < simH; y++) {
-                                            for (let x = 0; x < simW; x++) {
-                                                let dx = 0, dy = 0, sh = 0;
-                                                if (proSubIdx === 6) {
-                                                    const wv = Math.sin((y / simH) * Math.PI * 6 + state.seed) * cell * 2.5;
-                                                    const u = (x + wv) / cell;
-                                                    const ph = (u - Math.floor(u)) * 2 - 1;
-                                                    dx = -ph * amp * 1.3;
-                                                    sh = (Math.cos(ph * Math.PI * 0.5) * 0.35 - Math.abs(ph) * 0.45) * shAmp;
-                                                } else if (proSubIdx === 7) {
-                                                    const r1 = Math.sin(x / (cell * 0.65) + Math.cos(y / (cell * 0.85) + state.seed));
-                                                    const r2 = Math.cos(y / (cell * 0.65) + state.seed);
-                                                    dx = r1 * amp * 1.2; dy = r2 * amp * 1.2;
-                                                    sh = (r1 + r2) * 0.25 * shAmp;
-                                                } else if (proSubIdx === 8) {
-                                                    const gx = (x / (cell * 1.3)) + Math.sin(y / (cell * 1.3)) * 0.25;
-                                                    const gy = (y / (cell * 1.3)) + Math.cos(x / (cell * 1.3)) * 0.25;
-                                                    const fx = (gx - Math.floor(gx)) * 2 - 1;
-                                                    const fy = (gy - Math.floor(gy)) * 2 - 1;
-                                                    dx = -fx * amp; dy = -fy * amp;
-                                                    sh = ((1 - (fx * fx + fy * fy) * 0.6) * 0.35 - Math.max(Math.abs(fx), Math.abs(fy)) * 0.35) * shAmp;
-                                                } else if (proSubIdx === 9) {
-                                                    const bCell = cell * 1.8;
-                                                    const bx = Math.floor(x / bCell), by = Math.floor(y / bCell);
-                                                    const hx = Math.abs(Math.sin(bx * 12.989 + by * 78.233 + state.seed) * 43758.54) % 1;
-                                                    const hy = Math.abs(Math.sin(bx * 93.989 + by * 67.345 + state.seed) * 24634.63) % 1;
-                                                    const dist = Math.hypot(x - (bx + 0.2 + hx * 0.6) * bCell, y - (by + 0.2 + hy * 0.6) * bCell);
-                                                    const bRad = bCell * (0.08 + (hx * 0.12));
-                                                    if (dist < bRad) {
-                                                        const nx = (x - (bx + 0.2 + hx * 0.6) * bCell) / bRad;
-                                                        const ny = (y - (by + 0.2 + hy * 0.6) * bCell) / bRad;
-                                                        dx = -nx * amp * 1.6; dy = -ny * amp * 1.6;
-                                                        sh = (1 - (nx * nx + ny * ny)) * 0.65 * shAmp;
-                                                    }
-                                                } else if (proSubIdx === 11) {
-                                                    // 2.11 3D Liquid Reeded Flow (Fluid Fluted Wave & Vortex)
-                                                    const nx = x / simW;
-                                                    const ny = y / simH;
-                                                    let env = 0;
-                                                    if (nx > 0.22 && nx < 0.38) {
-                                                        const te = (nx - 0.22) / 0.16;
-                                                        env = te * te * (3 - 2 * te);
-                                                    } else if (nx >= 0.38 && nx <= 0.78) {
-                                                        env = 1.0;
-                                                    } else if (nx > 0.78) {
-                                                        const te = Math.min(1, (nx - 0.78) / 0.20);
-                                                        env = 1.0 - te * te * (3 - 2 * te) * 0.55;
-                                                    }
-                                                    const flowWave1 = Math.sin(ny * Math.PI * 3.1 + 0.35 + state.seed) * (cell * 1.55);
-                                                    const flowWave2 = Math.cos(ny * Math.PI * 1.6 - 0.50 - state.seed * 0.5) * (cell * 0.9);
-                                                    const flowWave3 = Math.sin(ny * Math.PI * 4.8) * (cell * 0.38);
-                                                    const dxEddy = (nx - 0.47) * 1.6;
-                                                    const dyEddy = (ny - 0.54);
-                                                    const eddyG = Math.exp(-(dxEddy * dxEddy + dyEddy * dyEddy) / 0.065);
-                                                    const eddyCurl = -Math.sin(Math.atan2(dyEddy, dxEddy) * 1.5 - 0.4 + state.seed) * (cell * 2.0) * eddyG;
-                                                    const totalWarp = (flowWave1 + flowWave2 + flowWave3 + eddyCurl) * env;
-
-                                                    const u = (x + totalWarp) / cell;
-                                                    const ph = (u - Math.floor(u)) * 2 - 1;
-                                                    dx = -ph * amp * 1.25;
-                                                    dy = Math.cos(ny * Math.PI * 3.1) * amp * 0.35 * env;
-                                                    const grooveShadow = Math.exp(-Math.pow((ph + 1.0) / 0.32, 2.0)) * 0.45;
-                                                    const cylHighlight = Math.cos(ph * Math.PI * 0.5) * 0.38;
-                                                    sh = (cylHighlight - grooveShadow) * shAmp;
-                                                } else {
-                                                    const u = (x + y) / (cell * 1.2);
-                                                    const v = (x - y) / (cell * 1.2);
-                                                    const fx = (u - Math.floor(u)) * 2 - 1;
-                                                    const fy = (v - Math.floor(v)) * 2 - 1;
-                                                    dx = fx * amp * 0.85;
-                                                    dy = fy * amp * 0.85;
-                                                    sh = (-fx * 0.32 - fy * 0.32) * shAmp;
+                                    for (let y = 0; y < simH; y++) {
+                                        const ny = y / simH;
+                                        for (let x = 0; x < simW; x++) {
+                                            const nx = x / simW;
+                                            let dx = 0, dy = 0, sh = 0, spec = 0;
+                                            if (proSubIdx === 2) {
+                                                // 2.2 Continuous Anti-Aliased Horizontal Reeded Glass HD (Zero Moiré, Zero Slicing)
+                                                const safeRows = Math.max(14, Math.min(48, Math.round(numLines * (simH / simW))));
+                                                const cellH = simH / safeRows;
+                                                const u = y / cellH;
+                                                const ph = Math.sin(u * Math.PI * 2);
+                                                dy = -Math.sin(ph * Math.PI * 0.5) * amp * 1.25;
+                                                dx = Math.sin(nx * Math.PI * 3 + state.seed) * amp * 0.12;
+                                                const cylHighlight = Math.cos(ph * Math.PI * 0.5) * 0.38;
+                                                const grooveShadow = Math.pow(Math.abs(ph), 2.0) * 0.42;
+                                                sh = (cylHighlight - grooveShadow) * shAmp;
+                                                spec = Math.pow(Math.max(0, 1.0 - Math.abs(ph + 0.15) * 2.0), 3) * 52 * shAmp;
+                                            } else if (proSubIdx === 1 || proSubIdx === 3 || proSubIdx === 4 || proSubIdx === 5) {
+                                                // 2.1, 2.3, 2.4, 2.5 Continuous Vertical Reeded Glass HD (Anti-Aliased Fluting)
+                                                const safeCols = Math.max(16, Math.min(56, proSubIdx === 5 ? Math.round(numLines * 1.35) : (proSubIdx === 3 ? Math.round(numLines * 1.2) : numLines)));
+                                                const cellW = simW / safeCols;
+                                                const dBoost = proSubIdx === 4 ? 1.55 : 1.0;
+                                                const u = x / cellW;
+                                                const ph = Math.sin(u * Math.PI * 2);
+                                                dx = -Math.sin(ph * Math.PI * 0.5) * amp * 1.25 * dBoost;
+                                                dy = Math.sin(ny * Math.PI * 4 + state.seed) * amp * 0.14;
+                                                const cylHighlight = Math.cos(ph * Math.PI * 0.5) * 0.38;
+                                                const grooveShadow = Math.pow(Math.abs(ph), 2.0) * 0.45;
+                                                sh = (cylHighlight - grooveShadow) * shAmp * dBoost;
+                                                spec = Math.pow(Math.max(0, 1.0 - Math.abs(ph + 0.15) * 2.0), 3) * 52 * shAmp * dBoost;
+                                            } else if (proSubIdx === 6) {
+                                                const wv = Math.sin((y / simH) * Math.PI * 6 + state.seed) * cell * 2.5;
+                                                const u = (x + wv) / cell;
+                                                const ph = (u - Math.floor(u)) * 2 - 1;
+                                                dx = -ph * amp * 1.3;
+                                                sh = (Math.cos(ph * Math.PI * 0.5) * 0.35 - Math.abs(ph) * 0.45) * shAmp;
+                                            } else if (proSubIdx === 7) {
+                                                const r1 = Math.sin(x / (cell * 0.65) + Math.cos(y / (cell * 0.85) + state.seed));
+                                                const r2 = Math.cos(y / (cell * 0.65) + state.seed);
+                                                dx = r1 * amp * 1.2; dy = r2 * amp * 1.2;
+                                                sh = (r1 + r2) * 0.25 * shAmp;
+                                            } else if (proSubIdx === 8) {
+                                                const gx = (x / (cell * 1.3)) + Math.sin(y / (cell * 1.3)) * 0.25;
+                                                const gy = (y / (cell * 1.3)) + Math.cos(x / (cell * 1.3)) * 0.25;
+                                                const fx = (gx - Math.floor(gx)) * 2 - 1;
+                                                const fy = (gy - Math.floor(gy)) * 2 - 1;
+                                                dx = -fx * amp; dy = -fy * amp;
+                                                sh = ((1 - (fx * fx + fy * fy) * 0.6) * 0.35 - Math.max(Math.abs(fx), Math.abs(fy)) * 0.35) * shAmp;
+                                            } else if (proSubIdx === 9) {
+                                                const bCell = cell * 1.8;
+                                                const bx = Math.floor(x / bCell), by = Math.floor(y / bCell);
+                                                const hx = Math.abs(Math.sin(bx * 12.989 + by * 78.233 + state.seed) * 43758.54) % 1;
+                                                const hy = Math.abs(Math.sin(bx * 93.989 + by * 67.345 + state.seed) * 24634.63) % 1;
+                                                const dist = Math.hypot(x - (bx + 0.2 + hx * 0.6) * bCell, y - (by + 0.2 + hy * 0.6) * bCell);
+                                                const bRad = bCell * (0.08 + (hx * 0.12));
+                                                if (dist < bRad) {
+                                                    const nx = (x - (bx + 0.2 + hx * 0.6) * bCell) / bRad;
+                                                    const ny = (y - (by + 0.2 + hy * 0.6) * bCell) / bRad;
+                                                    dx = -nx * amp * 1.6; dy = -ny * amp * 1.6;
+                                                    sh = (1 - (nx * nx + ny * ny)) * 0.65 * shAmp;
                                                 }
-                                                const rx = Math.max(0, Math.min(simW - 1, x + dx));
-                                                const ry = Math.max(0, Math.min(simH - 1, y + dy));
-                                                const di = (y * simW + x) * 4;
-                                                const m = 1 + sh;
-                                                dstPx[di] = Math.max(0, Math.min(255, Math.round(sampleBilinear(rx, ry, 0) * m)));
-                                                dstPx[di + 1] = Math.max(0, Math.min(255, Math.round(sampleBilinear(rx, ry, 1) * m)));
-                                                dstPx[di + 2] = Math.max(0, Math.min(255, Math.round(sampleBilinear(rx, ry, 2) * m)));
-                                                dstPx[di + 3] = 255;
+                                            } else if (proSubIdx === 11) {
+                                                // 2.11 3D Liquid Reeded Flow (Fluid Fluted Wave & Vortex)
+                                                const nx = x / simW;
+                                                const ny = y / simH;
+                                                let env = 0;
+                                                if (nx > 0.22 && nx < 0.38) {
+                                                    const te = (nx - 0.22) / 0.16;
+                                                    env = te * te * (3 - 2 * te);
+                                                } else if (nx >= 0.38 && nx <= 0.78) {
+                                                    env = 1.0;
+                                                } else if (nx > 0.78) {
+                                                    const te = Math.min(1, (nx - 0.78) / 0.20);
+                                                    env = 1.0 - te * te * (3 - 2 * te) * 0.55;
+                                                }
+                                                const flowWave1 = Math.sin(ny * Math.PI * 3.1 + 0.35 + state.seed) * (cell * 1.55);
+                                                const flowWave2 = Math.cos(ny * Math.PI * 1.6 - 0.50 - state.seed * 0.5) * (cell * 0.9);
+                                                const flowWave3 = Math.sin(ny * Math.PI * 4.8) * (cell * 0.38);
+                                                const dxEddy = (nx - 0.47) * 1.6;
+                                                const dyEddy = (ny - 0.54);
+                                                const eddyG = Math.exp(-(dxEddy * dxEddy + dyEddy * dyEddy) / 0.065);
+                                                const eddyCurl = -Math.sin(Math.atan2(dyEddy, dxEddy) * 1.5 - 0.4 + state.seed) * (cell * 2.0) * eddyG;
+                                                const totalWarp = (flowWave1 + flowWave2 + flowWave3 + eddyCurl) * env;
+
+                                                const u = (x + totalWarp) / cell;
+                                                const ph = (u - Math.floor(u)) * 2 - 1;
+                                                dx = -ph * amp * 1.25;
+                                                dy = Math.cos(ny * Math.PI * 3.1) * amp * 0.35 * env;
+                                                const grooveShadow = Math.exp(-Math.pow((ph + 1.0) / 0.32, 2.0)) * 0.45;
+                                                const cylHighlight = Math.cos(ph * Math.PI * 0.5) * 0.38;
+                                                sh = (cylHighlight - grooveShadow) * shAmp;
+                                            } else {
+                                                const u = (x + y) / (cell * 1.2);
+                                                const v = (x - y) / (cell * 1.2);
+                                                const fx = (u - Math.floor(u)) * 2 - 1;
+                                                const fy = (v - Math.floor(v)) * 2 - 1;
+                                                dx = fx * amp * 0.85;
+                                                dy = fy * amp * 0.85;
+                                                sh = (-fx * 0.32 - fy * 0.32) * shAmp;
                                             }
+                                            const rx = Math.max(0, Math.min(simW - 1, x + dx));
+                                            const ry = Math.max(0, Math.min(simH - 1, y + dy));
+                                            const di = (y * simW + x) * 4;
+                                            const m = 1 + sh;
+                                            const dither = ((Math.random() + Math.random()) - 1.0) * 0.65;
+                                            dstPx[di] = Math.max(0, Math.min(255, Math.round(sampleBilinear(rx, ry, 0) * m + spec + dither)));
+                                            dstPx[di + 1] = Math.max(0, Math.min(255, Math.round(sampleBilinear(rx, ry, 1) * m + spec + dither)));
+                                            dstPx[di + 2] = Math.max(0, Math.min(255, Math.round(sampleBilinear(rx, ry, 2) * m + spec + dither)));
+                                            dstPx[di + 3] = 255;
                                         }
-                                        outSim.getContext('2d').putImageData(outImg, 0, 0);
-                                        gCtx.imageSmoothingEnabled = true;
-                                        gCtx.imageSmoothingQuality = 'high';
-                                        gCtx.drawImage(outSim, 0, 0, workW, workH);
-                                        disposeCanvas(srcSim);
-                                        disposeCanvas(outSim);
-                                    } catch (pGlassErr) {
-                                        console.warn('Procedural glass fallback:', pGlassErr);
-                                        gCtx.drawImage(glassSrc, 0, 0, workW, workH);
                                     }
-                                } else {
-                                    const lines = proSubIdx === 5 ? Math.round(numLines * 1.85) : (proSubIdx === 3 ? Math.round(numLines * 1.4) : numLines);
-                                    const rW = workW / lines;
-                                    const dBoost = proSubIdx === 4 ? 1.55 : 1.0;
-                                    for (let i = 0; i < lines; i++) {
-                                        const x = i * rW;
-                                        const shiftX = Math.sin(i * 0.75 + state.seed) * rW * 1.4 * opticsNorm * dBoost;
-                                        const srcW = Math.max(2, rW / (1 + 0.4 * opticsNorm * dBoost));
-                                        const srcX = Math.max(0, Math.min(workW - srcW, x + (rW - srcW) * 0.5 + shiftX));
-                                        gCtx.drawImage(glassSrc, srcX, 0, srcW, workH, x, 0, rW + 1.8, workH);
-                                        const bev = gCtx.createLinearGradient(x, 0, x + rW, 0);
-                                        bev.addColorStop(0, `rgba(255,255,255,${Math.min(0.68, baseNorm * 0.34 * dBoost)})`);
-                                        bev.addColorStop(0.45, 'rgba(255,255,255,0)');
-                                        bev.addColorStop(1, `rgba(10,15,28,${Math.min(0.68, baseNorm * 0.36 * dBoost)})`);
-                                        gCtx.fillStyle = bev;
-                                        gCtx.fillRect(x, 0, rW + 1.0, workH);
-                                    }
+                                    outSim.getContext('2d').putImageData(outImg, 0, 0);
+                                    gCtx.imageSmoothingEnabled = true;
+                                    gCtx.imageSmoothingQuality = 'high';
+                                    gCtx.drawImage(outSim, 0, 0, workW, workH);
+                                    disposeCanvas(srcSim);
+                                    disposeCanvas(outSim);
+                                } catch (pGlassErr) {
+                                    console.warn('Procedural glass fallback:', pGlassErr);
+                                    gCtx.drawImage(glassSrc, 0, 0, workW, workH);
                                 }
 
                             } else if (proCatName === 'prism') {
@@ -15443,7 +15438,7 @@ function render100PremiumBackground(ctx, width, height, modelNum, opts) {
                                     gCtx.restore();
                                 });
                             }
-                        } else if (effDir === 'hd2d' || effDir === 'crosswave' || effDir === 'scurve') {
+                        } else if (effDir === 'hd2d' || effDir === 'crosswave' || effDir === 'scurve' || effDir === 'horizontal' || effDir === 'vertical' || effDir === 'diagonal' || effDir === 'dual') {
                             try {
                                 const simW = Math.min(8192, Math.max(720, Math.round(workW)));
                                 const simH = Math.round(simW * (workH / workW));
@@ -15555,9 +15550,38 @@ function render100PremiumBackground(ctx, width, height, modelNum, opts) {
                                             shade = (-slopeX * 0.32 - slopeY * 0.32) * shadeAmp;
                                             const apexDist = Math.hypot(triU - 0.7, triV - 0.7);
                                             spec = Math.pow(Math.max(0, 1.0 - apexDist * 1.45), 3) * 58 * shadeAmp;
-                                        } else if (styleNum === 1) {
+                                        } else if (effDir === 'horizontal' || [5, 10, 24].includes(styleNum)) {
+                                            // Continuous Anti-Aliased Horizontal Venetian / Fluted Ribs HD (Zero Moiré, C^infinity Smooth)
+                                            const safeRows = Math.max(14, Math.min(48, Math.round(numLines * (simH / simW))));
+                                            const cellPy = simH / safeRows;
+                                            let u = y / cellPy;
+                                            if (styleNum === 24) {
+                                                const ripple = Math.sin(nx * Math.PI * 6 + seedVal) * (cellPy * 0.35);
+                                                u = (y + ripple) / cellPy;
+                                            }
+                                            const phase = Math.sin(u * Math.PI * 2);
+                                            const smoothPhase = Math.sin(phase * Math.PI * 0.5);
+                                            dy = -smoothPhase * refractAmp * 1.15;
+                                            dx = Math.sin(nx * Math.PI * 3 + seedVal) * refractAmp * (styleNum === 24 ? 0.35 : 0.12);
+                                            const cylHighlight = Math.cos(phase * Math.PI * 0.5) * 0.38;
+                                            const grooveCrease = Math.pow(Math.abs(phase), 2.0) * 0.42;
+                                            shade = (cylHighlight - grooveCrease) * shadeAmp;
+                                            if (styleNum === 10) {
+                                                shade += Math.sin(u * Math.PI * 2) * 0.18 * shadeAmp;
+                                            }
+                                            spec = Math.pow(Math.max(0, 1.0 - Math.abs(phase + 0.15) * 2.0), 3) * 52 * shadeAmp;
+                                        } else if (effDir === 'vertical' || styleNum === 1) {
                                             // 01. Classic Reeded Glass HD (Continuous Anti-Aliased Vertical Fluting)
-                                            const u = x / cellPx;
+                                            const safeCols = Math.max(16, Math.min(56, numLines));
+                                            const cellCol = simW / safeCols;
+                                            let u = x / cellCol;
+                                            if (effShape === 'wavy' || styleNum === 31) {
+                                                const wave = Math.sin(ny * Math.PI * 6 + seedVal) * (cellCol * 0.4);
+                                                u = (x + wave) / cellCol;
+                                            } else if (effShape === 'curved' || styleNum === 12) {
+                                                const curve = Math.sin(ny * Math.PI * 2.5 + seedVal) * (cellCol * 0.5);
+                                                u = (x + curve) / cellCol;
+                                            }
                                             const phase = Math.sin(u * Math.PI * 2);
                                             const smoothPhase = Math.sin(phase * Math.PI * 0.5);
                                             dx = -smoothPhase * refractAmp * 1.15;
@@ -15566,6 +15590,32 @@ function render100PremiumBackground(ctx, width, height, modelNum, opts) {
                                             const grooveCrease = Math.pow(Math.abs(phase), 2.0) * 0.45;
                                             shade = (cylHighlight - grooveCrease) * shadeAmp;
                                             spec = Math.pow(Math.max(0, 1.0 - Math.abs(phase + 0.15) * 2.0), 3) * 52 * shadeAmp;
+                                        } else if (effDir === 'diagonal' || [7, 19, 20, 21].includes(styleNum)) {
+                                            // Continuous Anti-Aliased Diagonal Fluted Glass HD
+                                            const diagPeriod = cellPx * 1.414;
+                                            const u = (x + y) / diagPeriod;
+                                            const phase = Math.sin(u * Math.PI * 2);
+                                            const smoothPhase = Math.sin(phase * Math.PI * 0.5);
+                                            dx = -smoothPhase * refractAmp * 0.82;
+                                            dy = -smoothPhase * refractAmp * 0.82;
+                                            const cylHighlight = Math.cos(phase * Math.PI * 0.5) * 0.38;
+                                            const grooveCrease = Math.pow(Math.abs(phase), 2.0) * 0.45;
+                                            shade = (cylHighlight - grooveCrease) * shadeAmp;
+                                            spec = Math.pow(Math.max(0, 1.0 - Math.abs(phase + 0.15) * 2.0), 3) * 52 * shadeAmp;
+                                        } else if (effDir === 'dual' || [4, 22, 33].includes(styleNum)) {
+                                            // Continuous Anti-Aliased Dual-Axis Cross Reeded Glass HD
+                                            const safeCols = Math.max(16, Math.min(48, numLines));
+                                            const safeRows = Math.max(12, Math.min(40, Math.round(numLines * (simH / simW))));
+                                            const uX = x / (simW / safeCols);
+                                            const uY = y / (simH / safeRows);
+                                            const pX = Math.sin(uX * Math.PI * 2);
+                                            const pY = Math.sin(uY * Math.PI * 2);
+                                            dx = -Math.sin(pX * Math.PI * 0.5) * refractAmp * 0.75;
+                                            dy = -Math.sin(pY * Math.PI * 0.5) * refractAmp * 0.75;
+                                            const hX = Math.cos(pX * Math.PI * 0.5) * 0.28;
+                                            const hY = Math.cos(pY * Math.PI * 0.5) * 0.28;
+                                            shade = (hX + hY - (Math.abs(pX) + Math.abs(pY)) * 0.3) * shadeAmp;
+                                            spec = Math.pow(Math.max(0, 1.0 - (Math.abs(pX) + Math.abs(pY)) * 0.9), 3) * 44 * shadeAmp;
                                         } else if (styleNum === 6 || styleNum === 44) {
                                             // 06 & 44. Anti-Aliased Concentric Torus Rings (Continuous Trigonometric Phase)
                                             const dist = Math.hypot(x - cx, y - cy);
@@ -15704,9 +15754,10 @@ function render100PremiumBackground(ctx, width, height, modelNum, opts) {
                                         const gVal = sampleBilinear(sx, sy, 1);
                                         const bVal = dispOffset > 0 ? sampleBilinear(sx - dispOffset, sy, 2) : sampleBilinear(sx, sy, 2);
 
-                                        dstPixels[dstIdx] = Math.max(0, Math.min(255, Math.round(rVal * mult + spec)));
-                                        dstPixels[dstIdx + 1] = Math.max(0, Math.min(255, Math.round(gVal * mult + spec)));
-                                        dstPixels[dstIdx + 2] = Math.max(0, Math.min(255, Math.round(bVal * mult + spec)));
+                                        const dither = ((Math.random() + Math.random()) - 1.0) * 0.65;
+                                        dstPixels[dstIdx] = Math.max(0, Math.min(255, Math.round(rVal * mult + spec + dither)));
+                                        dstPixels[dstIdx + 1] = Math.max(0, Math.min(255, Math.round(gVal * mult + spec + dither)));
+                                        dstPixels[dstIdx + 2] = Math.max(0, Math.min(255, Math.round(bVal * mult + spec + dither)));
                                         dstPixels[dstIdx + 3] = 255;
                                     }
                                 }
@@ -15721,154 +15772,6 @@ function render100PremiumBackground(ctx, width, height, modelNum, opts) {
                                 console.warn('Refraction glass fallback:', refractErr);
                                 gCtx.drawImage(glassSrc, 0, 0, workW, workH);
                             }
-                        } else if (effDir === 'dual') {
-                            const pass1 = document.createElement('canvas');
-                            pass1.width = workW;
-                            pass1.height = workH;
-                            const p1Ctx = pass1.getContext('2d');
-                            for (let i = 0; i < numLines; i++) {
-                                const x = i * ribW;
-                                const stepMod = styleNum === 22 ? ((i % 3 === 0 ? 1.4 : 0.7)) : 1.0;
-                                const shiftX = Math.sin(i * 0.75 + state.seed) * maxShiftX * stepMod;
-                                const srcW = Math.max(2, ribW / lensStretch);
-                                const srcX = Math.max(0, Math.min(workW - srcW, x + (ribW - srcW) * 0.5 + shiftX));
-                                p1Ctx.drawImage(glassSrc, srcX, 0, srcW, workH, x, 0, ribW + 2.0, workH);
-                            }
-                            for (let j = 0; j < numRows; j++) {
-                                const y = j * ribH;
-                                const shiftY = Math.cos(j * 0.75 + state.seed) * maxShiftY;
-                                const srcH = Math.max(2, ribH / lensStretch);
-                                const srcY = Math.max(0, Math.min(workH - srcH, y + (ribH - srcH) * 0.5 + shiftY));
-                                gCtx.drawImage(pass1, 0, srcY, workW, srcH, 0, y, workW, ribH + 2.0);
-                            }
-                            gCtx.save();
-                            gCtx.globalCompositeOperation = 'soft-light';
-                            for (let i = 0; i < numLines; i++) {
-                                const x = i * ribW;
-                                if (baseNorm > 0) {
-                                    const bevel = gCtx.createLinearGradient(x, 0, x + ribW, 0);
-                                    bevel.addColorStop(0, `rgba(255,255,255,${Math.min(0.45, baseNorm * 0.22 * lightBoost)})`);
-                                    bevel.addColorStop(0.5, 'rgba(255,255,255,0)');
-                                    bevel.addColorStop(1, `rgba(10,15,28,${Math.min(0.45, baseNorm * 0.24 * lightBoost)})`);
-                                    gCtx.fillStyle = bevel;
-                                    gCtx.fillRect(x, 0, ribW + 1.0, workH);
-                                }
-                            }
-                            for (let j = 0; j < numRows; j++) {
-                                const y = j * ribH;
-                                if (baseNorm > 0) {
-                                    const bevelH = gCtx.createLinearGradient(0, y, 0, y + ribH);
-                                    bevelH.addColorStop(0, `rgba(255,255,255,${Math.min(0.4, baseNorm * 0.18 * lightBoost)})`);
-                                    bevelH.addColorStop(0.5, 'rgba(255,255,255,0)');
-                                    bevelH.addColorStop(1, `rgba(10,15,28,${Math.min(0.4, baseNorm * 0.20 * lightBoost)})`);
-                                    gCtx.fillStyle = bevelH;
-                                    gCtx.fillRect(0, y, workW, ribH + 1.0);
-                                }
-                            }
-                            gCtx.restore();
-                            disposeCanvas(pass1);
-                        } else if (effDir === 'vertical') {
-                            for (let i = 0; i < numLines; i++) {
-                                const x = i * ribW;
-                                const normIdx = i / numLines;
-                                const asymFactor = styleNum === 18 ? (0.5 + 0.9 * Math.sin(normIdx * Math.PI * 6)) : (styleNum === 37 ? (0.6 + 0.7 * Math.cos(normIdx * Math.PI * 3)) : 1.0);
-                                const gradFade = (styleNum === 28 || styleNum === 34) ? (0.25 + 0.75 * normIdx) : 1.0;
-                                let waveMod = 0;
-                                if (effShape === 'wavy') waveMod = Math.sin(normIdx * Math.PI * (styleNum === 31 ? 10 : 7) + state.seed) * maxShiftX * 0.5;
-                                else if (effShape === 'zigzag') waveMod = ((i % 2 === 0 ? 1 : -1) * maxShiftX * 0.4);
-                                else if (effShape === 'curved') waveMod = Math.sin(normIdx * Math.PI * (styleNum === 12 ? 3 : 1)) * maxShiftX * 0.55;
-
-                                const phaseAngle = styleNum === 17 ? (i * 0.5) : (i * 0.75 + state.seed);
-                                const shiftX = (Math.sin(phaseAngle) * maxShiftX * asymFactor * gradFade) + waveMod;
-                                const srcW = Math.max(2, ribW / lensStretch);
-                                const srcX = Math.max(0, Math.min(workW - srcW, x + (ribW - srcW) * 0.5 + shiftX));
-                                gCtx.drawImage(glassSrc, srcX, 0, srcW, workH, x, 0, ribW + 2.0, workH);
-
-                                const effectiveDisp = (styleNum === 26 || styleNum === 27 || styleNum === 29) ? 'rainbow' : gDispersion;
-                                if (opticsNorm > 0.1 && effectiveDisp !== 'none') {
-                                    const dispMult = effectiveDisp === 'rainbow' ? 2.4 : (effectiveDisp === 'medium' ? 1.5 : 0.85);
-                                    gCtx.save();
-                                    gCtx.globalCompositeOperation = 'screen';
-                                    gCtx.globalAlpha = Math.min(0.65, opticsNorm * 0.24 * gradFade * dispMult);
-                                    gCtx.drawImage(glassSrc, Math.min(workW - srcW, srcX + maxShiftX * 0.35 * dispMult), 0, srcW, workH, x, 0, ribW + 1.5, workH);
-                                    gCtx.restore();
-                                }
-
-                                if (baseNorm > 0) {
-                                    const bevel = gCtx.createLinearGradient(x, 0, x + ribW, 0);
-                                    const metallicTint = styleNum === 30 ? 'rgba(220,232,248,' : 'rgba(255,255,255,';
-                                    bevel.addColorStop(0, `${metallicTint}${Math.min(0.68, baseNorm * 0.32 * lightBoost * gradFade)})`);
-                                    bevel.addColorStop(0.28, `rgba(210,240,255,${Math.min(0.45, opticsNorm * 0.18 * lightBoost)})`);
-                                    bevel.addColorStop(0.55, 'rgba(255,255,255,0)');
-                                    bevel.addColorStop(1, `rgba(10,15,28,${Math.min(0.68, baseNorm * 0.34 * lightBoost)})`);
-                                    gCtx.fillStyle = bevel;
-                                    gCtx.fillRect(x, 0, ribW + 1.0, workH);
-                                }
-                            }
-                        } else if (effDir === 'horizontal') {
-                            for (let j = 0; j < numRows; j++) {
-                                const y = j * ribH;
-                                const louverStep = styleNum === 10 ? ((j % 2 === 0 ? 1.3 : 0.7)) : 1.0;
-                                const rippleWave = styleNum === 24 ? Math.sin((j / numRows) * Math.PI * 8 + state.seed) * maxShiftY * 0.45 : 0;
-                                const shiftY = Math.sin(j * 0.8 + state.seed) * maxShiftY * louverStep + rippleWave;
-                                const srcH = Math.max(2, ribH / lensStretch);
-                                const srcY = Math.max(0, Math.min(workH - srcH, y + (ribH - srcH) * 0.5 + shiftY));
-                                gCtx.drawImage(glassSrc, 0, srcY, workW, srcH, 0, y, workW, ribH + 2.0);
-                                if (baseNorm > 0) {
-                                    const bevel = gCtx.createLinearGradient(0, y, 0, y + ribH);
-                                    bevel.addColorStop(0, `rgba(255,255,255,${Math.min(0.65, baseNorm * 0.32 * lightBoost)})`);
-                                    bevel.addColorStop(0.5, 'rgba(255,255,255,0)');
-                                    bevel.addColorStop(1, `rgba(10,15,28,${Math.min(0.65, baseNorm * 0.34 * lightBoost)})`);
-                                    gCtx.fillStyle = bevel;
-                                    gCtx.fillRect(0, y, workW, ribH + 1.0);
-                                }
-                            }
-                        } else if (effDir === 'diagonal') {
-                            const diagCanvas = document.createElement('canvas');
-                            const diagSize = Math.ceil(Math.hypot(workW, workH));
-                            diagCanvas.width = diagSize;
-                            diagCanvas.height = diagSize;
-                            const dCtx = diagCanvas.getContext('2d');
-                            dCtx.imageSmoothingEnabled = true;
-                            dCtx.imageSmoothingQuality = 'high';
-                            dCtx.translate(diagSize / 2, diagSize / 2);
-                            dCtx.rotate(Math.PI / 4);
-                            dCtx.drawImage(glassSrc, -workW / 2, -workH / 2);
-
-                            const dRibW = diagSize / numLines;
-                            const dMaxShift = opticsNorm * dRibW * 1.4 * depthMult;
-                            const diagOut = document.createElement('canvas');
-                            diagOut.width = diagSize;
-                            diagOut.height = diagSize;
-                            const doCtx = diagOut.getContext('2d');
-                            doCtx.imageSmoothingEnabled = true;
-                            doCtx.imageSmoothingQuality = 'high';
-
-                            for (let i = 0; i < numLines; i++) {
-                                const dx = i * dRibW;
-                                const zigMod = (styleNum === 19 || styleNum === 20) ? ((i % 2 === 0 ? 1.35 : -1.35)) : 1.0;
-                                const sX = Math.sin(i * 0.8 + state.seed) * dMaxShift * zigMod;
-                                const srcW = Math.max(2, dRibW / lensStretch);
-                                const clampX = Math.max(0, Math.min(diagSize - srcW, dx + (dRibW - srcW) * 0.5 + sX));
-                                doCtx.drawImage(diagCanvas, clampX, 0, srcW, diagSize, dx, 0, dRibW + 1.0, diagSize);
-                                if (baseNorm > 0) {
-                                    const gBevel = doCtx.createLinearGradient(dx, 0, dx + dRibW, 0);
-                                    gBevel.addColorStop(0, `rgba(255,255,255,${Math.min(0.65, baseNorm * 0.35 * lightBoost)})`);
-                                    gBevel.addColorStop(0.5, 'rgba(255,255,255,0)');
-                                    gBevel.addColorStop(1, `rgba(5,10,22,${Math.min(0.65, baseNorm * 0.38 * lightBoost)})`);
-                                    doCtx.fillStyle = gBevel;
-                                    doCtx.fillRect(dx, 0, dRibW + 0.5, diagSize);
-                                }
-                            }
-                            gCtx.save();
-                            gCtx.imageSmoothingEnabled = true;
-                            gCtx.imageSmoothingQuality = 'high';
-                            gCtx.translate(workW / 2, workH / 2);
-                            gCtx.rotate(-Math.PI / 4);
-                            gCtx.drawImage(diagOut, -diagSize / 2, -diagSize / 2);
-                            gCtx.restore();
-                            disposeCanvas(diagCanvas);
-                            disposeCanvas(diagOut);
                         } else {
                             const rings = Math.max(6, Math.round(numLines * 0.55));
                             const maxR = Math.hypot(workW / 2, workH / 2);

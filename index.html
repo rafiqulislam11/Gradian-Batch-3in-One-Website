@@ -1246,6 +1246,14 @@
                                 <label class="studio-label text-[10px] block mb-0.5 font-bold uppercase tracking-wider">Resolution Standard</label>
                                 <select id="selDimensionPreset"
                                     class="studio-input w-full border rounded-md px-1.5 py-1 text-[11px] font-semibold focus:outline-none">
+                                    <optgroup label="Studio Master Resolutions (Custom Standards)">
+                                        <option value="5600x3150">5600 &times; 3150 px (17.6 MP &bull; 16:9 Ultra HD)</option>
+                                        <option value="6300x2500">6300 &times; 2500 px (15.8 MP &bull; 2.5:1 Panorama)</option>
+                                        <option value="6900x3500">6900 &times; 3500 px (24.2 MP &bull; ~2:1 Stock Master)</option>
+                                        <option value="6200x2700">6200 &times; 2700 px (16.7 MP &bull; 2.3:1 Cinema)</option>
+                                        <option value="7000x3000">7000 &times; 3000 px (21.0 MP &bull; 7:3 Ultra-Wide)</option>
+                                        <option value="7680x4320">7680 &times; 4320 px (33.2 MP &bull; 16:9 8K Cinema)</option>
+                                    </optgroup>
                                     <optgroup label="Microstock Standards (3:2 &amp; 4:3)">
                                         <option value="6000x4000" selected>6000 &times; 4000 (24 MP Ultra Stock &bull; 3:2)</option>
                                         <option value="3000x2000">3000 &times; 2000 (6 MP Fast Stock &bull; 3:2)</option>
@@ -2923,11 +2931,21 @@
                                 <label class="studio-label text-[9px] block">Export Resolution</label>
                                 <select id="selFlowExportRes"
                                     class="studio-input w-full border rounded-md px-1.5 py-1 text-[11px] focus:outline-none">
-                                    <option value="3840x2160" selected>3840 &times; 2160 (4K UHD 16:9)</option>
-                                    <option value="4000x2000">4000 &times; 2000 (4K Stock 2:1)</option>
-                                    <option value="4096x4096">4096 &times; 4096 (1:1 4K Square)</option>
-                                    <option value="2560x1440">2560 &times; 1440 (2K QHD 16:9)</option>
-                                    <option value="1920x1080">1920 &times; 1080 (FHD 16:9)</option>
+                                    <optgroup label="Studio Master Resolutions">
+                                        <option value="5600x3150">5600 &times; 3150 px (17.6 MP &bull; 16:9 Ultra HD)</option>
+                                        <option value="6300x2500">6300 &times; 2500 px (15.8 MP &bull; 2.5:1 Panorama)</option>
+                                        <option value="6900x3500">6900 &times; 3500 px (24.2 MP &bull; ~2:1 Stock Master)</option>
+                                        <option value="6200x2700">6200 &times; 2700 px (16.7 MP &bull; 2.3:1 Cinema)</option>
+                                        <option value="7000x3000">7000 &times; 3000 px (21.0 MP &bull; 7:3 Ultra-Wide)</option>
+                                        <option value="7680x4320">7680 &times; 4320 px (33.2 MP &bull; 16:9 8K Cinema)</option>
+                                    </optgroup>
+                                    <optgroup label="Standard Presets">
+                                        <option value="3840x2160" selected>3840 &times; 2160 (4K UHD 16:9)</option>
+                                        <option value="4000x2000">4000 &times; 2000 (4K Stock 2:1)</option>
+                                        <option value="4096x4096">4096 &times; 4096 (1:1 4K Square)</option>
+                                        <option value="2560x1440">2560 &times; 1440 (2K QHD 16:9)</option>
+                                        <option value="1920x1080">1920 &times; 1080 (FHD 16:9)</option>
+                                    </optgroup>
                                     <option value="custom">Custom Resolution &hellip;</option>
                                 </select>
                                 <div id="flowCustomResInputs" class="grid grid-cols-2 gap-1.5 hidden pt-1">

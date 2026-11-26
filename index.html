@@ -3522,6 +3522,8 @@
 
                                     <option value="pro_rib_10">2.10 Diamond Texture Glass</option>
 
+                                    <option value="pro_rib_11">2.11 3D Liquid Reeded Flow (Fluid Fluted Wave)</option>
+
                                 </optgroup>
 
                                 <optgroup label="3. Optical &amp; Prism Glass">
@@ -3820,8 +3822,8 @@
 
                                 </optgroup>
 
-                                <!-- CATEGORY 10: 25 3D GLASS BACKGROUND STYLES (FULL-FRAME) -->
-                                <optgroup label="10. 25 3D Glass Background Styles (Full-Frame)">
+                                <!-- CATEGORY 10: 26 3D GLASS BACKGROUND STYLES (FULL-FRAME) -->
+                                <optgroup label="10. 26 3D Glass Background Styles (Full-Frame)">
 
                                     <option value="bg_glass_1">10.01 3D Glass Wave</option>
 
@@ -3873,6 +3875,8 @@
 
                                     <option value="bg_glass_25">10.25 3D Soft Glass</option>
 
+                                    <option value="bg_glass_26">10.26 3D Liquid Reeded Glass (Fluid Fluted Wave)</option>
+
                                 </optgroup>
 
                             </select>
@@ -3885,12 +3889,15 @@
                                     <span class="text-[8px] font-mono studio-accent-text font-bold">10 Categories</span>
                                 </div>
                                 <div class="grid grid-cols-4 gap-1">
+                                    <button type="button" data-quick-glass="bg_glass_26"
+                                        class="studio-btn py-1 px-1 rounded border text-[9px] font-bold truncate hover:border-accent-main transition text-center col-span-4 bg-cyan-600/20 border-cyan-500/50 text-cyan-300 shadow-sm"
+                                        title="3D Liquid Reeded Glass (Fluid Fluted Wave) — Click to Apply Immediately">🌊 3D Liquid Reeded Glass (New)</button>
                                     <button type="button" data-quick-glass="flow_1"
                                         class="studio-btn py-1 px-1 rounded border text-[9px] font-bold truncate hover:border-accent-main transition text-center col-span-2 bg-emerald-600/15 border-emerald-500/40 text-emerald-400">🌊
                                         16 Flow Patterns</button>
-                                    <button type="button" data-quick-glass="bg_glass_1"
+                                    <button type="button" data-quick-glass="bg_glass_26"
                                         class="studio-btn py-1 px-1 rounded border text-[9px] font-bold truncate hover:border-accent-main transition text-center col-span-2 bg-sky-600/15 border-sky-500/40 text-sky-400">🧊
-                                        25 3D Glass BGs</button>
+                                        26 3D Glass BGs</button>
                                     <button type="button" data-quick-glass="pro_frost_1"
                                         class="studio-btn py-1 px-1 rounded border text-[9px] font-semibold truncate hover:border-accent-main transition text-center">❄️
                                         Frosted</button>
@@ -10209,6 +10216,119 @@
                 }
 
                 // ====================================================================
+                // 10.26 3D Liquid Reeded Glass (Fluid Fluted Wave & Vortex)
+                // ====================================================================
+                case 'bg_glass_26': {
+                    const simW = Math.min(2048, Math.max(720, Math.round(width)));
+                    const simH = Math.round(simW * (height / width));
+                    const offC = document.createElement('canvas');
+                    offC.width = simW;
+                    offC.height = simH;
+                    const offCtx = offC.getContext('2d');
+                    const imgData = offCtx.createImageData(simW, simH);
+                    const pixels = imgData.data;
+
+                    const densityFactor = Math.max(0.4, (opts.density || 100) / 100);
+                    const scaleFactor = Math.max(0.4, (opts.scale || 100) / 100);
+                    const numFlutes = Math.max(12, Math.round(33.0 * (densityFactor / scaleFactor)));
+                    const fluteW = simW / numFlutes;
+
+                    for (let y = 0; y < simH; y++) {
+                        const ny = y / simH;
+                        const flowWave1 = Math.sin(ny * Math.PI * 3.1 + 0.35) * (48.0 * scaleFactor);
+                        const flowWave2 = Math.cos(ny * Math.PI * 1.6 - 0.50) * (28.0 * scaleFactor);
+                        const flowWave3 = Math.sin(ny * Math.PI * 4.8) * (12.0 * scaleFactor);
+                        const flowRight = Math.sin(ny * Math.PI * 2.4 - 0.2) * (18.0 * scaleFactor);
+
+                        const t1 = Math.min(1, Math.max(0, ny / 0.55));
+                        const t2 = Math.min(1, Math.max(0, (ny - 0.55) / 0.40));
+                        const leftR = (5 * (1 - t1) + 60 * t1) * (1 - t2) + 10 * t2;
+                        const leftG = (83 * (1 - t1) + 187 * t1) * (1 - t2) + 176 * t2;
+                        const leftB = (147 * (1 - t1) + 228 * t1) * (1 - t2) + 238 * t2;
+
+                        const tr1 = Math.min(1, Math.max(0, ny / 0.30));
+                        const tr2 = Math.min(1, Math.max(0, (ny - 0.30) / 0.65));
+                        const rightR = (238 * (1 - tr1) + 168 * tr1) * (1 - tr2) + 99 * tr2;
+                        const rightG = (239 * (1 - tr1) + 155 * tr1) * (1 - tr2) + 97 * tr2;
+                        const rightB = (228 * (1 - tr1) + 110 * tr1) * (1 - tr2) + 56 * tr2;
+
+                        const rowOffset = y * simW * 4;
+
+                        for (let x = 0; x < simW; x++) {
+                            const nx = x / simW;
+
+                            let env = 0;
+                            if (nx > 0.22 && nx < 0.38) {
+                                const te = (nx - 0.22) / 0.16;
+                                env = te * te * (3 - 2 * te);
+                            } else if (nx >= 0.38 && nx <= 0.78) {
+                                env = 1.0;
+                            } else if (nx > 0.78) {
+                                const te = Math.min(1, (nx - 0.78) / 0.20);
+                                env = 1.0 - te * te * (3 - 2 * te) * 0.55;
+                            }
+
+                            const dxEddy = (nx - 0.47) * 1.6;
+                            const dyEddy = (ny - 0.54);
+                            const rEddySq = dxEddy * dxEddy + dyEddy * dyEddy;
+                            const eddyG = Math.exp(-rEddySq / 0.065);
+                            const eddyCurl = -Math.sin(Math.atan2(dyEddy, dxEddy) * 1.5 - 0.4) * (62.0 * scaleFactor) * eddyG;
+
+                            const rWeight = nx > 0.60 ? Math.min(1, (nx - 0.60) / 0.25) : 0;
+                            const totalWarp = (flowWave1 + flowWave2 + flowWave3 + eddyCurl + flowRight * rWeight) * env;
+
+                            const u = (x + totalWarp) / fluteW;
+                            const ribPhase = u - Math.floor(u);
+
+                            const p1 = ribPhase / 0.15;
+                            const grooveShadow = Math.exp(-p1 * p1) * 0.42;
+                            const p2 = (1.0 - ribPhase) / 0.22;
+                            const rightShadow = Math.exp(-p2 * p2) * 0.20;
+                            const cylBody = Math.max(0, Math.cos((ribPhase - 0.40) * Math.PI)) * 0.25;
+                            const specDist = Math.abs(ribPhase - 0.38) / 0.16;
+                            const specBase = Math.max(0, 1.0 - specDist);
+                            const gloss = specBase * specBase * specBase * specBase * 0.40;
+
+                            const lightMod = 1.0 - grooveShadow - rightShadow + cylBody + gloss;
+
+                            const wLeft = nx < 0.18 ? 1.0 : (nx > 0.36 ? 0.0 : (1.0 - ((nx - 0.18) / 0.18)));
+                            const wRight = nx < 0.68 ? 0.0 : (nx > 0.92 ? 1.0 : ((nx - 0.68) / 0.24));
+
+                            const dxW = (nx - 0.52) / 0.28;
+                            const dyW = ny / 0.35;
+                            const wWhite = Math.exp(-(dxW * dxW + dyW * dyW));
+
+                            const dxS = (nx - 0.50) / 0.26;
+                            const dyS = (ny - 0.58) / 0.32;
+                            const wSage = Math.exp(-(dxS * dxS + dyS * dyS));
+
+                            const dxO = (nx - 0.55) / 0.28;
+                            const dyO = (ny - 0.92) / 0.25;
+                            const wBotOlive = Math.exp(-(dxO * dxO + dyO * dyO));
+
+                            const centerWeight = (1.0 - wLeft) * (1.0 - wRight);
+                            const centerR = 116 * wSage + 242 * wWhite + 125 * wBotOlive;
+                            const centerG = 125 * wSage + 242 * wWhite + 128 * wBotOlive;
+                            const centerB = 105 * wSage + 235 * wWhite + 98 * wBotOlive;
+
+                            const bgR = leftR * wLeft + centerR * centerWeight + rightR * wRight;
+                            const bgG = leftG * wLeft + centerG * centerWeight + rightG * wRight;
+                            const bgB = leftB * wLeft + centerB * centerWeight + rightB * wRight;
+
+                            const idx = rowOffset + x * 4;
+                            pixels[idx] = Math.min(255, Math.max(0, Math.round(bgR * lightMod + gloss * 65)));
+                            pixels[idx + 1] = Math.min(255, Math.max(0, Math.round(bgG * lightMod + gloss * 65)));
+                            pixels[idx + 2] = Math.min(255, Math.max(0, Math.round(bgB * lightMod + gloss * 65)));
+                            pixels[idx + 3] = 255;
+                        }
+                    }
+                    offCtx.putImageData(imgData, 0, 0);
+                    ctx.drawImage(offC, 0, 0, width, height);
+                    disposeCanvas(offC);
+                    break;
+                }
+
+                // ====================================================================
                 // 10.25 3D Soft Glass — Atmospheric undulating frosted glass folds
                 // ====================================================================
                 case 'bg_glass_25':
@@ -11010,7 +11130,7 @@
                                         gCtx.fillStyle = bev;
                                         gCtx.fillRect(0, y, workW, ribH + 1.0);
                                     }
-                                } else if ([6, 7, 8, 9, 10].includes(proSubIdx)) {
+                                } else if ([6, 7, 8, 9, 10, 11].includes(proSubIdx)) {
                                     try {
                                         const simW = Math.min(8192, Math.max(720, Math.round(workW)));
                                         const simH = Math.round(simW * (workH / workW));
@@ -11076,6 +11196,36 @@
                                                         dx = -nx * amp * 1.6; dy = -ny * amp * 1.6;
                                                         sh = (1 - (nx * nx + ny * ny)) * 0.65 * shAmp;
                                                     }
+                                                } else if (proSubIdx === 11) {
+                                                    // 2.11 3D Liquid Reeded Flow (Fluid Fluted Wave & Vortex)
+                                                    const nx = x / simW;
+                                                    const ny = y / simH;
+                                                    let env = 0;
+                                                    if (nx > 0.22 && nx < 0.38) {
+                                                        const te = (nx - 0.22) / 0.16;
+                                                        env = te * te * (3 - 2 * te);
+                                                    } else if (nx >= 0.38 && nx <= 0.78) {
+                                                        env = 1.0;
+                                                    } else if (nx > 0.78) {
+                                                        const te = Math.min(1, (nx - 0.78) / 0.20);
+                                                        env = 1.0 - te * te * (3 - 2 * te) * 0.55;
+                                                    }
+                                                    const flowWave1 = Math.sin(ny * Math.PI * 3.1 + 0.35 + state.seed) * (cell * 1.55);
+                                                    const flowWave2 = Math.cos(ny * Math.PI * 1.6 - 0.50 - state.seed * 0.5) * (cell * 0.9);
+                                                    const flowWave3 = Math.sin(ny * Math.PI * 4.8) * (cell * 0.38);
+                                                    const dxEddy = (nx - 0.47) * 1.6;
+                                                    const dyEddy = (ny - 0.54);
+                                                    const eddyG = Math.exp(-(dxEddy * dxEddy + dyEddy * dyEddy) / 0.065);
+                                                    const eddyCurl = -Math.sin(Math.atan2(dyEddy, dxEddy) * 1.5 - 0.4 + state.seed) * (cell * 2.0) * eddyG;
+                                                    const totalWarp = (flowWave1 + flowWave2 + flowWave3 + eddyCurl) * env;
+
+                                                    const u = (x + totalWarp) / cell;
+                                                    const ph = (u - Math.floor(u)) * 2 - 1;
+                                                    dx = -ph * amp * 1.25;
+                                                    dy = Math.cos(ny * Math.PI * 3.1) * amp * 0.35 * env;
+                                                    const grooveShadow = Math.exp(-Math.pow((ph + 1.0) / 0.32, 2.0)) * 0.45;
+                                                    const cylHighlight = Math.cos(ph * Math.PI * 0.5) * 0.38;
+                                                    sh = (cylHighlight - grooveShadow) * shAmp;
                                                 } else {
                                                     const u = (x + y) / (cell * 1.2);
                                                     const v = (x - y) / (cell * 1.2);

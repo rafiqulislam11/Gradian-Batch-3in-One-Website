@@ -3446,7 +3446,7 @@
                             <span
                                 class="panel-accordion-chevron text-[10px] font-mono transition-transform duration-200">▼</span>
                             <span class="studio-heading text-xs font-bold uppercase tracking-wider truncate">5. 3D Glass
-                                Engine (136 Styles)</span>
+                                Engine (158 Styles)</span>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
                             <button id="btnShuffleGlass" type="button"
@@ -3468,9 +3468,9 @@
                             <div class="flex items-center justify-between">
                                 <span
                                     class="text-[10px] font-bold uppercase tracking-wider studio-heading flex items-center gap-1">
-                                    <span>🔮</span> Glass Preset (136 Styles)
+                                    <span>🔮</span> Glass Preset (158 Styles)
                                 </span>
-                                <span class="text-[9px] font-mono studio-accent-text font-bold">8 Categories</span>
+                                <span class="text-[9px] font-mono studio-accent-text font-bold">11 Categories</span>
                             </div>
 
                             <select id="selFracGlassStyle"
@@ -3879,6 +3879,51 @@
 
                                 </optgroup>
 
+                                <!-- CATEGORY 11: 20 MODERN 3D GLASS & FLOW MASTERPIECES -->
+                                <optgroup label="11. 20 Modern 3D Glass &amp; Flow Masterpieces">
+
+                                    <option value="bg_glass_layered_wave">11.01 Layered Wave</option>
+
+                                    <option value="bg_glass_liquid_glass">11.02 Liquid Glass</option>
+
+                                    <option value="bg_glass_flowing_silk">11.03 Flowing Silk</option>
+
+                                    <option value="bg_glass_topographic_lines">11.04 Topographic Lines</option>
+
+                                    <option value="bg_glass_wave_tunnel">11.05 Wave Tunnel</option>
+
+                                    <option value="bg_glass_folded_paper">11.06 Folded Paper</option>
+
+                                    <option value="bg_glass_ribbon_flow">11.07 Ribbon Flow</option>
+
+                                    <option value="bg_glass_mesh_wave">11.08 Mesh Wave</option>
+
+                                    <option value="bg_glass_liquid_chrome">11.09 Liquid Chrome</option>
+
+                                    <option value="bg_glass_concentric_layers">11.10 Concentric Layers</option>
+
+                                    <option value="bg_glass_organic_shapes">11.11 Organic Shapes</option>
+
+                                    <option value="bg_glass_glass_morphism">11.12 Glass Morphism</option>
+
+                                    <option value="bg_glass_radial_waves">11.13 Radial Waves</option>
+
+                                    <option value="bg_glass_spiral_wave">11.14 Spiral Wave</option>
+
+                                    <option value="bg_glass_3d_dunes">11.15 3D Dunes</option>
+
+                                    <option value="bg_glass_curved_panels">11.16 Curved Panels</option>
+
+                                    <option value="bg_glass_holographic">11.17 Holographic</option>
+
+                                    <option value="bg_glass_neon_waves">11.18 Neon Waves</option>
+
+                                    <option value="bg_glass_gradient_mesh">11.19 Gradient Mesh</option>
+
+                                    <option value="bg_glass_sculptural_layers">11.20 Sculptural Layers</option>
+
+                                </optgroup>
+
                             </select>
 
                             <!-- Quick Category Pills (8 Categories + 3D Flow) -->
@@ -3886,16 +3931,19 @@
                                 <div class="flex items-center justify-between">
                                     <span class="text-[9px] font-semibold studio-subtext uppercase tracking-wider">Quick
                                         Category Filter:</span>
-                                    <span class="text-[8px] font-mono studio-accent-text font-bold">10 Categories</span>
+                                    <span class="text-[8px] font-mono studio-accent-text font-bold">11 Categories</span>
                                 </div>
                                 <div class="grid grid-cols-4 gap-1">
                                     <button type="button" data-quick-glass="bg_glass_26"
-                                        class="studio-btn py-1 px-1 rounded border text-[9px] font-bold truncate hover:border-accent-main transition text-center col-span-4 bg-cyan-600/20 border-cyan-500/50 text-cyan-300 shadow-sm"
-                                        title="3D Liquid Reeded Glass (Fluid Fluted Wave) — Click to Apply Immediately">🌊 3D Liquid Reeded Glass (New)</button>
+                                        class="studio-btn py-1 px-1 rounded border text-[9px] font-bold truncate hover:border-accent-main transition text-center col-span-2 bg-cyan-600/20 border-cyan-500/50 text-cyan-300 shadow-sm"
+                                        title="3D Liquid Reeded Glass (Fluid Fluted Wave) — Click to Apply Immediately">🌊 Liquid Reeded (New)</button>
+                                    <button type="button" data-quick-glass="bg_glass_layered_wave"
+                                        class="studio-btn py-1 px-1 rounded border text-[9px] font-bold truncate hover:border-accent-main transition text-center col-span-2 bg-purple-600/20 border-purple-500/50 text-purple-300 shadow-sm"
+                                        title="20 Modern 3D Glass & Flow Masterpieces">✨ 20 Masterpieces</button>
                                     <button type="button" data-quick-glass="flow_1"
                                         class="studio-btn py-1 px-1 rounded border text-[9px] font-bold truncate hover:border-accent-main transition text-center col-span-2 bg-emerald-600/15 border-emerald-500/40 text-emerald-400">🌊
                                         16 Flow Patterns</button>
-                                    <button type="button" data-quick-glass="bg_glass_26"
+                                    <button type="button" data-quick-glass="bg_glass_1"
                                         class="studio-btn py-1 px-1 rounded border text-[9px] font-bold truncate hover:border-accent-main transition text-center col-span-2 bg-sky-600/15 border-sky-500/40 text-sky-400">🧊
                                         26 3D Glass BGs</button>
                                     <button type="button" data-quick-glass="pro_frost_1"
@@ -10327,6 +10375,799 @@
                     disposeCanvas(offC);
                     break;
                 }
+                // ====================================================================
+                // 11.01 Layered Wave — Translucent undulating 3D glass wave strata
+                // ====================================================================
+                case 'bg_glass_layered_wave': {
+                    const layers = Math.max(5, Math.min(12, Math.round(7 * (opts.density ? opts.density / 100 : 1.0))));
+                    for (let i = 0; i < layers; i++) {
+                        ctx.save();
+                        const progress = i / layers;
+                        const y0 = height * (0.12 + progress * 0.72);
+                        const amp = height * (0.18 * scale);
+                        const freq = 2.0 + (i % 3) * 0.5;
+                        const phase = (i * 0.8) + (state.seed || 0);
+
+                        ctx.beginPath();
+                        ctx.moveTo(0, y0);
+                        const steps = 30;
+                        for (let s = 1; s <= steps; s++) {
+                            const px = (s / steps) * width;
+                            const py = y0 + Math.sin((s / steps) * Math.PI * freq + phase) * amp + Math.cos((s / steps) * Math.PI * 1.5 - phase * 0.5) * (amp * 0.4);
+                            ctx.lineTo(px, py);
+                        }
+                        ctx.lineTo(width, height);
+                        ctx.lineTo(0, height);
+                        ctx.closePath();
+
+                        const lGrad = ctx.createLinearGradient(0, y0 - amp, width, y0 + amp + height * 0.3);
+                        const hue = (195 + i * 16) % 360;
+                        lGrad.addColorStop(0, `hsla(${hue}, 88%, 65%, ${0.55 - progress * 0.15})`);
+                        lGrad.addColorStop(0.4, `hsla(${hue + 25}, 80%, 55%, ${0.45 - progress * 0.1})`);
+                        lGrad.addColorStop(0.8, `hsla(${hue + 45}, 70%, 40%, 0.65)`);
+                        lGrad.addColorStop(1, 'rgba(8, 14, 30, 0.85)');
+                        ctx.fillStyle = lGrad;
+                        ctx.shadowColor = 'rgba(0, 5, 20, 0.45)';
+                        ctx.shadowBlur = 18 * scale;
+                        ctx.shadowOffsetY = 10 * scale;
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = Math.max(2, (4.5 - progress * 2.0) * scale);
+                        ctx.strokeStyle = `hsla(${hue}, 100%, 92%, ${0.9 - progress * 0.3})`;
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.02 Liquid Glass — Organic fluid melting glass caustics
+                // ====================================================================
+                case 'bg_glass_liquid_glass': {
+                    const blobs = 7;
+                    for (let b = 0; b < blobs; b++) {
+                        ctx.save();
+                        const bx = width * (0.2 + (b % 3) * 0.3 + Math.sin(b * 1.7) * 0.08);
+                        const by = height * (0.25 + Math.floor(b / 3) * 0.28 + Math.cos(b * 1.3) * 0.08);
+                        const br = Math.min(width, height) * (0.16 + (b % 3) * 0.06) * scale;
+
+                        ctx.beginPath();
+                        const pts = 16;
+                        for (let p = 0; p <= pts; p++) {
+                            const angle = (p / pts) * Math.PI * 2;
+                            const rWarp = br * (1.0 + Math.sin(angle * 3.0 + b) * 0.22 + Math.cos(angle * 2.0 - b * 0.5) * 0.15);
+                            const px = bx + Math.cos(angle) * rWarp;
+                            const py = by + Math.sin(angle) * rWarp;
+                            if (p === 0) ctx.moveTo(px, py);
+                            else ctx.lineTo(px, py);
+                        }
+                        ctx.closePath();
+
+                        const bGrad = ctx.createRadialGradient(bx - br * 0.3, by - br * 0.3, br * 0.05, bx, by, br * 1.2);
+                        bGrad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+                        bGrad.addColorStop(0.3, 'rgba(56, 189, 248, 0.55)');
+                        bGrad.addColorStop(0.65, 'rgba(16, 185, 129, 0.38)');
+                        bGrad.addColorStop(1, 'rgba(6, 78, 59, 0.8)');
+                        ctx.fillStyle = bGrad;
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                        ctx.shadowBlur = 24 * scale;
+                        ctx.shadowOffsetY = 14 * scale;
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = 3.5 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.arc(bx - br * 0.2, by - br * 0.2, br * 0.45, Math.PI * 0.8, Math.PI * 1.8);
+                        ctx.lineWidth = 4 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.03 Flowing Silk — Draped satin-smooth textile folds with specular gloss
+                // ====================================================================
+                case 'bg_glass_flowing_silk': {
+                    const folds = Math.max(8, Math.min(20, Math.round(12 * (opts.density ? opts.density / 100 : 1.0))));
+                    for (let f = 0; f < folds; f++) {
+                        ctx.save();
+                        const t = f / folds;
+                        const startX = -width * 0.1 + t * (width * 1.2);
+                        ctx.beginPath();
+                        ctx.moveTo(startX, -height * 0.1);
+                        ctx.bezierCurveTo(startX + width * 0.25, height * 0.35, startX - width * 0.2, height * 0.65, startX + width * 0.15, height * 1.1);
+                        ctx.lineTo(startX + width * 0.35, height * 1.1);
+                        ctx.bezierCurveTo(startX, height * 0.65, startX + width * 0.45, height * 0.35, startX + width * 0.2, -height * 0.1);
+                        ctx.closePath();
+
+                        const sGrad = ctx.createLinearGradient(startX, 0, startX + width * 0.3, height);
+                        if (f % 2 === 0) {
+                            sGrad.addColorStop(0, 'rgba(254, 243, 199, 0.75)');
+                            sGrad.addColorStop(0.3, 'rgba(245, 158, 11, 0.45)');
+                            sGrad.addColorStop(0.7, 'rgba(217, 119, 6, 0.6)');
+                            sGrad.addColorStop(1, 'rgba(69, 26, 3, 0.85)');
+                        } else {
+                            sGrad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+                            sGrad.addColorStop(0.4, 'rgba(251, 191, 36, 0.5)');
+                            sGrad.addColorStop(0.8, 'rgba(180, 83, 9, 0.55)');
+                            sGrad.addColorStop(1, 'rgba(120, 53, 15, 0.8)');
+                        }
+                        ctx.fillStyle = sGrad;
+                        ctx.fill();
+
+                        ctx.lineWidth = 2.5 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.04 Topographic Lines — Stepped elevation contour map in beveled glass
+                // ====================================================================
+                case 'bg_glass_topographic_lines': {
+                    const levels = Math.max(8, Math.min(22, Math.round(14 * (opts.density ? opts.density / 100 : 1.0))));
+                    const cx = width * 0.52;
+                    const cy = height * 0.54;
+                    for (let l = levels; l >= 1; l--) {
+                        ctx.save();
+                        const rBase = Math.min(width, height) * (0.05 + l * 0.05) * scale;
+                        ctx.beginPath();
+                        const steps = 48;
+                        for (let s = 0; s <= steps; s++) {
+                            const theta = (s / steps) * Math.PI * 2;
+                            const rMod = rBase * (1.0 + Math.sin(theta * 3.0 + l * 0.5) * 0.2 + Math.cos(theta * 2.0 - l * 0.3) * 0.15 + Math.sin(theta * 5.0) * 0.08);
+                            const px = cx + Math.cos(theta) * rMod * 1.35;
+                            const py = cy + Math.sin(theta) * rMod;
+                            if (s === 0) ctx.moveTo(px, py);
+                            else ctx.lineTo(px, py);
+                        }
+                        ctx.closePath();
+
+                        const tGrad = ctx.createLinearGradient(0, cy - rBase, width, cy + rBase);
+                        tGrad.addColorStop(0, `rgba(30, 41, 59, ${0.4 + l * 0.025})`);
+                        tGrad.addColorStop(0.5, `rgba(71, 85, 105, ${0.3 + l * 0.02})`);
+                        tGrad.addColorStop(1, `rgba(15, 23, 42, ${0.6 + l * 0.02})`);
+                        ctx.fillStyle = tGrad;
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                        ctx.shadowBlur = 12 * scale;
+                        ctx.shadowOffsetY = 6 * scale;
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = Math.max(1.5, (3.5 - (l / levels) * 1.5) * scale);
+                        ctx.strokeStyle = l % 3 === 0 ? 'rgba(56, 189, 248, 0.95)' : 'rgba(255, 255, 255, 0.65)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.05 Wave Tunnel — Concentric perspective wave rings into cosmic depth
+                // ====================================================================
+                case 'bg_glass_wave_tunnel': {
+                    const rings = Math.max(8, Math.min(18, Math.round(12 * (opts.density ? opts.density / 100 : 1.0))));
+                    const tx = width * 0.5;
+                    const ty = height * 0.5;
+                    for (let r = rings; r >= 1; r--) {
+                        ctx.save();
+                        const p = r / rings;
+                        const rad = Math.hypot(width, height) * 0.55 * Math.pow(p, 1.4) * scale;
+                        ctx.beginPath();
+                        const pts = 36;
+                        for (let i = 0; i <= pts; i++) {
+                            const angle = (i / pts) * Math.PI * 2;
+                            const wobble = rad * (1.0 + Math.sin(angle * 6.0 + r * 0.8) * 0.08);
+                            const px = tx + Math.cos(angle) * wobble * 1.25;
+                            const py = ty + Math.sin(angle) * wobble;
+                            if (i === 0) ctx.moveTo(px, py);
+                            else ctx.lineTo(px, py);
+                        }
+                        ctx.closePath();
+
+                        const rGrad = ctx.createRadialGradient(tx, ty, rad * 0.2, tx, ty, rad * 1.1);
+                        rGrad.addColorStop(0, 'rgba(15, 23, 42, 0.1)');
+                        rGrad.addColorStop(0.6, `rgba(56, 189, 248, ${0.35 * p})`);
+                        rGrad.addColorStop(1, `rgba(147, 51, 234, ${0.55 * p})`);
+                        ctx.fillStyle = rGrad;
+                        ctx.fill();
+
+                        ctx.lineWidth = Math.max(1.5, 4.0 * p * scale);
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.4 + 0.55 * p})`;
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.06 Folded Paper — Geometric origami faceted glass planes
+                // ====================================================================
+                case 'bg_glass_folded_paper': {
+                    const cols = 5;
+                    const rows = 4;
+                    const cellW = width / cols;
+                    const cellH = height / rows;
+                    const grid = [];
+                    for (let j = 0; j <= rows; j++) {
+                        grid[j] = [];
+                        for (let i = 0; i <= cols; i++) {
+                            const ox = (i === 0 || i === cols) ? 0 : (Math.sin(i * 1.7 + j * 2.3) * cellW * 0.28 * scale);
+                            const oy = (j === 0 || j === rows) ? 0 : (Math.cos(i * 2.1 - j * 1.5) * cellH * 0.28 * scale);
+                            grid[j][i] = { x: i * cellW + ox, y: j * cellH + oy };
+                        }
+                    }
+
+                    for (let j = 0; j < rows; j++) {
+                        for (let i = 0; i < cols; i++) {
+                            const p00 = grid[j][i];
+                            const p10 = grid[j][i + 1];
+                            const p01 = grid[j + 1][i];
+                            const p11 = grid[j + 1][i + 1];
+
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.moveTo(p00.x, p00.y);
+                            ctx.lineTo(p10.x, p10.y);
+                            ctx.lineTo(p01.x, p01.y);
+                            ctx.closePath();
+                            const g1 = ctx.createLinearGradient(p00.x, p00.y, p10.x, p01.y);
+                            const lum1 = 0.35 + ((i + j) % 2) * 0.35;
+                            g1.addColorStop(0, `rgba(240, 249, 255, ${lum1})`);
+                            g1.addColorStop(1, `rgba(186, 230, 253, ${lum1 * 0.6})`);
+                            ctx.fillStyle = g1;
+                            ctx.fill();
+                            ctx.lineWidth = 1.5 * scale;
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+                            ctx.stroke();
+                            ctx.restore();
+
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.moveTo(p10.x, p10.y);
+                            ctx.lineTo(p11.x, p11.y);
+                            ctx.lineTo(p01.x, p01.y);
+                            ctx.closePath();
+                            const g2 = ctx.createLinearGradient(p10.x, p10.y, p11.x, p01.y);
+                            const lum2 = 0.2 + (((i + j + 1) % 2)) * 0.45;
+                            g2.addColorStop(0, `rgba(125, 211, 252, ${lum2})`);
+                            g2.addColorStop(1, `rgba(14, 165, 233, ${lum2 * 0.8})`);
+                            ctx.fillStyle = g2;
+                            ctx.fill();
+                            ctx.lineWidth = 1.5 * scale;
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                            ctx.stroke();
+                            ctx.restore();
+                        }
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.07 Ribbon Flow — Sweeping extruded twisting 3D glass ribbons
+                // ====================================================================
+                case 'bg_glass_ribbon_flow': {
+                    const ribbons = 4;
+                    for (let r = 0; r < ribbons; r++) {
+                        ctx.save();
+                        const baseY = height * (0.2 + r * 0.22);
+                        const rThick = height * 0.18 * scale;
+                        ctx.beginPath();
+                        ctx.moveTo(-width * 0.1, baseY);
+                        ctx.bezierCurveTo(width * 0.3, baseY - height * 0.35, width * 0.6, baseY + height * 0.4, width * 1.1, baseY - height * 0.15);
+                        ctx.lineTo(width * 1.1, baseY - height * 0.15 + rThick);
+                        ctx.bezierCurveTo(width * 0.6, baseY + height * 0.4 + rThick, width * 0.3, baseY - height * 0.35 + rThick, -width * 0.1, baseY + rThick);
+                        ctx.closePath();
+
+                        const rGrad = ctx.createLinearGradient(0, baseY - height * 0.3, width, baseY + height * 0.4);
+                        if (r % 2 === 0) {
+                            rGrad.addColorStop(0, 'rgba(236, 72, 153, 0.7)');
+                            rGrad.addColorStop(0.5, 'rgba(168, 85, 247, 0.55)');
+                            rGrad.addColorStop(1, 'rgba(59, 130, 246, 0.75)');
+                        } else {
+                            rGrad.addColorStop(0, 'rgba(56, 189, 248, 0.75)');
+                            rGrad.addColorStop(0.5, 'rgba(251, 146, 60, 0.55)');
+                            rGrad.addColorStop(1, 'rgba(244, 63, 94, 0.7)');
+                        }
+                        ctx.fillStyle = rGrad;
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+                        ctx.shadowBlur = 24 * scale;
+                        ctx.shadowOffsetY = 14 * scale;
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = 3.5 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.08 Mesh Wave — 3D undulating wireframe grid with luminous vertex nodes
+                // ====================================================================
+                case 'bg_glass_mesh_wave': {
+                    const lines = Math.max(14, Math.min(32, Math.round(20 * (opts.density ? opts.density / 100 : 1.0))));
+                    for (let l = 0; l < lines; l++) {
+                        ctx.save();
+                        const y0 = height * (0.1 + (l / lines) * 0.85);
+                        ctx.beginPath();
+                        ctx.moveTo(0, y0);
+                        const steps = 40;
+                        for (let s = 1; s <= steps; s++) {
+                            const px = (s / steps) * width;
+                            const py = y0 + Math.sin((s / steps) * Math.PI * 4.0 + l * 0.3) * (height * 0.08 * scale) + Math.cos((s / steps) * Math.PI * 2.0) * (height * 0.05 * scale);
+                            ctx.lineTo(px, py);
+                        }
+                        ctx.lineWidth = (l % 4 === 0 ? 3.0 : 1.2) * scale;
+                        ctx.strokeStyle = l % 4 === 0 ? 'rgba(56, 189, 248, 0.85)' : 'rgba(255, 255, 255, 0.35)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    const crossCount = 18;
+                    for (let c = 0; c < crossCount; c++) {
+                        ctx.save();
+                        const x0 = width * (0.05 + (c / crossCount) * 0.9);
+                        ctx.beginPath();
+                        ctx.moveTo(x0, 0);
+                        const steps = 30;
+                        for (let s = 1; s <= steps; s++) {
+                            const py = (s / steps) * height;
+                            const px = x0 + Math.sin((s / steps) * Math.PI * 3.0 + c * 0.4) * (width * 0.04 * scale);
+                            ctx.lineTo(px, py);
+                        }
+                        ctx.lineWidth = 1.0 * scale;
+                        ctx.strokeStyle = 'rgba(147, 197, 253, 0.3)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.09 Liquid Chrome — Molten mercury fluid with horizon reflections
+                // ====================================================================
+                case 'bg_glass_liquid_chrome': {
+                    const pools = 4;
+                    for (let p = 0; p < pools; p++) {
+                        ctx.save();
+                        const py0 = height * (0.25 + p * 0.2);
+                        ctx.beginPath();
+                        ctx.moveTo(0, py0);
+                        ctx.bezierCurveTo(width * 0.3, py0 - height * 0.3, width * 0.7, py0 + height * 0.35, width, py0 - height * 0.1);
+                        ctx.lineTo(width, height);
+                        ctx.lineTo(0, height);
+                        ctx.closePath();
+
+                        const cGrad = ctx.createLinearGradient(0, py0 - height * 0.25, 0, py0 + height * 0.4);
+                        cGrad.addColorStop(0, '#f8fafc');
+                        cGrad.addColorStop(0.2, '#94a3b8');
+                        cGrad.addColorStop(0.48, '#0f172a');
+                        cGrad.addColorStop(0.52, '#ffffff');
+                        cGrad.addColorStop(0.75, '#cbd5e1');
+                        cGrad.addColorStop(1, '#1e293b');
+                        ctx.fillStyle = cGrad;
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+                        ctx.shadowBlur = 20 * scale;
+                        ctx.shadowOffsetY = 12 * scale;
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = 4 * scale;
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.10 Concentric Layers — Nested stepped rounded glass plates
+                // ====================================================================
+                case 'bg_glass_concentric_layers': {
+                    const plates = Math.max(6, Math.min(14, Math.round(9 * (opts.density ? opts.density / 100 : 1.0))));
+                    for (let i = plates; i >= 1; i--) {
+                        ctx.save();
+                        const p = i / plates;
+                        const pw = width * (0.15 + p * 0.8) * scale;
+                        const ph = height * (0.18 + p * 0.76) * scale;
+                        const px = (width - pw) / 2;
+                        const py = (height - ph) / 2;
+                        const rad = Math.min(pw, ph) * 0.22;
+
+                        ctx.beginPath();
+                        ctx.roundRect(px, py, pw, ph, rad);
+
+                        const pGrad = ctx.createLinearGradient(px, py, px + pw, py + ph);
+                        pGrad.addColorStop(0, `rgba(255, 255, 255, ${0.45 - p * 0.2})`);
+                        pGrad.addColorStop(0.5, `rgba(56, 189, 248, ${0.25 - p * 0.1})`);
+                        pGrad.addColorStop(1, `rgba(15, 23, 42, ${0.6 + p * 0.25})`);
+                        ctx.fillStyle = pGrad;
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                        ctx.shadowBlur = 18 * scale;
+                        ctx.shadowOffsetY = 10 * scale;
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = 2.5 * scale;
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.9 - p * 0.4})`;
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.11 Organic Shapes — Smooth floating pebble-like fluid glass metaballs
+                // ====================================================================
+                case 'bg_glass_organic_shapes': {
+                    const count = 9;
+                    for (let i = 0; i < count; i++) {
+                        ctx.save();
+                        const ox = width * (0.15 + (i % 3) * 0.35 + Math.sin(i * 2.1) * 0.05);
+                        const oy = height * (0.2 + Math.floor(i / 3) * 0.32 + Math.cos(i * 1.7) * 0.05);
+                        const radX = Math.min(width, height) * (0.12 + (i % 2) * 0.06) * scale;
+                        const radY = radX * (0.75 + ((i + 1) % 3) * 0.25);
+
+                        ctx.translate(ox, oy);
+                        ctx.rotate((i * 35 * Math.PI) / 180);
+                        ctx.beginPath();
+                        ctx.ellipse(0, 0, radX, radY, 0, 0, Math.PI * 2);
+
+                        const oGrad = ctx.createRadialGradient(-radX * 0.3, -radY * 0.3, radX * 0.08, 0, 0, radX * 1.2);
+                        const hues = [340, 260, 190, 40, 160];
+                        const h = hues[i % hues.length];
+                        oGrad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+                        oGrad.addColorStop(0.4, `hsla(${h}, 90%, 65%, 0.45)`);
+                        oGrad.addColorStop(1, `hsla(${h}, 80%, 25%, 0.75)`);
+                        ctx.fillStyle = oGrad;
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                        ctx.shadowBlur = 22 * scale;
+                        ctx.shadowOffsetY = 12 * scale;
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = 3 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.12 Glass Morphism — Floating frosted UI glass shields over radiant light
+                // ====================================================================
+                case 'bg_glass_glass_morphism': {
+                    const orbs = [
+                        { x: 0.25, y: 0.35, r: 0.28, color: 'rgba(244, 63, 94, 0.75)' },
+                        { x: 0.72, y: 0.38, r: 0.32, color: 'rgba(59, 130, 246, 0.8)' },
+                        { x: 0.50, y: 0.75, r: 0.35, color: 'rgba(168, 85, 247, 0.75)' }
+                    ];
+                    orbs.forEach(o => {
+                        ctx.save();
+                        const ox = width * o.x, oy = height * o.y, or = Math.min(width, height) * o.r * scale;
+                        const og = ctx.createRadialGradient(ox, oy, or * 0.1, ox, oy, or);
+                        og.addColorStop(0, o.color);
+                        og.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                        ctx.fillStyle = og;
+                        ctx.beginPath();
+                        ctx.arc(ox, oy, or, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                    });
+
+                    const cards = [
+                        { x: 0.15, y: 0.2, w: 0.42, h: 0.55, rot: -0.06 },
+                        { x: 0.45, y: 0.3, w: 0.44, h: 0.52, rot: 0.05 }
+                    ];
+                    cards.forEach(c => {
+                        ctx.save();
+                        const cx = width * c.x, cy = height * c.y, cw = width * c.w, ch = height * c.h;
+                        ctx.translate(cx + cw / 2, cy + ch / 2);
+                        ctx.rotate(c.rot);
+                        ctx.translate(-cw / 2, -ch / 2);
+
+                        ctx.beginPath();
+                        ctx.roundRect(0, 0, cw, ch, 24 * scale);
+
+                        const cg = ctx.createLinearGradient(0, 0, cw, ch);
+                        cg.addColorStop(0, 'rgba(255, 255, 255, 0.42)');
+                        cg.addColorStop(1, 'rgba(255, 255, 255, 0.08)');
+                        ctx.fillStyle = cg;
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+                        ctx.shadowBlur = 28 * scale;
+                        ctx.shadowOffsetY = 16 * scale;
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = 2 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                        ctx.stroke();
+                        ctx.restore();
+                    });
+                    break;
+                }
+
+                // ====================================================================
+                // 11.13 Radial Waves — Circular ripple waves with caustic interference
+                // ====================================================================
+                case 'bg_glass_radial_waves': {
+                    const ripples = Math.max(10, Math.min(26, Math.round(16 * (opts.density ? opts.density / 100 : 1.0))));
+                    const rx1 = width * 0.38, ry1 = height * 0.48;
+                    const rx2 = width * 0.68, ry2 = height * 0.52;
+                    for (let r = 1; r <= ripples; r++) {
+                        ctx.save();
+                        const rad = Math.min(width, height) * (r / ripples) * 0.85 * scale;
+                        ctx.beginPath();
+                        ctx.arc(rx1, ry1, rad, 0, Math.PI * 2);
+                        ctx.lineWidth = (2.0 + Math.sin(r * 0.6) * 1.5) * scale;
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${0.7 - (r / ripples) * 0.45})`;
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.arc(rx2, ry2, rad * 0.85, 0, Math.PI * 2);
+                        ctx.lineWidth = (1.5 + Math.cos(r * 0.6) * 1.0) * scale;
+                        ctx.strokeStyle = `rgba(168, 85, 247, ${0.65 - (r / ripples) * 0.45})`;
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.14 Spiral Wave — Logarithmic swirling vortex arms with glass ribbing
+                // ====================================================================
+                case 'bg_glass_spiral_wave': {
+                    const arms = 6;
+                    const cx = width * 0.5, cy = height * 0.5;
+                    const maxR = Math.hypot(width, height) * 0.55 * scale;
+                    for (let a = 0; a < arms; a++) {
+                        ctx.save();
+                        const baseAngle = (a / arms) * Math.PI * 2;
+                        ctx.beginPath();
+                        const steps = 80;
+                        for (let s = 0; s <= steps; s++) {
+                            const p = s / steps;
+                            const r = p * maxR;
+                            const theta = baseAngle + p * Math.PI * 3.5;
+                            const px = cx + Math.cos(theta) * r * 1.25;
+                            const py = cy + Math.sin(theta) * r;
+                            if (s === 0) ctx.moveTo(px, py);
+                            else ctx.lineTo(px, py);
+                        }
+                        const armGrad = ctx.createLinearGradient(cx, cy, cx + Math.cos(baseAngle) * maxR, cy + Math.sin(baseAngle) * maxR);
+                        armGrad.addColorStop(0, '#ffffff');
+                        armGrad.addColorStop(0.3, '#38bdf8');
+                        armGrad.addColorStop(0.7, '#818cf8');
+                        armGrad.addColorStop(1, '#c084fc');
+                        ctx.lineWidth = (12 - a * 1.2) * scale;
+                        ctx.strokeStyle = armGrad;
+                        ctx.shadowColor = 'rgba(56, 189, 248, 0.6)';
+                        ctx.shadowBlur = 18 * scale;
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.15 3D Dunes — Translucent frosted glass desert sand dunes with ripples
+                // ====================================================================
+                case 'bg_glass_3d_dunes': {
+                    const dunes = 5;
+                    for (let d = 0; d < dunes; d++) {
+                        ctx.save();
+                        const dy0 = height * (0.2 + d * 0.18);
+                        ctx.beginPath();
+                        ctx.moveTo(0, dy0);
+                        ctx.bezierCurveTo(width * 0.32, dy0 - height * 0.22, width * 0.68, dy0 + height * 0.26, width, dy0);
+                        ctx.lineTo(width, height);
+                        ctx.lineTo(0, height);
+                        ctx.closePath();
+
+                        const dGrad = ctx.createLinearGradient(0, dy0 - height * 0.15, width, dy0 + height * 0.35);
+                        dGrad.addColorStop(0, 'rgba(254, 215, 170, 0.7)');
+                        dGrad.addColorStop(0.35, 'rgba(251, 146, 60, 0.45)');
+                        dGrad.addColorStop(0.7, 'rgba(194, 65, 12, 0.65)');
+                        dGrad.addColorStop(1, 'rgba(67, 20, 7, 0.85)');
+                        ctx.fillStyle = dGrad;
+                        ctx.fill();
+
+                        ctx.lineWidth = 3.5 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.16 Curved Panels — Architectural floating glass louvers & shields
+                // ====================================================================
+                case 'bg_glass_curved_panels': {
+                    const panels = 6;
+                    for (let p = 0; p < panels; p++) {
+                        ctx.save();
+                        const px = width * (0.08 + p * 0.15);
+                        const py = height * 0.12;
+                        const pw = width * 0.18 * scale;
+                        const ph = height * 0.76;
+
+                        ctx.beginPath();
+                        ctx.moveTo(px, py);
+                        ctx.bezierCurveTo(px + pw * 0.6, py + ph * 0.3, px - pw * 0.3, py + ph * 0.7, px + pw * 0.4, py + ph);
+                        ctx.lineTo(px + pw * 0.8, py + ph);
+                        ctx.bezierCurveTo(px + pw * 0.1, py + ph * 0.7, px + pw * 1.0, py + ph * 0.3, px + pw * 0.4, py);
+                        ctx.closePath();
+
+                        const panGrad = ctx.createLinearGradient(px, py, px + pw, py + ph);
+                        panGrad.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
+                        panGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.28)');
+                        panGrad.addColorStop(1, 'rgba(15, 23, 42, 0.65)');
+                        ctx.fillStyle = panGrad;
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                        ctx.shadowBlur = 18 * scale;
+                        ctx.shadowOffsetY = 10 * scale;
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = 2.5 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.17 Holographic — Iridescent prismatic film with angle-dependent sheen
+                // ====================================================================
+                case 'bg_glass_holographic': {
+                    const holoWaves = 6;
+                    for (let h = 0; h < holoWaves; h++) {
+                        ctx.save();
+                        const hy = height * (0.15 + h * 0.15);
+                        ctx.beginPath();
+                        ctx.moveTo(0, hy);
+                        ctx.bezierCurveTo(width * 0.35, hy - height * 0.25, width * 0.65, hy + height * 0.3, width, hy);
+                        ctx.lineTo(width, height);
+                        ctx.lineTo(0, height);
+                        ctx.closePath();
+
+                        const hg = ctx.createLinearGradient(0, hy - height * 0.2, width, hy + height * 0.3);
+                        hg.addColorStop(0, 'rgba(255, 0, 128, 0.45)');
+                        hg.addColorStop(0.25, 'rgba(255, 170, 0, 0.4)');
+                        hg.addColorStop(0.5, 'rgba(0, 255, 200, 0.45)');
+                        hg.addColorStop(0.75, 'rgba(0, 150, 255, 0.45)');
+                        hg.addColorStop(1, 'rgba(170, 0, 255, 0.55)');
+                        ctx.fillStyle = hg;
+                        ctx.fill();
+
+                        ctx.lineWidth = 3.5 * scale;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.18 Neon Waves — Cybernetic luminous electric wave filaments in glass
+                // ====================================================================
+                case 'bg_glass_neon_waves': {
+                    const neonCount = 8;
+                    const colors = ['#00f0ff', '#ff007f', '#7000ff', '#00ff88', '#ffe600'];
+                    for (let n = 0; n < neonCount; n++) {
+                        ctx.save();
+                        const ny0 = height * (0.15 + (n / neonCount) * 0.75);
+                        ctx.beginPath();
+                        ctx.moveTo(0, ny0);
+                        const steps = 40;
+                        for (let s = 1; s <= steps; s++) {
+                            const px = (s / steps) * width;
+                            const py = ny0 + Math.sin((s / steps) * Math.PI * 3.5 + n * 0.7) * (height * 0.12 * scale);
+                            ctx.lineTo(px, py);
+                        }
+                        const col = colors[n % colors.length];
+                        ctx.shadowColor = col;
+                        ctx.shadowBlur = 24 * scale;
+                        ctx.lineWidth = 4 * scale;
+                        ctx.strokeStyle = col;
+                        ctx.stroke();
+
+                        ctx.shadowBlur = 0;
+                        ctx.lineWidth = 1.5 * scale;
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
+                // ====================================================================
+                // 11.19 Gradient Mesh — Multi-point smooth fluid color mesh with glass sheen
+                // ====================================================================
+                case 'bg_glass_gradient_mesh': {
+                    const meshPoints = [
+                        { x: 0.15, y: 0.2, r: 0.45, color: '#f43f5e' },
+                        { x: 0.82, y: 0.25, r: 0.48, color: '#fb923c' },
+                        { x: 0.5, y: 0.55, r: 0.5, color: '#8b5cf6' },
+                        { x: 0.18, y: 0.85, r: 0.45, color: '#06b6d4' },
+                        { x: 0.85, y: 0.8, r: 0.45, color: '#3b82f6' }
+                    ];
+                    meshPoints.forEach(p => {
+                        ctx.save();
+                        const mx = width * p.x, my = height * p.y, mr = Math.min(width, height) * p.r * scale;
+                        const mg = ctx.createRadialGradient(mx, my, mr * 0.1, mx, my, mr);
+                        mg.addColorStop(0, p.color);
+                        mg.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                        ctx.globalAlpha = 0.75;
+                        ctx.fillStyle = mg;
+                        ctx.fillRect(0, 0, width, height);
+                        ctx.restore();
+                    });
+
+                    ctx.save();
+                    const strips = 20;
+                    for (let s = 0; s < strips; s++) {
+                        const sx = s * (width / strips);
+                        const sw = width / strips;
+                        const sh = ctx.createLinearGradient(sx, 0, sx + sw, 0);
+                        sh.addColorStop(0, 'rgba(255, 255, 255, 0.18)');
+                        sh.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
+                        sh.addColorStop(1, 'rgba(0, 0, 0, 0.15)');
+                        ctx.fillStyle = sh;
+                        ctx.fillRect(sx, 0, sw, height);
+                    }
+                    ctx.restore();
+                    break;
+                }
+
+                // ====================================================================
+                // 11.20 Sculptural Layers — Chiseled museum-grade geometric strata relief
+                // ====================================================================
+                case 'bg_glass_sculptural_layers': {
+                    const steps = 7;
+                    for (let s = steps; s >= 1; s--) {
+                        ctx.save();
+                        const p = s / steps;
+                        const sx = width * (0.05 + (1.0 - p) * 0.15);
+                        const sy = height * (0.08 + (1.0 - p) * 0.12);
+                        const sw = width * (0.9 - (1.0 - p) * 0.3) * scale;
+                        const sh = height * (0.85 - (1.0 - p) * 0.25) * scale;
+
+                        ctx.beginPath();
+                        ctx.roundRect(sx, sy, sw, sh, 16 * scale);
+
+                        const scGrad = ctx.createLinearGradient(sx, sy, sx + sw, sy + sh);
+                        scGrad.addColorStop(0, `rgba(248, 250, 252, ${0.45 - p * 0.15})`);
+                        scGrad.addColorStop(0.5, `rgba(148, 163, 184, ${0.35 - p * 0.1})`);
+                        scGrad.addColorStop(1, `rgba(15, 23, 42, ${0.65 + p * 0.15})`);
+                        ctx.fillStyle = scGrad;
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+                        ctx.shadowBlur = 18 * scale;
+                        ctx.shadowOffsetY = 10 * scale;
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.lineWidth = 2.5 * scale;
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.9 - p * 0.35})`;
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+                }
+
 
                 // ====================================================================
                 // 10.25 3D Soft Glass — Atmospheric undulating frosted glass folds

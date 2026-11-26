@@ -5207,6 +5207,35 @@
     </div>
 
     <script>
+    // Universal HTML5 Canvas Polyfills for Cross-Browser / Older Android & Safari Compatibility
+    if (typeof CanvasRenderingContext2D !== 'undefined') {
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, radii) {
+                let r = 0;
+                if (typeof radii === 'number') r = radii;
+                else if (Array.isArray(radii)) r = radii[0] || 0;
+                r = Math.min(r, Math.abs(w) / 2, Math.abs(h) / 2);
+                this.moveTo(x + r, y);
+                this.arcTo(x + w, y, x + w, y + h, r);
+                this.arcTo(x + w, y + h, x, y + h, r);
+                this.arcTo(x, y + h, x, y, r);
+                this.arcTo(x, y, x + w, y, r);
+                this.closePath();
+                return this;
+            };
+        }
+        if (!CanvasRenderingContext2D.prototype.ellipse) {
+            CanvasRenderingContext2D.prototype.ellipse = function(x, y, rx, ry, rot, start, end, ccw) {
+                this.save();
+                this.translate(x, y);
+                this.rotate(rot);
+                this.scale(rx, ry);
+                this.arc(0, 0, 1, start, end, ccw);
+                this.restore();
+                return this;
+            };
+        }
+    }
         /* ============================================================================
          * RI CREATIVE BACKGROUND STUDIO ULTRA PRO — CORE ENGINE
          * Developed by RI Creative Agency
@@ -10848,12 +10877,11 @@
                         if (effDir === 'auto') {
                             if (isProCat) effDir = 'pro8cat';
                             else if ([51, 52, 53, 54, 55, 56].includes(styleNum)) effDir = 'pro3d';
-                            else if ([1, 8, 32, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50].includes(styleNum)) effDir = 'hd2d';
+                            else if ([1, 6, 8, 9, 32, 36, 39, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50].includes(styleNum)) effDir = 'hd2d';
                             else if (styleNum === 2) effDir = 'crosswave';
                             else if ([3, 23, 35, 40].includes(styleNum)) effDir = 'scurve';
                             else if ([4, 22, 33].includes(styleNum)) effDir = 'dual';
                             else if ([5, 10, 24].includes(styleNum)) effDir = 'horizontal';
-                            else if ([6, 9, 36, 39].includes(styleNum)) effDir = 'radial';
                             else if ([7, 19, 20, 21].includes(styleNum)) effDir = 'diagonal';
                             else effDir = 'vertical';
                         }
@@ -11815,8 +11843,19 @@
                                             shade = (-slopeX * 0.32 - slopeY * 0.32) * shadeAmp;
                                             const apexDist = Math.hypot(triU - 0.7, triV - 0.7);
                                             spec = Math.pow(Math.max(0, 1.0 - apexDist * 1.45), 3) * 58 * shadeAmp;
-                                        } else if (styleNum === 44) {
-                                            // 44. Anti-Aliased Concentric Torus Rings (Continuous Trigonometric Phase)
+                                        } else if (styleNum === 1) {
+                                            // 01. Classic Reeded Glass HD (Continuous Anti-Aliased Vertical Fluting)
+                                            const u = x / cellPx;
+                                            const phase = Math.sin(u * Math.PI * 2);
+                                            const smoothPhase = Math.sin(phase * Math.PI * 0.5);
+                                            dx = -smoothPhase * refractAmp * 1.15;
+                                            dy = Math.sin(ny * Math.PI * 4 + seedVal) * refractAmp * 0.15;
+                                            const cylHighlight = Math.cos(phase * Math.PI * 0.5) * 0.38;
+                                            const grooveCrease = Math.pow(Math.abs(phase), 2.0) * 0.45;
+                                            shade = (cylHighlight - grooveCrease) * shadeAmp;
+                                            spec = Math.pow(Math.max(0, 1.0 - Math.abs(phase + 0.15) * 2.0), 3) * 52 * shadeAmp;
+                                        } else if (styleNum === 6 || styleNum === 44) {
+                                            // 06 & 44. Anti-Aliased Concentric Torus Rings (Continuous Trigonometric Phase)
                                             const dist = Math.hypot(x - cx, y - cy);
                                             const coreR = Math.max(10, simW * 0.018);
                                             const coreF = Math.min(1.0, dist / coreR);
@@ -11828,21 +11867,36 @@
                                             dy = Math.sin(ang) * phase * refractAmp * 1.4 * smoothCore;
                                             shade = phase * 0.38 * shadeAmp * smoothCore;
                                             spec = Math.pow(Math.max(0, phase), 3) * 58 * shadeAmp * smoothCore;
-                                        } else if (styleNum === 45) {
-                                            // 45. Vortex Spiral Twist Glass HD (Continuous Sinusoidal Phase - Zero Banding & Zero Staircasing)
+                                        } else if (styleNum === 9 || styleNum === 36 || styleNum === 45) {
+                                            // 09, 36, 45. Vortex Spiral Twist Glass HD (Continuous Sinusoidal Phase - Zero Banding & Zero Staircasing)
                                             const dist = Math.hypot(x - cx, y - cy);
                                             const coreR = Math.max(16, simW * 0.035);
                                             const coreF = Math.min(1.0, dist / coreR);
                                             const smoothCore = coreF * coreF * (3.0 - 2.0 * coreF);
-                                            const ang = Math.atan2(y - cy, x - cx) + ((dist * smoothCore) / (simW * 0.14)) * Math.PI + seedVal;
+                                            const twistRate = styleNum === 36 ? 0.10 : 0.14;
+                                            const ang = Math.atan2(y - cy, x - cx) + ((dist * smoothCore) / (simW * twistRate)) * Math.PI + seedVal;
                                             const u = (ang / (Math.PI * 2)) * Math.max(18, numLines * 0.45);
-                                            // Continuous sinusoidal phase: eliminates sawtooth jump from +1 to -1 along spiral arms
                                             const phase = Math.sin(u * Math.PI * 2);
                                             const smoothPhase = Math.sin(phase * Math.PI * 0.5);
                                             dx = -Math.sin(ang) * smoothPhase * refractAmp * 1.5 * smoothCore;
                                             dy = Math.cos(ang) * smoothPhase * refractAmp * 1.5 * smoothCore;
                                             shade = (Math.cos(phase * Math.PI * 0.5) * 0.36 - Math.abs(phase) * 0.42) * shadeAmp * smoothCore;
                                             spec = Math.pow(Math.max(0, 1.0 - Math.abs(phase) * 2.2), 3) * 58 * shadeAmp * smoothCore;
+                                        } else if (styleNum === 39) {
+                                            // 39. Ultra-HD Continuous Anti-Aliased Radial Fluted Ribs Glass
+                                            const dist = Math.hypot(x - cx, y - cy);
+                                            const coreR = Math.max(14, simW * 0.025);
+                                            const coreF = Math.min(1.0, dist / coreR);
+                                            const smoothCore = coreF * coreF * (3.0 - 2.0 * coreF);
+                                            const ang = Math.atan2(y - cy, x - cx);
+                                            const sectors = Math.max(16, Math.round(numLines * 0.5));
+                                            const u = (ang / (Math.PI * 2)) * sectors;
+                                            const phase = Math.sin(u * Math.PI * 2);
+                                            const smoothPhase = Math.sin(phase * Math.PI * 0.5);
+                                            dx = -Math.sin(ang) * smoothPhase * refractAmp * 1.25 * smoothCore;
+                                            dy = Math.cos(ang) * smoothPhase * refractAmp * 1.25 * smoothCore;
+                                            shade = (Math.cos(phase * Math.PI * 0.5) * 0.38 - Math.abs(phase) * 0.42) * shadeAmp * smoothCore;
+                                            spec = Math.pow(Math.max(0, 1.0 - Math.abs(phase) * 2.0), 3) * 54 * shadeAmp * smoothCore;
                                         } else if (styleNum === 46) {
                                             const n1 = Math.sin(x / (cellPx * 0.75) + seedVal) * Math.cos(y / (cellPx * 0.75) - seedVal);
                                             const n2 = Math.sin((x + y) / (cellPx * 1.1) + seedVal * 1.4);
@@ -11862,9 +11916,10 @@
                                             shade = (isHoriz ? -phaseY * 0.35 : -phaseX * 0.35) * shadeAmp;
                                             spec = Math.pow(Math.max(0, isHoriz ? -phaseY : -phaseX), 3) * 48 * shadeAmp;
                                         } else if (styleNum === 48) {
+                                            // Continuous Anti-Aliased Cellular Voronoi Crystal Glass HD (Smooth Euclidean Distance)
                                             const cScale = cellPx * 1.65;
                                             const gx = Math.floor(x / cScale), gy = Math.floor(y / cScale);
-                                            let minD = 9999, nearX = x, nearY = y;
+                                            let d1 = 9999, d2 = 9999, nearX = x, nearY = y;
                                             for (let oy = -1; oy <= 1; oy++) {
                                                 for (let ox = -1; ox <= 1; ox++) {
                                                     const cxI = gx + ox, cyI = gy + oy;
@@ -11873,15 +11928,18 @@
                                                     const pxC = (cxI + hx) * cScale;
                                                     const pyC = (cyI + hy) * cScale;
                                                     const d = Math.hypot(x - pxC, y - pyC);
-                                                    if (d < minD) { minD = d; nearX = pxC; nearY = pyC; }
+                                                    if (d < d1) { d2 = d1; d1 = d; nearX = pxC; nearY = pyC; }
+                                                    else if (d < d2) { d2 = d; }
                                                 }
                                             }
+                                            const edgeDist = Math.max(0, Math.min(1.0, (d2 - d1) / (cScale * 0.35)));
+                                            const smoothBevel = edgeDist * edgeDist * (3.0 - 2.0 * edgeDist);
                                             const vx = (x - nearX) / cScale;
                                             const vy = (y - nearY) / cScale;
-                                            dx = -vx * refractAmp * 1.5;
-                                            dy = -vy * refractAmp * 1.5;
-                                            shade = (-vx * 0.45 - vy * 0.45) * shadeAmp;
-                                            spec = Math.max(0, 1 - Math.hypot(vx + 0.25, vy + 0.25) * 2.2) * 48 * shadeAmp;
+                                            dx = -vx * refractAmp * 1.25 * smoothBevel;
+                                            dy = -vy * refractAmp * 1.25 * smoothBevel;
+                                            shade = (-vx * 0.38 - vy * 0.38) * shadeAmp * smoothBevel;
+                                            spec = Math.max(0, 1 - Math.hypot(vx + 0.25, vy + 0.25) * 2.0) * 46 * shadeAmp * smoothBevel;
                                         } else if (styleNum === 49) {
                                             const wave = Math.sin(ny * Math.PI * 5 + seedVal) * (cellPx * 2.8);
                                             const u = (x + wave) / (cellPx * 0.75);

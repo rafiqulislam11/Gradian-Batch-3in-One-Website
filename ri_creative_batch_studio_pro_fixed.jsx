@@ -103,11 +103,16 @@ app.bringToFront();
 
 
         var RESOLUTION_PRESETS = [
+            { label: "5600 × 3150 px (17.6 MP • 16:9 Ultra HD)", width: 5600, height: 3150 },
+            { label: "6300 × 2500 px (15.8 MP • 2.5:1 Panorama)", width: 6300, height: 2500 },
+            { label: "6900 × 3500 px (24.2 MP • ~2:1 Stock Master)", width: 6900, height: 3500 },
+            { label: "6200 × 2700 px (16.7 MP • 2.3:1 Cinema)", width: 6200, height: 2700 },
+            { label: "7000 × 3000 px (21.0 MP • 7:3 Ultra-Wide)", width: 7000, height: 3000 },
+            { label: "7680 × 4320 px (33.2 MP • 16:9 8K Cinema)", width: 7680, height: 4320 },
+            { label: "6000 × 4000 (24 MP Ultra Stock • 3:2)", width: 6000, height: 4000 },
             { label: "4000 × 2000 (Standard Stock 2:1)", width: 4000, height: 2000 },
             { label: "6000 × 3000 (6K Ultra Panorama)", width: 6000, height: 3000 },
-            { label: "6000 × 4000 (6K 3:2 Photo)", width: 6000, height: 4000 },
             { label: "3840 × 2160 (4K UHD 16:9)", width: 3840, height: 2160 },
-            { label: "7680 × 4320 (8K UHD 16:9)", width: 7680, height: 4320 },
             { label: "5000 × 3000 (5K Commercial)", width: 5000, height: 3000 },
             { label: "3000 × 2000 (3K Stock Standard)", width: 3000, height: 2000 },
             { label: "2560 × 1440 (2K QHD 16:9)", width: 2560, height: 1440 },

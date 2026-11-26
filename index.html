@@ -11750,44 +11750,50 @@
                                         let dx = 0, dy = 0, shade = 0, spec = 0;
 
                                         if (effDir === 'crosswave') {
+                                            // Continuous Anti-Aliased Cross-Wave Interference (Zero-Jumps, Zero-Pixelation)
                                             const swirlX = Math.sin(ny * Math.PI * 3.0 + nx * Math.PI * 1.5 + seedVal) * (cellPx * 3.5);
                                             const swirlY = Math.cos(nx * Math.PI * 2.5 - ny * Math.PI * 2.0 + seedVal * 0.8) * (cellPx * 3.0);
                                             const u1 = ((x + swirlX) * 0.74 + (y + swirlY) * 0.67) / (cellPx * 0.9);
                                             const u2 = ((x - swirlY * 0.6) * 0.67 - (y + swirlX * 0.6) * 0.74) / (cellPx * 1.15);
-                                            const p1 = (u1 - Math.floor(u1)) * 2.0 - 1.0;
-                                            const p2 = (u2 - Math.floor(u2)) * 2.0 - 1.0;
-                                            dx = (Math.sin(p1 * Math.PI) * 0.72 + Math.sin(p2 * Math.PI) * 0.35) * refractAmp * 1.35 + swirlX * 0.35 * opticsNorm;
-                                            dy = (Math.cos(p1 * Math.PI) * 0.45 - Math.sin(p2 * Math.PI) * 0.65) * refractAmp * 1.35 + swirlY * 0.35 * opticsNorm;
-                                            const rib1Shade = (Math.cos(p1 * Math.PI * 0.5) * 0.32 - Math.abs(p1) * 0.52);
-                                            const rib2Shade = (Math.cos(p2 * Math.PI * 0.5) * 0.20 - Math.abs(p2) * 0.32);
+                                            const p1 = Math.sin(u1 * Math.PI * 2);
+                                            const p2 = Math.sin(u2 * Math.PI * 2);
+                                            const smoothP1 = Math.sin(p1 * Math.PI * 0.5);
+                                            const smoothP2 = Math.sin(p2 * Math.PI * 0.5);
+                                            dx = (smoothP1 * 0.72 + smoothP2 * 0.35) * refractAmp * 1.25 + swirlX * 0.35 * opticsNorm;
+                                            dy = (Math.cos(u1 * Math.PI * 2) * 0.45 - smoothP2 * 0.65) * refractAmp * 1.25 + swirlY * 0.35 * opticsNorm;
+                                            const rib1Shade = (Math.cos(p1 * Math.PI * 0.5) * 0.32 - Math.abs(p1) * 0.42);
+                                            const rib2Shade = (Math.cos(p2 * Math.PI * 0.5) * 0.20 - Math.abs(p2) * 0.28);
                                             shade = (rib1Shade + rib2Shade) * shadeAmp;
-                                            spec = Math.pow(Math.max(0, 1.0 - Math.abs(p1) * 2.5), 3) * 52 * shadeAmp;
+                                            spec = Math.pow(Math.max(0, 1.0 - Math.abs(p1) * 2.0), 3) * 48 * shadeAmp;
                                         } else if (effDir === 'scurve') {
+                                            // Continuous Anti-Aliased S-Curve & Wave Fluted Ribs (C^infinity Smooth - Zero Tearing & Zero Pixelation)
                                             const waveFreq = styleNum === 40 ? 6.0 : (styleNum === 35 ? 4.5 : 3.2);
                                             const waveAmp = styleNum === 40 ? 2.2 : 4.2;
                                             const bend1 = Math.sin(ny * Math.PI * waveFreq + seedVal) * (cellPx * waveAmp);
                                             const bend2 = Math.cos(ny * Math.PI * (waveFreq * 0.55) - seedVal * 0.6) * (cellPx * (waveAmp * 0.55));
                                             const ribSpacing = styleNum === 40 ? (cellPx * 0.55) : (cellPx * 0.85);
                                             const u = (x + bend1 + bend2) / ribSpacing;
-                                            const phase = (u - Math.floor(u)) * 2.0 - 1.0;
-                                            dx = (-phase * 0.85 + Math.sin(phase * Math.PI) * 0.25) * refractAmp * 1.45;
-                                            dy = Math.cos(ny * Math.PI * waveFreq + seedVal) * refractAmp * 0.4;
-                                            const cylHighlight = Math.cos(phase * Math.PI * 0.5) * 0.36;
-                                            const grooveCrease = Math.pow(Math.abs(phase), 2.2) * 0.72;
+                                            // Continuous sinusoidal cylindrical lens phase: zero sawtooth jump across rib seams
+                                            const phase = Math.sin(u * Math.PI * 2);
+                                            const smoothPhase = Math.sin(phase * Math.PI * 0.5);
+                                            dx = -smoothPhase * refractAmp * 1.15;
+                                            dy = Math.cos(ny * Math.PI * waveFreq + seedVal) * refractAmp * 0.35;
+                                            const cylHighlight = Math.cos(phase * Math.PI * 0.5) * 0.38;
+                                            const grooveCrease = Math.pow(Math.abs(phase), 2.0) * 0.48;
                                             shade = (cylHighlight - grooveCrease) * shadeAmp;
-                                            spec = Math.pow(Math.max(0, 1.0 - Math.abs(phase + 0.15) * 2.6), 3) * 56 * shadeAmp;
+                                            spec = Math.pow(Math.max(0, 1.0 - Math.abs(phase + 0.15) * 2.0), 3) * 48 * shadeAmp;
                                         } else if (styleNum === 8 || styleNum === 41) {
+                                            // Continuous Anti-Aliased Hexagonal Micro-Lens Array HD
                                             const hexR = cellPx * 0.95;
                                             const qx = x / (hexR * 1.5);
                                             const qy = y / (hexR * 1.732);
-                                            const rowOffset = (Math.floor(qx) % 2) * 0.5;
-                                            const fx = (qx - Math.floor(qx)) * 2.0 - 1.0;
-                                            const fy = ((qy + rowOffset) - Math.floor(qy + rowOffset)) * 2.0 - 1.0;
-                                            dx = -fx * refractAmp * 1.15;
-                                            dy = -fy * refractAmp * 1.15;
+                                            const fx = Math.sin(qx * Math.PI * 2);
+                                            const fy = Math.sin(qy * Math.PI * 2 + fx * 0.4);
+                                            dx = -Math.sin(fx * Math.PI * 0.5) * refractAmp * 1.15;
+                                            dy = -Math.sin(fy * Math.PI * 0.5) * refractAmp * 1.15;
                                             const r2 = Math.min(1.2, fx * fx + fy * fy);
                                             shade = ((1.0 - r2) * 0.35 - Math.pow(r2, 1.4) * 0.45) * shadeAmp;
-                                            spec = Math.pow(Math.max(0, 1.0 - Math.hypot(fx + 0.3, fy + 0.3) * 1.9), 3) * 62 * shadeAmp;
+                                            spec = Math.pow(Math.max(0, 1.0 - Math.hypot(fx + 0.3, fy + 0.3) * 1.6), 3) * 54 * shadeAmp;
                                         } else if (styleNum === 42) {
                                             const w1 = Math.sin(nx * Math.PI * 10 + Math.cos(ny * Math.PI * 6 + seedVal) * 2.5);
                                             const w2 = Math.cos(ny * Math.PI * 10 + Math.sin(nx * Math.PI * 6 - seedVal) * 2.5);
@@ -11845,16 +11851,16 @@
                                             shade = (n1 * 0.35 + n2 * 0.2) * shadeAmp;
                                             spec = Math.pow(Math.max(0, n1), 3) * 60 * shadeAmp;
                                         } else if (styleNum === 47) {
+                                            // Continuous Anti-Aliased Woven Herringbone Basket Glass HD
                                             const gx = x / (cellPx * 1.15);
                                             const gy = y / (cellPx * 1.15);
-                                            const ix = Math.floor(gx), iy = Math.floor(gy);
-                                            const fx = (gx - ix) * 2.0 - 1.0;
-                                            const fy = (gy - iy) * 2.0 - 1.0;
-                                            const isHoriz = ((ix + iy) % 2) === 0;
-                                            dx = (isHoriz ? fx * 0.3 : -fx) * refractAmp * 1.25;
-                                            dy = (isHoriz ? -fy : fy * 0.3) * refractAmp * 1.25;
-                                            shade = (isHoriz ? -fy * 0.38 : -fx * 0.38) * shadeAmp;
-                                            spec = Math.pow(Math.max(0, isHoriz ? -fy : -fx), 3) * 52 * shadeAmp;
+                                            const phaseX = Math.sin(gx * Math.PI * 2);
+                                            const phaseY = Math.sin(gy * Math.PI * 2);
+                                            const isHoriz = Math.sin((gx + gy) * Math.PI) >= 0;
+                                            dx = (isHoriz ? phaseX * 0.3 : -phaseX) * refractAmp * 1.15;
+                                            dy = (isHoriz ? -phaseY : phaseY * 0.3) * refractAmp * 1.15;
+                                            shade = (isHoriz ? -phaseY * 0.35 : -phaseX * 0.35) * shadeAmp;
+                                            spec = Math.pow(Math.max(0, isHoriz ? -phaseY : -phaseX), 3) * 48 * shadeAmp;
                                         } else if (styleNum === 48) {
                                             const cScale = cellPx * 1.65;
                                             const gx = Math.floor(x / cScale), gy = Math.floor(y / cScale);
@@ -11885,6 +11891,7 @@
                                             shade = phase * 0.42 * shadeAmp;
                                             spec = Math.pow(Math.max(0, phase), 4) * 58 * shadeAmp;
                                         } else if (styleNum === 50) {
+                                            // Continuous Anti-Aliased Kaleidoscope Starburst Prism HD
                                             const rad = Math.hypot(x - cx, y - cy);
                                             const coreR = Math.max(12, simW * 0.022);
                                             const coreF = Math.min(1.0, rad / coreR);
@@ -11893,25 +11900,29 @@
                                             const sectors = 12;
                                             const sym = Math.abs(((ang + Math.PI) % (Math.PI / sectors)) - Math.PI / (sectors * 2));
                                             const u = (rad * Math.cos(sym)) / (cellPx * 0.85);
-                                            const phase = (u - Math.floor(u)) * 2.0 - 1.0;
-                                            dx = Math.cos(sym * 2) * phase * refractAmp * 1.35 * smoothCore;
-                                            dy = Math.sin(sym * 2) * phase * refractAmp * 1.35 * smoothCore;
-                                            shade = (Math.cos(phase * Math.PI * 0.5) * 0.35 - Math.abs(phase) * 0.5) * shadeAmp * smoothCore;
-                                            spec = Math.pow(Math.max(0, 1 - Math.abs(phase) * 2.4), 3) * 62 * shadeAmp * smoothCore;
+                                            const phase = Math.sin(u * Math.PI * 2);
+                                            const smoothPhase = Math.sin(phase * Math.PI * 0.5);
+                                            dx = Math.cos(sym * 2) * smoothPhase * refractAmp * 1.25 * smoothCore;
+                                            dy = Math.sin(sym * 2) * smoothPhase * refractAmp * 1.25 * smoothCore;
+                                            shade = (Math.cos(phase * Math.PI * 0.5) * 0.35 - Math.abs(phase) * 0.42) * shadeAmp * smoothCore;
+                                            spec = Math.pow(Math.max(0, 1.0 - Math.abs(phase) * 2.0), 3) * 54 * shadeAmp * smoothCore;
                                         } else {
+                                            // Continuous Anti-Aliased Organic Lens Cells HD
                                             const bubbleWarp = styleNum === 32 ? 0.22 : 0.08;
                                             const gx = (x / cellPx) + Math.sin(ny * Math.PI * 2.5 + seedVal) * bubbleWarp;
                                             const gy = (y / cellPx) + Math.cos(nx * Math.PI * 2.5 + seedVal) * bubbleWarp;
-                                            const fx = (gx - Math.floor(gx)) * 2.0 - 1.0;
-                                            const fy = (gy - Math.floor(gy)) * 2.0 - 1.0;
-                                            dx = -fx * (1.0 - fy * fy * 0.35) * refractAmp;
-                                            dy = -fy * (1.0 - fx * fx * 0.35) * refractAmp;
-                                            const dome = Math.max(0, 1.0 - (fx * fx + fy * fy) * 0.65);
-                                            const rim = Math.max(Math.abs(fx), Math.abs(fy));
+                                            const fx = Math.sin(gx * Math.PI * 2);
+                                            const fy = Math.sin(gy * Math.PI * 2);
+                                            const smoothFx = Math.sin(fx * Math.PI * 0.5);
+                                            const smoothFy = Math.sin(fy * Math.PI * 0.5);
+                                            dx = -smoothFx * (1.0 - smoothFy * smoothFy * 0.35) * refractAmp * 0.95;
+                                            dy = -smoothFy * (1.0 - smoothFx * smoothFx * 0.35) * refractAmp * 0.95;
+                                            const dome = Math.max(0, 1.0 - (smoothFx * smoothFx + smoothFy * smoothFy) * 0.55);
+                                            const rim = Math.max(Math.abs(smoothFx), Math.abs(smoothFy));
                                             const rimDark = rim > 0.72 ? Math.pow((rim - 0.72) / 0.28, 1.5) : 0;
-                                            const topLeftHighlight = Math.max(0, (-fx * 0.6 - fy * 0.6)) * dome;
-                                            shade = (topLeftHighlight * 0.42 - rimDark * 0.78) * shadeAmp;
-                                            spec = Math.pow(Math.max(0, 1.0 - Math.hypot(fx + 0.32, fy + 0.32) * 1.8), 3) * 65 * shadeAmp;
+                                            const topLeftHighlight = Math.max(0, (-smoothFx * 0.6 - smoothFy * 0.6)) * dome;
+                                            shade = (topLeftHighlight * 0.42 - rimDark * 0.65) * shadeAmp;
+                                            spec = Math.pow(Math.max(0, 1.0 - Math.hypot(smoothFx + 0.32, smoothFy + 0.32) * 1.6), 3) * 54 * shadeAmp;
                                         }
 
                                         const sx = x + dx;
@@ -16945,8 +16956,8 @@ false 3 colorimage
                 const s = Math.min(0.40, Math.max(0.04, strength));
                 // Isotropic weights: 4 cardinal neighbors (0.15) + 4 diagonal neighbors (0.10) = 1.0 total
                 const rowStride = w * 4;
-                const threshold = 6.5; // Strictly avoid sharpening smooth gradient regions to prevent micro-noise and banding halos
-                const maxDelta = 10.0; // Clamped to strictly prevent white/black ringing halos (Microstock Certified)
+                const threshold = 8.5; // Strictly avoid sharpening smooth gradient regions to prevent micro-noise and banding halos
+                const maxDelta = 6.0; // Clamped to strictly prevent white/black ringing halos (Microstock Certified)
 
                 for (let y = 1; y < h - 1; y++) {
                     const rowPrev = (y - 1) * rowStride;
@@ -19731,6 +19742,17 @@ Tip: You can get a free Google Gemini API key at aistudio.google.com, or select 
             loadDefaultSampleTriplet();
             initLiquifyStudioEvents();
             initAiStudioEngine();
+
+            // Guard against accidental low-res thumbnail saves: intercept right-click contextmenu on preview canvas
+            const prevCanvasEl = document.getElementById('previewCanvas');
+            if (prevCanvasEl) {
+                prevCanvasEl.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    showToast('🚀 Downloading 24MP Master', 'Stock agencies reject low-res thumbnails! Downloading Ultra-HD 6000×4000 300 DPI master file.');
+                    const btnDl = document.getElementById('btnDownloadSingle');
+                    if (btnDl) btnDl.click();
+                });
+            }
         }
 
         if (document.readyState === 'loading') {

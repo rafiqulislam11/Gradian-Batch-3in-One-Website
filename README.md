@@ -9,7 +9,6 @@ A powerful, high-performance web-based creative studio and batch processing engi
 
 ### Project Files
 - **`index.html`**: The complete standalone single-file Web Studio Application with built-in Tailwind CSS, WebGL Liquify Engine, Photoshop Blur/Noise/Glass Engine, 100 Premium Background Models, and responsive UI for Desktop, Tablet, and Mobile.
-- **`ri_creative_background_studio_ultra_pro.html`**: Dedicated standalone release mirror of the Web Studio Application, fully synchronized and operational.
 - **`ri_creative_batch_studio_pro_fixed.jsx`**: Adobe Photoshop ExtendScript (ES3 compatible) for running batch automation directly in Photoshop with all master resolution presets.
 
 ---
